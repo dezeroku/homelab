@@ -1,0 +1,45 @@
+$script = <<-SCRIPT
+# I just want the internet!
+sed -i 's#nameserver.*#nameserver 8.8.8.8##' /etc/resolv.conf
+apt update -y
+apt upgrade -y
+apt install -y\
+  vmdb2\
+  dosfstools\
+  qemu-utils\
+  qemu-user-static\
+  debootstrap\
+  binfmt-support\
+  time\
+  kpartx\
+  bmap-tools\
+  python3\
+  make\
+  git\
+  zerofree
+#apt install -y fakemachine
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.box = 'debian/bookworm64'
+  #config.vm.box_version = "12.20230615.1"
+
+  if Vagrant.has_plugin?("vagrant-disksize")
+    config.disksize.size = '50GB'
+  end
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4096
+    v.cpus = 4
+  end
+
+  config.vm.provider "libvirt" do |v|
+    v.memory = 4096
+    v.cpus = 4
+  end
+
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  #config.vm.synced_folder './image-specs', '/image-specs'
+
+  config.vm.provision "shell", inline: $script
+end

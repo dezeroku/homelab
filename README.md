@@ -19,8 +19,36 @@ In other words, what needs to be done when you lay your hands on the machine.
 
 1. Update the bootloader and make it boot from the USB first. `RPi Imager` > `Bootloader` > `USB Boot`
 2. (optional) Flash the Raspberry Pi OS (64-bit) and make sure that it works fine
-3. Pick your system. Pure Debian "Bookworm" was chosen for this exercise
-4. Install it on the Pi and make sure that you can SSH into it
+3. Pure Debian "Bookworm" OS was chosen for this exercise.
+   Install it on the Pi and make sure that you can SSH into it as `ansible_bootstrap` user and have root privileges.
+   For Debian this can be done by setting up a non-root user and giving it e.g. sudo access
+
+# Flashing Debian
+
+To make the whole process a bit easier, a custom Debian image (that fulfills the requirements listed above)
+can be built using the scripts in `image_build` directory.
+It requires `vagrant` and `ssh` to be available on host
+
+Running the `build.sh` script will create an image that:
+
+1. is based on the newest `bookworm` release packages available to date
+2. contains `ansible_bootstrap` user with passwordless sudo, which can be logged in via SSH using any of the keys that
+   correspond to `ssh-add -L`
+3. sets up the minimal hardening of ssh server (denies password authentication, denies root login, allows public key based auth)
+
+The built image can be found in `image_build/output` directory.
+
+If you were to use an official image you'll have to do the user and SSH setup manually.
+
+In later steps, the Ansible deploy will make sure that SSH config is properly hardened and `ansible_bootstrap` user is removed.
+
+When you have the image on hand you can flash it on the SSD using the tool of your choice, e.g. with `dd`
+
+```
+dd of=<path to your SSD> bs=64k oflag=dsync status=progress
+```
+
+or using a tool like `rufus` or `etcher`.
 
 # Software
 
