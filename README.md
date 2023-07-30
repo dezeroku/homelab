@@ -19,7 +19,8 @@ In other words, what needs to be done when you lay your hands on the machine.
 
 1. Update the bootloader and make it boot from the USB first. `RPi Imager` > `Bootloader` > `USB Boot`
 2. (optional) Flash the Raspberry Pi OS (64-bit) and make sure that it works fine
-3. Pure Debian "Bookworm" OS was chosen for this exercise.
+3. (optional) Disconnect the fan cable from Argon One case. The case itself is good enough for cooling and the fan noise is annoying
+4. Pure Debian "Bookworm" OS was chosen for this exercise.
    Install it on the Pi and make sure that you can SSH into it as `ansible_bootstrap` user and have root privileges.
    For Debian this can be done by setting up a non-root user and giving it e.g. sudo access
 
