@@ -104,13 +104,14 @@ A bunch of charts to be installed, that will cover:
 
 1. certificates generation
 2. incoming traffic redirection
+3. monitoring
 
 How to deploy:
 
 1. Go to `helmfile/core/cert-manager-cluster-issuer/aws-cert-user/` and follow the README to obtain AWS access data that will be used later on for obtaining certificates
 2. Copy the `helmfile/core/cert-manager-cluster-issuer/values.yaml` as `helmfile/core/values-cert-manager-cluster-issuer.yaml` and adjust accordingly to your needs
 3. Go to `helmfile/core`
-4. Run `helmfile apply`
+4. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls, but deploying prometheus requires CRDs, so `sync` is needed on the initial deploy)
 
 ## End applications
 
