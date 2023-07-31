@@ -1,0 +1,17 @@
+---
+- name: Set up k3s server
+  hosts: homeserver
+  become: true
+  become_user: root
+  vars:
+    k3s_release_version: v1.27.3+k3s1
+    k3s_build_cluster: false
+    k3s_server:
+      disable:
+        - traefik
+      tls-san:
+        - homeserver.lan
+        - "{{ vars.k3s_tls_san | mandatory }}"
+      write-kubeconfig-mode: "0644"
+  roles:
+    - role: xanmanning.k3s

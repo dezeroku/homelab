@@ -91,7 +91,8 @@ What you need to do (this step assumes that your homeserver is available as `hom
    This whole step should really only be run once, as you won't be able to use `ansible_bootstrap` user to connect again after this.
    You can modify `initial-inventory.yml` to use another user if needed in the future.
 
-4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass` and enter the password that you chose to provision the rest
+4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars k3s_tls_san=<domain of your choice>` and enter the password that you chose to provision the k3s cluster
+5. Obtain kubeconfig via `scp server@<homeserver_ip_dns>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`
 
 ## Core cluster setup
 

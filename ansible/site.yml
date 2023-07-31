@@ -4,3 +4,6 @@
 
 - name: Set up tooling
   import_playbook: tooling.yml
+
+- name: Set up k3s server
+  import_playbook: k3s.yml

@@ -5,3 +5,5 @@ all:
       ansible_connection: ssh
       ansible_user: server
       ansible_host: homeserver.lan
+  vars:
+    k3s_become: true
