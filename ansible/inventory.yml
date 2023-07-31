@@ -1,7 +1,7 @@
 ---
 all:
   hosts:
-    homeserver-main:
+    homeserver:
       ansible_connection: ssh
       ansible_user: server
       ansible_host: homeserver.lan

@@ -1,13 +1,16 @@
 ---
-- name: Install sudo
+- name: Install sudo and bash
   ansible.builtin.apt:
-    name: sudo
+    name:
+      - sudo
+      - bash
     state: present
 
 - name: Create user
   ansible.builtin.user:
     name: "{{ user_name }}"
     password: "{{ user_password | password_hash('sha512') }}"
+    shell: "/bin/bash"
     state: present
 
 - name: Enable sudo insults

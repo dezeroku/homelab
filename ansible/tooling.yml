@@ -1,0 +1,14 @@
+---
+- name: Install basic packages
+  hosts: homeserver
+  become: true
+  become_user: root
+  tasks:
+    - name: Install tools
+      ansible.builtin.apt:
+        name:
+          - lm-sensors
+          - neovim
+          - podman
+          - crun
+        state: present

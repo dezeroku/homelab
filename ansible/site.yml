@@ -1,3 +1,6 @@
 ---
 - name: Initial user setup
   import_playbook: initial-setup.yml
+
+- name: Set up tooling
+  import_playbook: tooling.yml
