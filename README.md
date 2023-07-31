@@ -96,11 +96,21 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 ## Core cluster setup
 
+This chapter assumes that the `kubeconfig.yaml` obtained in previous step is the one in use.
+Prefix commands with `KUBECONFIG=<path_to_kubeconfig_yaml>` as needed.
+It also requires the `helm` (with [diff-plugin](https://github.com/databus23/helm-diff)) and `helmfile` tools to be present.
+
 A bunch of charts to be installed, that will cover:
 
 1. certificates generation
 2. incoming traffic redirection
-3. storage
+
+How to deploy:
+
+1. Go to `helmfile/core/cert-manager-cluster-issuer/aws-cert-user/` and follow the README to obtain AWS access data that will be used later on for obtaining certificates
+2. Copy the `helmfile/core/cert-manager-cluster-issuer/values.yaml` as `helmfile/core/values-cert-manager-cluster-issuer.yaml` and adjust accordingly to your needs
+3. Go to `helmfile/core`
+4. Run `helmfile apply`
 
 ## End applications
 

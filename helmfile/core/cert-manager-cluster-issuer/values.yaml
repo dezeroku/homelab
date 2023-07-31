@@ -1,0 +1,10 @@
+---
+# TLD domain for which you want this issuer to run
+domain: null
+# AWS region with the user
+region: us-east-1
+hostedZoneID: null
+accessKeyID: null
+accessKeySecret: null
+# Email to be used during ACME calls
+email: null
