@@ -1,0 +1,21 @@
+---
+- name: Delete ansible_bootstrap homedir
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /home/ansible_bootstrap
+    state: absent
+
+- name: Delete ansible_bootstrap user
+  become: true
+  become_user: root
+  ansible.builtin.user:
+    name: "ansible_bootstrap"
+    state: absent
+
+- name: Delete ansible_bootstrap sudo permissions
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /etc/sudoers.d/01-ansible_bootstrap
+    state: absent

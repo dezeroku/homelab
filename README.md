@@ -78,7 +78,20 @@ Starting with `Ansible` the idea is to ensure that core blocks such as:
 
 are properly configured and versioned.
 
-TBD
+What you need to do (this step assumes that your homeserver is available as `homeserver.lan`. Modify the inventories if it's not true):
+
+1. Enter the `ansible` directory
+2. Get dependencies via `ansible-galaxy install -r requirements.yml`
+3. Run the `ansible-playbook site.yml -i initial-inventory.yml --extra-vars user_password=<password you want to set>` command to provision the default `server` user.
+   You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default of `~/.ssh/id_rsa.pub` doesn't suit you.
+
+   (optional, but recommended) Make sure that you can log in as the user (ssh as user `server` to the server)
+   When you are sure that the user was created and works fine, run the same command as you did just a moment before, but add the `--extra-vars cleanup_bootstrap_user=true` to get rid of the `ansible_bootstrap` user.
+
+   This whole step should really only be run once, as you won't be able to use `ansible_bootstrap` user to connect again after this.
+   You can modify `initial-inventory.yml` to use another user if needed in the future.
+
+4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass` and enter the password that you chose to provision the rest
 
 ## Core cluster setup
 

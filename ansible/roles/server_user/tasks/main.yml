@@ -1,0 +1,37 @@
+---
+- name: Install sudo
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    password: "{{ user_password | password_hash('sha512') }}"
+    state: present
+
+- name: Enable sudo insults
+  become: true
+  become_user: root
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/01-sudo-insults
+    line: "Defaults insults"
+    create: true
+    validate: "visudo -cf %s"
+    mode: 0440
+
+- name: Give user sudo permissions
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/10-server-user
+    line: "{{ user_name }} ALL=(ALL) ALL"
+    create: true
+    validate: "visudo -cf %s"
+    mode: 0440
+  become: true
+  become_user: root
+
+- name: Set authorized key from host
+  ansible.posix.authorized_key:
+    user: "{{ user_name }}"
+    state: present
+    key: "{{ lookup('ansible.builtin.file', vars.ssh_pub_key_file) }}"

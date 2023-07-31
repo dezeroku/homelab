@@ -1,0 +1,14 @@
+---
+- name: Set up user
+  hosts: homeserver-initial
+  become: true
+  become_user: root
+  roles:
+    - server_user
+
+- name: Clean up bootstrap user
+  hosts: homeserver-initial
+  become: true
+  become_user: root
+  roles:
+    - {role: cleanup_bootstrap_user, when: vars.cleanup_bootstrap_user}
