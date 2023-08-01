@@ -1,0 +1,13 @@
+---
+# We only want to generate pretty secrets here
+
+secrets:
+  grafana-dashboard-nginx-ingress:
+    labels:
+      grafana_dashboard: "1"
+    enabled: true
+    data:
+      # That's just https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/grafana/dashboards/nginx.json
+      # Commit: 101ab06010f80990009c212d7cb5c187e6502648
+      # Jan 19, 2023
+      nginx.json: b64:{{ readFile "./grafana-dashboards/nginx.json" | b64enc }}

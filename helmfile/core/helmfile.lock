@@ -9,5 +9,8 @@ dependencies:
 - name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
   version: 48.2.2
-digest: sha256:18402b90781c74e73b5f4d587a15f968ef80489b41361eee8579c213e5bc11a4
-generated: "2023-08-01T00:11:27.149306605+02:00"
+- name: universal-chart
+  repository: https://registry.nixys.ru/chartrepo/public
+  version: 2.4.0
+digest: sha256:d3b4702009eb43292ff9aa1c5b6aac63624cc8cb80ef11c3d5f2d6c10db67c19
+generated: "2023-08-02T01:23:27.839507818+02:00"
