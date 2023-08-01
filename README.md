@@ -104,9 +104,9 @@ It also requires the `helm` (with [diff-plugin](https://github.com/databus23/hel
 
 A bunch of charts to be installed, that will cover:
 
-1. certificates generation
-2. incoming traffic redirection
-3. monitoring
+1. cert-manager for certificates generation (Route53 DNS solver under the hood)
+2. ingress-nginx for reverse proxying
+3. kube-prometheus-stack for monitoring
 
 How to deploy:
 
@@ -119,7 +119,8 @@ How to deploy:
 
 This sets up:
 
-1. Homebridge
+1. [Homebridge](https://github.com/homebridge/homebridge) for Homekit support for smart devices that aren't officially compatible
+2. [Pacoloco](https://github.com/anatol/pacoloco) for caching the archlinux packages (I have few Arch hosts running on LAN)
 
 How to deploy:
 
