@@ -31,4 +31,3 @@ repos:
     rev: v6.17.2
     hooks:
       - id: ansible-lint
-        entry: python3 -m ansiblelint -v --force-color --project-dir ansible

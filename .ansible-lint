@@ -1,5 +1,16 @@
 ---
-profile: production
+# extends: default
+
+# For whatever reason ansiblelint doesn't want to install requirements.yml from
+# a subdirectory. I don't have time to play with this now
+# offline: true
+mock_roles:
+  - xanmanning.k3s
+mock_modules:
+  - ansible.posix.authorized_key
+
 exclude_paths:
   - .cache/
   - .github/
+
+profile: production
