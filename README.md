@@ -91,7 +91,8 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars cleanup_bootstrap_user=true --extra-vars k3s_tls_san=<domain of your choice>` and enter the password that you chose to provision the k3s cluster.
    You don't have to pass the `cleanup_bootstrap_user` param on subsequent calls
-5. Obtain kubeconfig via `scp server@<homeserver_ip_dns>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`
+5. Obtain kubeconfig via `scp server@<homeserver_ip_dns>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+   You'll have to modify the `127.0.0.1` so it points to your homeserver
 
 ## Core cluster setup
 
