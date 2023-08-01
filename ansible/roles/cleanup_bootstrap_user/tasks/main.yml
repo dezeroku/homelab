@@ -12,3 +12,10 @@
   ansible.builtin.file:
     path: /etc/sudoers.d/01-ansible_bootstrap
     state: absent
+
+- name: Make sure ansible_bootstrap user is gone
+  become: true
+  become_user: root
+  ansible.builtin.user:
+    name: "ansible_bootstrap"
+    state: absent

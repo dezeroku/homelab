@@ -86,12 +86,11 @@ What you need to do (this step assumes that your homeserver is available as `hom
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default of `~/.ssh/id_rsa.pub` doesn't suit you.
 
    (optional, but recommended) Make sure that you can log in as the user (ssh as user `server` to the server)
-   When you are sure that the user was created and works fine, run the same command as you did just a moment before, but add the `--extra-vars cleanup_bootstrap_user=true` to get rid of the `ansible_bootstrap` user.
-
-   This whole step should really only be run once, as you won't be able to use `ansible_bootstrap` user to connect again after this.
+   This step won't be runnable later, as the underlying ansible_bootstrap user will be removed.
    You can modify `initial-inventory.yml` to use another user if needed in the future.
 
-4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars k3s_tls_san=<domain of your choice>` and enter the password that you chose to provision the k3s cluster
+4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars cleanup_bootstrap_user=true --extra-vars k3s_tls_san=<domain of your choice>` and enter the password that you chose to provision the k3s cluster.
+   You don't have to pass the `cleanup_bootstrap_user` param on subsequent calls
 5. Obtain kubeconfig via `scp server@<homeserver_ip_dns>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`
 
 ## Core cluster setup
