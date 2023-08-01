@@ -12,3 +12,15 @@
   become_user: root
   roles:
     - {role: cleanup_bootstrap_user, when: vars.cleanup_bootstrap_user}
+
+- name: Get rid of ansible_bootstrap user
+  hosts: homeserver
+  become: true
+  become_user: root
+  tasks:
+    - name: Make sure ansible_bootstrap user is gone
+      become: true
+      become_user: root
+      ansible.builtin.user:
+        name: "ansible_bootstrap"
+        state: absent

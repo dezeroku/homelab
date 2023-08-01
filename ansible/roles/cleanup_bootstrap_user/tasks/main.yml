@@ -6,13 +6,6 @@
     path: /home/ansible_bootstrap
     state: absent
 
-- name: Delete ansible_bootstrap user
-  become: true
-  become_user: root
-  ansible.builtin.user:
-    name: "ansible_bootstrap"
-    state: absent
-
 - name: Delete ansible_bootstrap sudo permissions
   become: true
   become_user: root
