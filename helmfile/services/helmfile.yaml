@@ -1,0 +1,12 @@
+---
+repositories:
+  - name: k8s-at-home
+    url: https://k8s-at-home.com/charts
+
+releases:
+  - name: homebridge
+    namespace: homebridge
+    chart: k8s-at-home/homebridge
+    version: 5.3.2
+    values:
+      - homebridge-values.yaml.gotmpl

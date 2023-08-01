@@ -96,6 +96,8 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 ## Core cluster setup
 
+TODO: nginx based basic auth for prometheus and alertmanager
+
 This chapter assumes that the `kubeconfig.yaml` obtained in previous step is the one in use.
 Prefix commands with `KUBECONFIG=<path_to_kubeconfig_yaml>` as needed.
 It also requires the `helm` (with [diff-plugin](https://github.com/databus23/helm-diff)) and `helmfile` tools to be present.
@@ -115,5 +117,11 @@ How to deploy:
 
 ## End applications
 
+This sets up:
+
 1. Homebridge
-2. Some kind of a monitoring stack to collect Homebridge sensors data to
+
+How to deploy:
+
+1. Go to `helmfile/services`
+2. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls)
