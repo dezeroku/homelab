@@ -2,6 +2,8 @@
 repositories:
   - name: k8s-at-home
     url: https://k8s-at-home.com/charts
+  - name: bjw-s
+    url: https://bjw-s.github.io/helm-charts
 
 releases:
   - name: homebridge
@@ -10,3 +12,10 @@ releases:
     version: 5.3.2
     values:
       - homebridge-values.yaml.gotmpl
+
+  - name: pacoloco
+    namespace: pacoloco
+    chart: bjw-s/app-template
+    version: 1.5.1
+    values:
+      - pacoloco-values.yaml.gotmpl

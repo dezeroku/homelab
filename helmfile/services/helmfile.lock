@@ -1,7 +1,10 @@
 version: 0.0.0-dev
 dependencies:
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 1.5.1
 - name: homebridge
   repository: https://k8s-at-home.com/charts
   version: 5.3.2
-digest: sha256:994b564047a93ae31b6c4536cea0253547cf01cfb10e85762a4d3034832c721c
-generated: "2023-08-01T01:47:25.40942971+02:00"
+digest: sha256:42207c07bf6fbd1f0b60c1cbf0b1fa387761fc99dd2738a820697ca7dcaaa14f
+generated: "2023-08-01T03:40:29.533498768+02:00"
