@@ -9,7 +9,7 @@ It's currently an RPi 4B, 8GB of RAM, 4x1.5GHz CPU.
 Because of that, probably some tooling will be chosen with ARM in mind, but it shouldn't matter too much.
 Argon One (with M2 extension board) is chosen for a case + some cheap M.2 SATA SSD on top to increase speeds.
 
-It's connected via Ethernet to a separate IoT subnetwork, as defined in [network_layout](repo).
+It's connected via Ethernet to a separate IoT subnetwork, as defined in [network_layout](https://github.com/dezeroku/network_layout).
 This comes mostly from the `Homebridge` deployment, as it needs (or at least should need) to
 be in the same network that the devices are.
 
@@ -99,7 +99,7 @@ What you need to do (this step assumes that your homeserver is available as `hom
 TODO: nginx based basic auth for prometheus and alertmanager
 
 This chapter assumes that the `kubeconfig.yaml` obtained in previous step is the one in use.
-Prefix commands with `KUBECONFIG=<path_to_kubeconfig_yaml>` as needed.
+Prefix commands with `KUBECONFIG=<path_to_kubeconfig_yaml>` if needed.
 It also requires the `helm` (with [diff-plugin](https://github.com/databus23/helm-diff)) and `helmfile` tools to be present.
 
 A bunch of charts to be installed, that will cover:
