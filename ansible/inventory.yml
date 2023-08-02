@@ -7,3 +7,4 @@ all:
       ansible_host: homeserver.lan
   vars:
     k3s_become: true
+    cleanup_bootstrap_user: false

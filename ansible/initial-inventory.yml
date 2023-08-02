@@ -7,5 +7,4 @@ all:
       ansible_host: homeserver.lan
   vars:
     user_name: server
-    cleanup_bootstrap_user: false
     ssh_pub_key_file: ~/.ssh/id_rsa.pub
