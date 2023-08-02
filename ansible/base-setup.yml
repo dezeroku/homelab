@@ -1,0 +1,8 @@
+---
+- name: Base setup
+  hosts: homeserver
+  become: true
+  become_user: root
+  roles:
+    - {role: hardening}
+    - {role: tooling}

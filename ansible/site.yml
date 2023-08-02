@@ -2,8 +2,8 @@
 - name: Initial user setup
   import_playbook: initial-setup.yml
 
-- name: Set up tooling
-  import_playbook: tooling.yml
+- name: Base setup
+  import_playbook: base-setup.yml
 
 - name: Set up k3s server
   import_playbook: k3s.yml

@@ -1,0 +1,17 @@
+---
+- name: Set up sshd hardening
+  become: true
+  become_user: root
+  ansible.builtin.copy:
+    src: 01-basic-sshd-hardening.conf
+    dest: /etc/ssh/sshd_config.d/01-basic-sshd-hardening.conf
+    mode: 0644
+  register: sshd_hardening_conf
+
+- name: Start and enable sshd
+  become: true
+  become_user: root
+  ansible.builtin.systemd:
+    name: sshd.service
+    enabled: true
+    state: "{{ (sshd_hardening_conf.changed) | ternary('restarted', 'started') }}"
