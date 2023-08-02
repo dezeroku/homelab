@@ -1,0 +1,24 @@
+---
+# via: https://www.redhat.com/sysadmin/ansible-automate-updates-home
+- name: Update system packages
+  hosts: homeserver
+  become: true
+  become_user: root
+  tasks:
+    - name: Update all installed packages using APT module
+      ansible.builtin.apt:
+        name: '*'
+        # This isn't idempotent, but it's kind of expected
+        state: latest  # noqa: package-latest
+        update_cache: true
+        only_upgrade: true
+      register: apt_update_status
+
+    - name: Remove packages not needed anymore
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Reboot when packages were updated
+      ansible.builtin.reboot:
+        post_reboot_delay: 60
+      when: apt_update_status.changed  # noqa: no-handler

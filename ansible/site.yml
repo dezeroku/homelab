@@ -5,5 +5,9 @@
 - name: Base setup
   import_playbook: base-setup.yml
 
+- name: Upgrade packages
+  import_playbook: upgrade-packages.yml
+  when: vars.upgrade_packages
+
 - name: Set up k3s server
   import_playbook: k3s.yml

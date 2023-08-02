@@ -94,6 +94,14 @@ What you need to do (this step assumes that your homeserver is available as `hom
 5. Obtain kubeconfig via `scp server@<homeserver_ip_dns>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
    You'll have to modify the `127.0.0.1` so it points to your homeserver
 
+Note: later on you can use the above command again, but this time also make it run system updates:
+
+```
+ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars k3s_tls_san=<domain of your choice> --extra-vars upgrade_packages=true
+```
+
+This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
+
 ## Core cluster setup
 
 TODO: nginx based basic auth for prometheus and alertmanager

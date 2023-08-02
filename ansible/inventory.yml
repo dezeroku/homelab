@@ -8,3 +8,4 @@ all:
   vars:
     k3s_become: true
     cleanup_bootstrap_user: false
+    upgrade_packages: false
