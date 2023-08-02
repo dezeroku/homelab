@@ -22,6 +22,15 @@ releases:
               enabled: true
               additionalLabels:
                 release: prometheus
+          # The below is needed, as it's a bare-metal deployment
+          hostNetwork: true
+          dnsPolicy: ClusterFirst
+          reportNodeInternalIp: true
+          publishService:
+            enabled: false
+          kind: DaemonSet
+          service:
+            enabled: false
 
   - name: cert-manager
     namespace: cert-manager
