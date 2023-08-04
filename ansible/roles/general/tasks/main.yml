@@ -1,0 +1,7 @@
+---
+- name: Set timezone
+  become: true
+  become_user: root
+  community.general.timezone:
+    name: "{{ vars.timezone }}"
+    hwclock: UTC

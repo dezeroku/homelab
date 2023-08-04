@@ -4,5 +4,6 @@
   become: true
   become_user: root
   roles:
+    - {role: general}
     - {role: hardening}
     - {role: tooling}
