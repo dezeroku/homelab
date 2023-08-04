@@ -12,3 +12,4 @@ secrets:
       # Jan 19, 2023
       nginx.json: b64:{{ readFile "./grafana-dashboards/nginx.json" | b64enc }}
       home-overview.json: b64:{{ readFile "./grafana-dashboards/home-overview.json" | b64enc }}
+      node-temperatures.json: b64:{{ readFile "./grafana-dashboards/node-temperatures.json" | b64enc }}
