@@ -7,6 +7,7 @@ secrets:
       grafana_dashboard: "1"
     enabled: true
     data:
+      # These are inserted as base64'd secrets to avoid helmfile templating
       # That's just https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/grafana/dashboards/nginx.json
       # Commit: 101ab06010f80990009c212d7cb5c187e6502648
       # Jan 19, 2023
