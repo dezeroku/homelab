@@ -26,6 +26,15 @@ alertmanager:
               storage: 5Gi
 
 grafana:
+  defaultDashboardsTimezone: Europe/Warsaw
+  additionalDataSources:
+    - name: VictoriaMetrics
+      type: prometheus
+      isDefault: false
+      url: http://victoriametrics-victoria-metrics-single-server.victoriametrics.svc.cluster.local:8428/
+      access: proxy
+      uid: victoria-metrics-dezeroku
+
   grafana.ini:
     auth.anonymous:
       enabled: true

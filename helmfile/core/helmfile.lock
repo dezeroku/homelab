@@ -12,5 +12,8 @@ dependencies:
 - name: universal-chart
   repository: https://registry.nixys.ru/chartrepo/public
   version: 2.4.0
-digest: sha256:d3b4702009eb43292ff9aa1c5b6aac63624cc8cb80ef11c3d5f2d6c10db67c19
-generated: "2023-08-02T01:23:27.839507818+02:00"
+- name: victoria-metrics-single
+  repository: https://victoriametrics.github.io/helm-charts/
+  version: 0.9.2
+digest: sha256:b6070c345d97657b20988e323f1d11eda3c8c8155671574c5b77fe438ff83a22
+generated: "2023-08-04T20:43:10.826951929+02:00"
