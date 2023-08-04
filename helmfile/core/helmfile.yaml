@@ -27,12 +27,67 @@ releases:
       - name: installCRDs
         value: true
 
+  - name: victoriametrics-auth
+    namespace: victoriametrics
+    chart: victoriametrics/victoria-metrics-auth
+    version: 0.3.2
+    values:
+      - secretName: "victoriametrics-auth-config-config"
+      - serviceMonitor:
+          enabled: true
+      - resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      - ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+            kubernetes.io/ingress.class: "nginx"
+            nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+          hosts:
+            - name: victoriametrics.{{ requiredEnv "DOMAIN" }}
+              path: /
+              pathType: ImplementationSpecific
+          tls:
+            - secretName: victoriametrics-general-tls
+              hosts:
+                - victoriametrics.{{ requiredEnv "DOMAIN" }}
+
+  - name: victoriametrics-auth-config
+    namespace: victoriametrics
+    chart: nixys/universal-chart
+    version: 2.4.0
+    values:
+      - secrets:
+          config:
+            enabled: true
+            data:
+              auth.yml: |
+                users:
+                  - bearer_token: "XXXX"
+                    url_prefix: "http://victoriametrics-victoria-metrics-single-server.victoriametrics.svc.cluster.local:8428"
+
+                  - bearer_token: "homekit"
+                    url_prefix: "http://victoriametrics-victoria-metrics-single-server.victoriametrics.svc.cluster.local:8428?extra_label=category=homekit"
+
+                  - username: "test"
+                    password: "test"
+                    url_prefix: "http://victoriametrics-victoria-metrics-single-server.victoriametrics.svc.cluster.local:8428"
+
+
   - name: victoriametrics
     namespace: victoriametrics
     chart: victoriametrics/victoria-metrics-single
     version: 0.9.2
     values:
       - server:
+          serviceMonitor:
+            enabled: true
+          retentionPeriod: 36
           resources:
             limits:
               cpu: 500m
@@ -40,23 +95,10 @@ releases:
             requests:
               cpu: 250m
               memory: 256Mi
-          ingress:
-            enabled: true
-            annotations:
-              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-              kubernetes.io/ingress.class: "nginx"
-              nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
-            hosts:
-              - name: victoriametrics.{{ requiredEnv "DOMAIN" }}
-                path: /
-                pathType: ImplementationSpecific
-            tls:
-              - secretName: victoriametrics-general-tls
-                hosts:
-                  - victoriametrics.{{ requiredEnv "DOMAIN" }}
       - vmstorage:
           persistentVolume:
             storageClass: "local-path"
+            size: "50Gi"
 
   - name: cert-manager-cluster-issuer
     namespace: cert-manager
