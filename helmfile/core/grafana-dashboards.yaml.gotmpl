@@ -11,3 +11,4 @@ secrets:
       # Commit: 101ab06010f80990009c212d7cb5c187e6502648
       # Jan 19, 2023
       nginx.json: b64:{{ readFile "./grafana-dashboards/nginx.json" | b64enc }}
+      home-overview.json: b64:{{ readFile "./grafana-dashboards/home-overview.json" | b64enc }}
