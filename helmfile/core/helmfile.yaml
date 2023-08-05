@@ -15,22 +15,7 @@ releases:
     chart: ingress-nginx/ingress-nginx
     version: 4.7.1
     values:
-      - controller:
-          metrics:
-            enabled: true
-            serviceMonitor:
-              enabled: true
-              additionalLabels:
-                release: prometheus
-          # The below is needed, as it's a bare-metal deployment
-          hostNetwork: true
-          dnsPolicy: ClusterFirst
-          reportNodeInternalIp: true
-          publishService:
-            enabled: false
-          kind: DaemonSet
-          service:
-            enabled: false
+      - values-ingress-nginx.yaml
 
   - name: cert-manager
     namespace: cert-manager
