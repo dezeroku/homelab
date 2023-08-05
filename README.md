@@ -115,6 +115,8 @@ A bunch of charts to be installed, that will cover:
 1. cert-manager for certificates generation (Route53 DNS solver under the hood)
 2. ingress-nginx for reverse proxying
 3. kube-prometheus-stack for monitoring
+4. VictoriaMetrics for push-model metrics collection (and possibly more in the future)
+5. vault for secrets management. It's not really "properly" deployed but should be more than enough for the use-case, basically we just want a central storage for credentials
 
 How to deploy:
 
@@ -122,6 +124,9 @@ How to deploy:
 2. Copy the `helmfile/core/cert-manager-cluster-issuer/values.yaml` as `helmfile/core/values-cert-manager-cluster-issuer.yaml` and adjust accordingly to your needs
 3. Go to `helmfile/core`
 4. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls, but deploying prometheus requires CRDs, so `sync` is needed on the initial deploy)
+
+While the steps above cover the deployment, there's some special treatment needed to initialize vault.
+Please follow the [helmfile/core/vault-setup.md](helmfile/core/vault-setup.md).
 
 ## End applications
 

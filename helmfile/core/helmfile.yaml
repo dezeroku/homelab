@@ -10,6 +10,8 @@ repositories:
     url: https://registry.nixys.ru/chartrepo/public
   - name: victoriametrics
     url: https://victoriametrics.github.io/helm-charts/
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
 
 releases:
   - name: ingress-nginx
@@ -18,6 +20,13 @@ releases:
     version: 4.7.1
     values:
       - values-ingress-nginx.yaml
+
+  - name: vault
+    namespace: vault
+    chart: hashicorp/vault
+    version: 0.25.0
+    values:
+      - values-vault.yaml.gotmpl
 
   - name: cert-manager
     namespace: cert-manager

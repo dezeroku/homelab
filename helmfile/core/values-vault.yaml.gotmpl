@@ -1,0 +1,85 @@
+---
+global:
+  serverTelemetry:
+    prometheusOperator: true
+
+injector:
+  metrics:
+    enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+
+server:
+  #metrics:
+  #  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+    hosts:
+      - host: vault.{{ requiredEnv "DOMAIN" }}
+        paths: []
+    tls:
+      - secretName: vault-tls
+        hosts:
+          - vault.{{ requiredEnv "DOMAIN" }}
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+  standalone:
+    config: |
+       ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          # Enable unauthenticated metrics access (necessary for Prometheus Operator)
+          telemetry {
+            unauthenticated_metrics_access = "true"
+          }
+        }
+        storage "file" {
+          path = "/vault/data"
+        }
+
+        # Example configuration for enabling Prometheus metrics in your config.
+        telemetry {
+          prometheus_retention_time = "30s"
+          disable_hostname = true
+        }
+
+  dataStorage:
+    storageClass: "local-path"
+
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+  prometheusRules:
+    enabled: true
+    rules:
+      - alert: vault-HighResponseTime
+        annotations:
+          message: The response time of Vault is over 500ms on average over the last 5 minutes.
+        expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
+        for: 5m
+        labels:
+          severity: warning
+      - alert: vault-HighResponseTime
+        annotations:
+          message: The response time of Vault is over 1s on average over the last 5 minutes.
+        expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
+        for: 5m
+        labels:
+          severity: critical
