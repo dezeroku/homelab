@@ -1,0 +1,16 @@
+---
+server:
+  serviceMonitor:
+    enabled: true
+  retentionPeriod: 36
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+vmstorage:
+  persistentVolume:
+    storageClass: "local-path"
+    size: "50Gi"
