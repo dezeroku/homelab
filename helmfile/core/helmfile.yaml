@@ -19,21 +19,21 @@ releases:
     chart: ingress-nginx/ingress-nginx
     version: 4.7.1
     values:
-      - values-ingress-nginx.yaml
+      - values/ingress-nginx.yaml
 
   - name: vault
     namespace: vault
     chart: hashicorp/vault
     version: 0.25.0
     values:
-      - values-vault.yaml.gotmpl
+      - values/vault.yaml.gotmpl
 
   - name: vault-secrets-operator
     namespace: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
     version: 0.1.0
     values:
-      - values-vault-secrets-operator.yaml.gotmpl
+      - values/vault-secrets-operator.yaml.gotmpl
 
   - name: cert-manager
     namespace: cert-manager
@@ -48,20 +48,20 @@ releases:
     chart: victoria-metrics/victoria-metrics-auth
     version: 0.3.2
     values:
-      - values-victoria-metrics-auth.yaml.gotmpl
+      - values/victoria-metrics-auth.yaml.gotmpl
 
   - name: victoria-metrics
     namespace: victoria-metrics
     chart: victoria-metrics/victoria-metrics-single
     version: 0.9.2
     values:
-      - values-victoria-metrics-single.yaml
+      - values/victoria-metrics-single.yaml
 
   - name: cert-manager-cluster-issuer
     namespace: cert-manager
     chart: ./cert-manager-cluster-issuer
     values:
-      - values-cert-manager-cluster-issuer.yaml
+      - values/cert-manager-cluster-issuer.yaml
 
   # This will be autodetected by the kube-prometheus-stack
   - name: grafana-dashboards
@@ -69,7 +69,7 @@ releases:
     chart: nixys/universal-chart
     version: 2.4.0
     values:
-      - grafana-dashboards.yaml.gotmpl
+      - values/grafana-dashboards.yaml.gotmpl
 
   - name: kube-prometheus-stack-enhancements
     namespace: kube-prometheus-stack
@@ -80,4 +80,4 @@ releases:
     chart: prometheus-community/kube-prometheus-stack
     version: 48.2.2
     values:
-      - values-kube-prometheus-stack.yaml.gotmpl
+      - values/kube-prometheus-stack.yaml.gotmpl
