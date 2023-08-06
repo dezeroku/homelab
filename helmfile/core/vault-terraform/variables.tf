@@ -17,3 +17,11 @@ variable "kube_prometheus_stack_grafana_admin_username" {
 variable "kube_prometheus_stack_grafana_admin_password" {
   type = string
 }
+
+variable "kube_prometheus_stack_prometheus_ingress_username" {
+  type = string
+}
+
+variable "kube_prometheus_stack_prometheus_ingress_password" {
+  type = string
+}
