@@ -1,5 +1,7 @@
 ---
-secretName: "victoriametrics-auth-config-config"
+# Point to vault rendered template
+extraArgs:
+  "auth.config": "vault/secrets/auth.yml"
 serviceMonitor:
   enabled: true
 resources:
@@ -23,3 +25,10 @@ ingress:
     - secretName: victoriametrics-general-tls
       hosts:
         - victoriametrics.{{ requiredEnv "DOMAIN" }}
+
+podAnnotations:
+  vault.hashicorp.com/agent-inject-secret-auth.yml: kvv2/victoria-metrics/auth-config
+  vault.hashicorp.com/agent-inject-template-auth.yml: |
+{{ (readFile "victoria-metrics-auth.yaml.gotmpl") | indent 4 }}
+  vault.hashicorp.com/agent-inject: 'true'
+  vault.hashicorp.com/role: victoria-metrics-auth

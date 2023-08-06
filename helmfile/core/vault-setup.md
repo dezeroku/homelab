@@ -26,15 +26,26 @@ export VAULT_ADDR=vault.<DOMAIN>
 vault login
 ```
 
-## Initial setup
-Few basic operations that have to be performed on a fresh installation
+## Setup
+The vault content is controlled via Terraform files defined in `vault-terraform` directory.
+The following steps assume that you have CLI access to the vault and `VAULT_ADDR` env variable exposed pointing to the vault instance.
 
-# Initialize the engine at `/data` path
+The secret values are kept in `terraform.tfvars` file which is explicitly ignored by the version control.
+To start, create your own copy of that file, based on the example one and modify the values:
 ```
-vault secrets enable -path=data kv-v2
+cp terraform.tfvars.example terraform.tfvars
+# modify values with an editor...
 ```
 
-# TBD initial setup
+Run:
+```
+terraform init # only needed during the first run in the directory
+
+terraform apply # to sync the configuration
+```
+
+All of the further changes should be reflected in the terraform.
+
 
 ## Revoke the root key
 While the root token is very handy, it's also a security risk.

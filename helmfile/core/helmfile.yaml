@@ -43,13 +43,6 @@ releases:
     values:
       - values-victoria-metrics-auth.yaml.gotmpl
 
-  - name: victoriametrics-auth-config
-    namespace: victoriametrics
-    chart: nixys/universal-chart
-    version: 2.4.0
-    values:
-      - values-victoria-metrics-auth-config.yaml
-
   - name: victoriametrics
     namespace: victoriametrics
     chart: victoriametrics/victoria-metrics-single
