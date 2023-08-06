@@ -22,9 +22,9 @@ resource "vault_generic_secret" "victoria-metrics-auth-config" {
 
   data_json = jsonencode(
     {
-      "homekit_token" = "homekit",
-      "test_username" = "test",
-      "test_password" = "test"
+      "homekit_token" = var.victoria_metrics_homekit_token,
+      "test_username" = var.victoria_metrics_test_username,
+      "test_password" = var.victoria_metrics_test_password
     }
   )
 }

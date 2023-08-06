@@ -35,6 +35,8 @@ To start, create your own copy of that file, based on the example one and modify
 ```
 cp terraform.tfvars.example terraform.tfvars
 # modify values with an editor...
+# Tip: you can use openssl to generate secrets and use them in the file later on
+openssl rand -base64 40
 ```
 
 Run:
