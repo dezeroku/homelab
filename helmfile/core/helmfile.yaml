@@ -59,7 +59,7 @@ releases:
 
   - name: cert-manager-cluster-issuer
     namespace: cert-manager
-    chart: ./cert-manager-cluster-issuer
+    chart: ./charts/cert-manager-cluster-issuer
     values:
       - values/cert-manager-cluster-issuer.yaml
 
@@ -73,7 +73,7 @@ releases:
 
   - name: kube-prometheus-stack-enhancements
     namespace: kube-prometheus-stack
-    chart: ./kube-prometheus-stack-enhancements
+    chart: ./charts/kube-prometheus-stack-enhancements
 
   - name: kube-prometheus-stack
     namespace: kube-prometheus-stack
