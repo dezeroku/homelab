@@ -42,11 +42,9 @@ grafana:
       access: proxy
       uid: victoria-metrics-dezeroku
 
-  grafana.ini:
-    auth.anonymous:
-      enabled: true
-      # That's a bit too much, even with potential nginx basic auth in place
-      # org_role: Admin
+  #grafana.ini:
+  #  auth.anonymous:
+  #    enabled: true
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
