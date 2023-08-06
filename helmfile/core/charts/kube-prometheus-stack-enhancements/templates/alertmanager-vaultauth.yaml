@@ -1,0 +1,11 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: alertmanager
+spec:
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: kube-prometheus-stack-alertmanager
+    serviceAccount: kube-prometheus-stack-alertmanager

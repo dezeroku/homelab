@@ -104,8 +104,6 @@ This will ensure that your setup didn't drift away and also reboot when required
 
 ## Core cluster setup
 
-TODO: nginx based basic auth for prometheus and alertmanager
-
 This chapter assumes that the `kubeconfig.yaml` obtained in previous step is the one in use.
 Prefix commands with `KUBECONFIG=<path_to_kubeconfig_yaml>` if needed.
 It also requires the `helm` (with [diff-plugin](https://github.com/databus23/helm-diff)) and `helmfile` tools to be present.

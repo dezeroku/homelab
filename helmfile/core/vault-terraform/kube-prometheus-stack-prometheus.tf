@@ -24,7 +24,9 @@ resource "vault_generic_secret" "kube-prometheus-stack-prometheus-ingress-basic-
     {
       # Field compatible with the ingress-nginx
       # Sadly vault secrets injector doesn't seem to support secrets templating yet
-      "auth" : "${var.kube_prometheus_stack_prometheus_ingress_username}:${bcrypt(var.kube_prometheus_stack_prometheus_ingress_password)}",
+      # This is undeterministic with resources, let's force the user to pass the bcrypted entry
+      #"auth" : "${var.kube_prometheus_stack_prometheus_ingress_username}:${bcrypt(var.kube_prometheus_stack_prometheus_ingress_password)}",
+      "auth" : "${var.kube_prometheus_stack_prometheus_ingress_username}:${var.kube_prometheus_stack_prometheus_ingress_password_bcrypt_hash}",
       "username" : var.kube_prometheus_stack_prometheus_ingress_username,
       "password" : var.kube_prometheus_stack_prometheus_ingress_password
     }

@@ -25,3 +25,19 @@ variable "kube_prometheus_stack_prometheus_ingress_username" {
 variable "kube_prometheus_stack_prometheus_ingress_password" {
   type = string
 }
+
+variable "kube_prometheus_stack_prometheus_ingress_password_bcrypt_hash" {
+  type = string
+}
+
+variable "kube_prometheus_stack_alertmanager_ingress_username" {
+  type = string
+}
+
+variable "kube_prometheus_stack_alertmanager_ingress_password" {
+  type = string
+}
+
+variable "kube_prometheus_stack_alertmanager_ingress_password_bcrypt_hash" {
+  type = string
+}
