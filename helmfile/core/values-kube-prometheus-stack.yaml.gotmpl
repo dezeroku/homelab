@@ -26,6 +26,10 @@ alertmanager:
               storage: 5Gi
 
 grafana:
+  admin:
+    existingSecret: "grafana-admin-credentials"
+    userKey: admin-username
+    passwordKey: admin-password
   defaultDashboardsTimezone: Europe/Warsaw
   additionalDataSources:
     - name: VictoriaMetrics

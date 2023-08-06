@@ -1,3 +1,5 @@
 victoria_metrics_homekit_token = "homekit"
 victoria_metrics_test_username = "test"
 victoria_metrics_test_password = "test"
+kube_prometheus_stack_grafana_admin_username = "admin"
+kube_prometheus_stack_grafana_admin_password = "prom-operator"

@@ -28,6 +28,13 @@ releases:
     values:
       - values-vault.yaml.gotmpl
 
+  - name: vault-secrets-operator
+    namespace: vault-secrets-operator
+    chart: hashicorp/vault-secrets-operator
+    version: 0.1.0
+    values:
+      - values-vault-secrets-operator.yaml.gotmpl
+
   - name: cert-manager
     namespace: cert-manager
     chart: jetstack/cert-manager
@@ -56,13 +63,6 @@ releases:
     values:
       - values-cert-manager-cluster-issuer.yaml
 
-  - name: kube-prometheus-stack
-    namespace: kube-prometheus-stack
-    chart: prometheus-community/kube-prometheus-stack
-    version: 48.2.2
-    values:
-      - values-kube-prometheus-stack.yaml.gotmpl
-
   # This will be autodetected by the kube-prometheus-stack
   - name: grafana-dashboards
     namespace: grafana-dashboards
@@ -70,3 +70,14 @@ releases:
     version: 2.4.0
     values:
       - grafana-dashboards.yaml.gotmpl
+
+  - name: kube-prometheus-stack-enhancements
+    namespace: kube-prometheus-stack
+    chart: ./kube-prometheus-stack-enhancements
+
+  - name: kube-prometheus-stack
+    namespace: kube-prometheus-stack
+    chart: prometheus-community/kube-prometheus-stack
+    version: 48.2.2
+    values:
+      - values-kube-prometheus-stack.yaml.gotmpl
