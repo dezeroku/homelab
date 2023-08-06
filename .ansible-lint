@@ -8,6 +8,7 @@ mock_roles:
   - xanmanning.k3s
 mock_modules:
   - ansible.posix.authorized_key
+  - community.general.timezone
 
 exclude_paths:
   - .cache/
