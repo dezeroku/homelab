@@ -8,7 +8,7 @@ repositories:
     url: https://charts.jetstack.io
   - name: nixys
     url: https://registry.nixys.ru/chartrepo/public
-  - name: victoriametrics
+  - name: victoria-metrics
     url: https://victoriametrics.github.io/helm-charts/
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
@@ -36,16 +36,16 @@ releases:
       - name: installCRDs
         value: true
 
-  - name: victoriametrics-auth
-    namespace: victoriametrics
-    chart: victoriametrics/victoria-metrics-auth
+  - name: victoria-metrics-auth
+    namespace: victoria-metrics
+    chart: victoria-metrics/victoria-metrics-auth
     version: 0.3.2
     values:
       - values-victoria-metrics-auth.yaml.gotmpl
 
-  - name: victoriametrics
-    namespace: victoriametrics
-    chart: victoriametrics/victoria-metrics-single
+  - name: victoria-metrics
+    namespace: victoria-metrics
+    chart: victoria-metrics/victoria-metrics-single
     version: 0.9.2
     values:
       - values-victoria-metrics-single.yaml

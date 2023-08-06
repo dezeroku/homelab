@@ -1,9 +1,9 @@
 resource "vault_kubernetes_auth_backend_role" "victoria-metrics-auth" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "victoria-metrics-auth"
-  bound_service_account_namespaces = ["victoriametrics"]
+  bound_service_account_namespaces = ["victoria-metrics"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["victoriametrics-auth-victoria-metrics-auth"]
+  bound_service_account_names      = ["victoria-metrics-auth"]
   token_policies                   = ["victoria-metrics-auth"]
 }
 
