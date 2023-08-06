@@ -63,14 +63,6 @@ releases:
     values:
       - values/cert-manager-cluster-issuer.yaml
 
-  # This will be autodetected by the kube-prometheus-stack
-  - name: grafana-dashboards
-    namespace: grafana-dashboards
-    chart: nixys/universal-chart
-    version: 2.4.0
-    values:
-      - values/grafana-dashboards.yaml.gotmpl
-
   - name: kube-prometheus-stack-enhancements
     namespace: kube-prometheus-stack
     chart: ./charts/kube-prometheus-stack-enhancements
@@ -79,5 +71,10 @@ releases:
     namespace: kube-prometheus-stack
     chart: prometheus-community/kube-prometheus-stack
     version: 48.2.2
+    dependencies:
+      - chart: nixys/universal-chart
+        version: 2.4.0
+        alias: grafana_dashboards
     values:
       - values/kube-prometheus-stack.yaml.gotmpl
+      - values/grafana-dashboards.yaml.gotmpl
