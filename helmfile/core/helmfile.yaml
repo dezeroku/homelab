@@ -42,6 +42,8 @@ releases:
     set:
       - name: installCRDs
         value: true
+    values:
+      - enableCertificateOwnerRef: true
 
   - name: victoria-metrics-auth
     namespace: victoria-metrics
