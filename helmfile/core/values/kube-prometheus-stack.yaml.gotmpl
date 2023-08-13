@@ -97,3 +97,7 @@ prometheus:
           resources:
             requests:
               storage: 100Gi
+    additionalScrapeConfigs:
+      - job_name: devserver_node
+        static_configs:
+          - targets: ['devserver.lan:9100']
