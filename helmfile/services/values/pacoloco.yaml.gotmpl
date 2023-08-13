@@ -2,12 +2,8 @@
 controller:
   strategy: Recreate
 image:
-  #repository: ghcr.io/anatol/pacoloco
-  # Hardcoded to release from July
-  #tag: latest@sha256:095a355f1c485b79d0a9db592a0b04171d7b1ad226e7683401b6b9cd7726c2a2
-
-  # Using own repo for ARM64 builds
-  repository: dezeroku/pacoloco
+  repository: ghcr.io/anatol/pacoloco
+  # TODO: modify to a proper tag when it comes out
   tag: latest
   pullPolicy: IfNotPresent
 
