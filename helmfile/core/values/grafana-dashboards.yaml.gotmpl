@@ -16,3 +16,5 @@ grafana_dashboards:
         node-temperatures.json: b64:{{ readFile "./grafana-dashboards/node-temperatures.json" | b64enc }}
         # This is https://grafana.com/grafana/dashboards/12904-hashicorp-vault/ rev 2
         vault.json: b64:{{ readFile "./grafana-dashboards/vault.json" | b64enc }}
+        # This is https://grafana.com/grafana/dashboards/1860-node-exporter-full/?tab=revisions rev 31
+        node-exporter-full.json: b64:{{ readFile "./grafana-dashboards/node-exporter-full.json" | b64enc }}
