@@ -1,0 +1,13 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: tgtg-ses
+spec:
+  type: kv-v2
+  mount: kvv2
+  path: services/tgtg/ses
+  destination:
+    name: tgtg-ses
+    create: true
+  vaultAuthRef: tgtg

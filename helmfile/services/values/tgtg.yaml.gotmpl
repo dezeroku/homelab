@@ -1,0 +1,66 @@
+---
+controller:
+  strategy: Recreate
+image:
+  repository: derhenning/tgtg
+  tag: v1.17.1
+  pullPolicy: IfNotPresent
+
+env:
+  SLEEP_TIME: 60
+  TZ: Europe/Warsaw
+  LOCALE: en_US
+  METRICS: "true"
+  DEBUG: "true"
+  #SCHEDULE_CRON: "* * * * *"
+  SCHEDULE_CRON: "* 16-20 * * *"
+  TGTG_USERNAME:
+    valueFrom:
+      secretKeyRef:
+        name: tgtg-username
+        key: username
+  # Use the AA_ prefix to make sure that variable are listed before APPRISE_URL so it can be templated
+  AA_SES_FROM:
+     valueFrom:
+      secretKeyRef:
+        name: tgtg-ses
+        key: from
+  AA_SES_TO:
+     valueFrom:
+      secretKeyRef:
+        name: tgtg-ses
+        key: to
+  AA_SES_ACCESS_KEY_ID:
+    valueFrom:
+      secretKeyRef:
+        name: tgtg-ses
+        key: access_key_id
+  AA_SES_ACCESS_KEY_SECRET:
+    valueFrom:
+      secretKeyRef:
+        name: tgtg-ses
+        key: access_key_secret
+  APPRISE: "true"
+  APPRISE_URL: "ses://$(AA_SES_FROM)/$(AA_SES_ACCESS_KEY_ID)/$(AA_SES_ACCESS_KEY_SECRET)/eu-central-1/$(AA_SES_TO)/?name=TGTG Notifier"
+
+service:
+  # matrics
+  main:
+   ports:
+     http:
+       port: 8000
+
+persistence:
+  tokens:
+    enabled: true
+    type: pvc
+    storageClass: local-path
+    accessMode: ReadWriteOnce
+    size: 32Mi
+    mountPath: /tokens
+
+resources:
+  limits:
+    memory: 256Mi
+  requests:
+    memory: 64Mi

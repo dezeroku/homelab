@@ -22,6 +22,17 @@ releases:
     values:
       - values/pacoloco.yaml.gotmpl
 
+  - name: tgtg-enhancements
+    namespace: tgtg
+    chart: ./charts/tgtg-enhancements
+
+  - name: tgtg
+    namespace: tgtg
+    chart: bjw-s/app-template
+    version: 1.5.1
+    values:
+      - values/tgtg.yaml.gotmpl
+
   - name: minio-enhancements
     namespace: minio
     chart: ./charts/minio-enhancements
