@@ -11,16 +11,19 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     env:
-      tflint_version: v0.44.1
       python_version: "3.11"
+      tflint_version: "v0.44.1"
+      terragrunt_version: "0.50.4"
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.python_version }}
+      - uses: autero1/action-terragrunt@v1.3.2
+        with:
+          terragrunt_version: ${{ env.terragrunt_version }}
       - uses: terraform-linters/setup-tflint@v3
-        name: Setup TFLint
         with:
           tflint_version: ${{ env.tflint_version }}
       - uses: pre-commit/action@v3.0.0
