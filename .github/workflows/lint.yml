@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       python_version: "3.11"
-      tflint_version: "v0.44.1"
+      tflint_version: "v0.47.0"
       terragrunt_version: "0.50.4"
 
     steps:
