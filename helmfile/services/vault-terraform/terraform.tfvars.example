@@ -1,0 +1,2 @@
+minio_root_username = "admin"
+minio_root_password = "password"

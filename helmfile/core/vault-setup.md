@@ -41,12 +41,12 @@ openssl rand -base64 40
 
 Run:
 ```
-terraform init # only needed during the first run in the directory
+terragrunt init # only needed during the first run in the directory
 
-terraform apply # to sync the configuration
+terragrunt apply # to sync the configuration
 ```
 
-All of the further changes should be reflected in the terraform.
+All of the further changes should be reflected in the terraform/terragrunt files.
 
 
 ## Revoke the root key
