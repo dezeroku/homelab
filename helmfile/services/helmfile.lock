@@ -6,5 +6,8 @@ dependencies:
 - name: homebridge
   repository: https://k8s-at-home.com/charts
   version: 5.3.2
-digest: sha256:42207c07bf6fbd1f0b60c1cbf0b1fa387761fc99dd2738a820697ca7dcaaa14f
-generated: "2023-08-01T03:40:29.533498768+02:00"
+- name: minio
+  repository: https://charts.min.io/
+  version: 5.0.13
+digest: sha256:dc13d2b32922ed8aa121ea3c31e9cd180e0944b40443001388c1c689ccb36670
+generated: "2023-08-19T04:45:04.079473246+02:00"

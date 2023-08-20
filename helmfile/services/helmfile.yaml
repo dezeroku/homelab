@@ -4,6 +4,8 @@ repositories:
     url: https://k8s-at-home.com/charts
   - name: bjw-s
     url: https://bjw-s.github.io/helm-charts
+  - name: minio
+    url: https://charts.min.io/
 
 releases:
   - name: homebridge
@@ -19,3 +21,14 @@ releases:
     version: 1.5.1
     values:
       - values/pacoloco.yaml.gotmpl
+
+  - name: minio-enhancements
+    namespace: minio
+    chart: ./charts/minio-enhancements
+
+  - name: minio
+    namespace: minio
+    chart: minio/minio
+    version: 5.0.13
+    values:
+      - values/minio.yaml.gotmpl

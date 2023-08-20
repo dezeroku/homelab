@@ -1,0 +1,45 @@
+mode: standalone
+replicas: 1
+resources:
+  requests:
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+persistence:
+  storageClass: local-path
+  size: 100Gi
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+    nginx.ingress.kubernetes.io/proxy-body-size: 10g
+  tls:
+    - secretName: minio-general-tls
+      hosts:
+        - minio.{{ requiredEnv "DOMAIN" }}
+  hosts:
+    - minio.{{ requiredEnv "DOMAIN" }}
+
+consoleIngress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+    nginx.ingress.kubernetes.io/proxy-body-size: 10g
+  tls:
+    - secretName: minio-console-general-tls
+      hosts:
+        - minio-console.{{ requiredEnv "DOMAIN" }}
+  hosts:
+    - minio-console.{{ requiredEnv "DOMAIN" }}
+
+metrics:
+  serviceMonitor:
+    enabled: true
+
+existingSecret: minio-root-credentials
