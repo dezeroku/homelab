@@ -39,11 +39,8 @@ releases:
     namespace: cert-manager
     chart: jetstack/cert-manager
     version: 1.12.3
-    set:
-      - name: installCRDs
-        value: true
     values:
-      - enableCertificateOwnerRef: true
+      - values/cert-manager.yaml.gotmpl
 
   - name: victoria-metrics-auth
     namespace: victoria-metrics
