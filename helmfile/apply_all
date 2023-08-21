@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# This script goes through all "appliable" directories and makes sure
+# that they are in sync with the cluster
+
+set -euxo pipefail
+
+[ -z "${DOMAIN:-}" ] && echo "DOMAIN env var is required" && exit 1
+
+RUNDIR="$(readlink -f "$(dirname "$0")")"
+cd "${RUNDIR}"
+
+terragrunt run-all apply --terragrunt-non-interactive
+
+pushd "core"
+helmfile apply
+
+popd
+pushd "services"
+helmfile apply
+popd
