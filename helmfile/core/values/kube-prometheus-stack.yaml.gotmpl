@@ -98,6 +98,6 @@ prometheus:
             requests:
               storage: 100Gi
     additionalScrapeConfigs:
-      - job_name: devserver_node
+      - job_name: node-exporter
         static_configs:
           - targets: ['devserver.lan:9100']
