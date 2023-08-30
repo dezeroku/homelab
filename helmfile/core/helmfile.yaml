@@ -55,7 +55,7 @@ releases:
   - name: kube-prometheus-stack
     namespace: kube-prometheus-stack
     chart: prometheus-community/kube-prometheus-stack
-    version: 48.2.2
+    version: 48.6.0
     dependencies:
       - chart: nixys/universal-chart
         version: 2.4.0

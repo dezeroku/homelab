@@ -8,12 +8,12 @@ dependencies:
   version: 4.7.1
 - name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
-  version: 48.2.2
+  version: 48.6.0
 - name: vault
   repository: https://helm.releases.hashicorp.com
   version: 0.25.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.1.0
-digest: sha256:22364c81b2a50430331675337cd202fe8e6a4b892bd3caca67988e3f6963c72a
-generated: "2023-08-30T22:41:39.454638003+02:00"
+digest: sha256:3913de0b7424f5f5d864d96e6fbd0ad7e25e1c054e87810eb656bd158c402d11
+generated: "2023-08-30T22:54:44.8997122+02:00"
