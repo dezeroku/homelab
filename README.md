@@ -138,3 +138,18 @@ How to deploy:
 
 1. Go to `helmfile/services`
 2. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls)
+
+## Tips
+
+### PRs for helmfile
+
+[Renovate Bot](https://github.com/renovatebot/github-action) is set up to run daily in the repo.
+It's meant to notify about new charts releases (and general dependencies).
+The workflow for these changes should be roughly:
+
+1. Checkout the PR locally (it's recommended to read the Release Notes first)
+2. Run `DOMAIN=<domain of your choice> helmfile deps` in the appropriate directory (depending on the change)
+3. Run `DOMAIN=<domain of your choice> helmfile diff` and make sure that the changes look good
+4. Run `DOMAIN=<domain of your choice> helmfile apply`
+5. Amend the changed `helmfile.lock` if needed and merge to master
+6. Push to upstream
