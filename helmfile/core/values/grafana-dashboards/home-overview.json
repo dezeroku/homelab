@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -102,10 +102,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_carbon_dioxide",
+          "expr": "hass_sensor_carbon_dioxide_ppm{entity=\"sensor.wellbeing_air_purifier_eco2\"}",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -117,7 +117,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -195,10 +195,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_temperature",
+          "expr": "hass_sensor_temperature_celsius",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -210,7 +210,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -283,7 +283,7 @@
                 "value": {
                   "legend": false,
                   "tooltip": false,
-                  "viz": true
+                  "viz": false
                 }
               }
             ]
@@ -313,10 +313,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_humidity",
+          "expr": "hass_sensor_humidity_percent",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -328,7 +328,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -385,10 +385,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_carbon_dioxide",
+          "expr": "hass_sensor_carbon_dioxide_ppm{entity=\"sensor.wellbeing_air_purifier_eco2\"}",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -400,7 +400,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -450,10 +450,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_temperature",
+          "expr": "hass_sensor_temperature_celsius",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -465,7 +465,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -527,10 +527,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_humidity",
+          "expr": "hass_sensor_humidity_percent",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -542,7 +542,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -616,10 +616,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_pm_ten_density",
+          "expr": "hass_sensor_pm10_u0xb5g_per_mu0xb3",
           "instant": false,
           "range": true,
           "refId": "A"
@@ -627,14 +627,26 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "Homekit_pm_two_and_half_density",
+          "expr": "hass_sensor_pm25_u0xb5g_per_mu0xb3",
           "hide": false,
           "instant": false,
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "hass_sensor_pm1_u0xb5g_per_mu0xb3",
+          "hide": false,
+          "instant": false,
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "PM",
@@ -643,7 +655,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -722,11 +734,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
+            "uid": "prometheus"
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "Homekit_volatile_organic_compound_density",
+          "expr": "hass_sensor_unit_ppb",
           "format": "time_series",
           "instant": false,
           "range": true,
@@ -734,95 +746,6 @@
         }
       ],
       "title": "Volatile Organic Compound Density",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics-dezeroku"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 22
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics-dezeroku"
-          },
-          "editorMode": "builder",
-          "expr": "Homekit_rotation_speed",
-          "instant": false,
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Air Purifier Rotation Speed",
       "type": "timeseries"
     }
   ],
@@ -834,7 +757,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {
@@ -854,6 +777,6 @@
   "timezone": "",
   "title": "Home Overview",
   "uid": "b44a2584-f556-4f9b-903a-1d42561b46ab",
-  "version": 1,
+  "version": 1667,
   "weekStart": ""
 }

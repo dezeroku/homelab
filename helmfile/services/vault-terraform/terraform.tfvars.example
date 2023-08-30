@@ -3,3 +3,6 @@ minio_root_password = "password"
 tgtg_username = "example_tgtg_username"
 tgtg_ses_from = "homeserver-tgtg@example.com"
 tgtg_ses_to = "receiver@example.com"
+# This one is a "long-lived token" and needs to be generated from within the home assistant deployment
+# It's safe to deploy this with dummy value first and modify later
+home_assistant_prometheus_token = "example_token"

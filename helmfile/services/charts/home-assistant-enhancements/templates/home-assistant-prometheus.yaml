@@ -1,0 +1,13 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: home-assistant-prometheus
+spec:
+  type: kv-v2
+  mount: kvv2
+  path: services/home-assistant/prometheus
+  destination:
+    name: home-assistant-prometheus
+    create: true
+  vaultAuthRef: home-assistant

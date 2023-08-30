@@ -30,3 +30,7 @@ variable "ses_access_key_id" {
 variable "ses_access_key_secret" {
   type = string
 }
+
+variable "home_assistant_prometheus_token" {
+  type = string
+}

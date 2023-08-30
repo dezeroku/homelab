@@ -33,6 +33,17 @@ releases:
     values:
       - values/tgtg.yaml.gotmpl
 
+  - name: home-assistant-enhancements
+    namespace: home-assistant
+    chart: ./charts/home-assistant-enhancements
+
+  - name: home-assistant
+    namespace: home-assistant
+    chart: bjw-s/app-template
+    version: 1.5.1
+    values:
+      - values/home-assistant.yaml.gotmpl
+
   - name: minio-enhancements
     namespace: minio
     chart: ./charts/minio-enhancements

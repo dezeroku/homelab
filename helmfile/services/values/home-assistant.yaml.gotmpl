@@ -1,0 +1,79 @@
+---
+controller:
+  type: statefulset
+image:
+  repository: ghcr.io/home-assistant/home-assistant
+  tag: 2023.8.4
+  pullPolicy: IfNotPresent
+service:
+  main:
+    ports:
+      http:
+        port: 8123
+
+ingress:
+  main:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+    tls:
+      - secretName: home-assistant-general-tls
+        hosts:
+          - &host home-assistant.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: *host
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+
+persistence:
+  config-storage:
+    enabled: true
+    type: pvc
+    storageClass: local-path
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    mountPath: /config
+
+  config:
+    enabled: true
+    type: custom
+    volumeSpec:
+      configMap:
+        name: home-assistant-config
+    subPath:
+      - path: configuration.yaml
+        mountPath: /config/configuration.yaml
+
+configMaps:
+  config:
+    enabled: true
+    data:
+      configuration.yaml: |
+        # Loads default set of integrations. Do not remove.
+        default_config:
+
+        # Load frontend themes from the themes folder
+        #frontend:
+        #  themes: !include_dir_merge_named themes
+
+        #automation: !include automations.yaml
+        #script: !include scripts.yaml
+        #scene: !include scenes.yaml
+
+        prometheus:
+          namespace: hass
+
+        http:
+          use_x_forwarded_for: true
+          # TODO: this looks pretty much like a hardcode
+          # does our ansible setup make any guarantees about the CIDR for pods?
+          trusted_proxies: "10.42.0.0/16"
+
+resources:
+  limits:
+    memory: 1000Mi
+  requests:
+    memory: 250Mi
