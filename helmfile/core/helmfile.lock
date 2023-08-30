@@ -15,11 +15,5 @@ dependencies:
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.1.0
-- name: victoria-metrics-auth
-  repository: https://victoriametrics.github.io/helm-charts/
-  version: 0.3.2
-- name: victoria-metrics-single
-  repository: https://victoriametrics.github.io/helm-charts/
-  version: 0.9.2
-digest: sha256:342c5908942d9c4b26b1d3d64f0710968749553c621e366ec11c063b11c5513d
-generated: "2023-08-07T01:21:34.399192135+02:00"
+digest: sha256:4c2e8853b8007d576cc08318b2c0a2c43870474fbfee860ed6f002539d4a5bbb
+generated: "2023-08-30T21:20:05.618113691+02:00"
