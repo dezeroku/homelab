@@ -3,11 +3,17 @@ dependencies:
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
   version: 1.5.1
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 1.5.1
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 1.5.1
 - name: homebridge
   repository: https://k8s-at-home.com/charts
   version: 5.3.2
 - name: minio
   repository: https://charts.min.io/
   version: 5.0.13
-digest: sha256:dc13d2b32922ed8aa121ea3c31e9cd180e0944b40443001388c1c689ccb36670
-generated: "2023-08-19T04:45:04.079473246+02:00"
+digest: sha256:5bf1fc15e9e1c380c05bab397f8005956508077991de302a2e5d7661c32e800d
+generated: "2023-08-30T22:42:46.546463646+02:00"

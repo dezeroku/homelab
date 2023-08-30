@@ -25,6 +25,7 @@ releases:
   - name: tgtg-enhancements
     namespace: tgtg
     chart: ./charts/tgtg-enhancements
+    version: 0.1.0
 
   - name: tgtg
     namespace: tgtg
@@ -36,6 +37,7 @@ releases:
   - name: home-assistant-enhancements
     namespace: home-assistant
     chart: ./charts/home-assistant-enhancements
+    version: 0.1.0
 
   - name: home-assistant
     namespace: home-assistant
@@ -47,6 +49,7 @@ releases:
   - name: minio-enhancements
     namespace: minio
     chart: ./charts/minio-enhancements
+    version: 0.1.0
 
   - name: minio
     namespace: minio
