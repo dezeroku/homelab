@@ -1,4 +1,6 @@
 ---
+hostNetwork: true
+
 controller:
   type: statefulset
 image:
@@ -70,7 +72,18 @@ configMaps:
           use_x_forwarded_for: true
           # TODO: this looks pretty much like a hardcode
           # does our ansible setup make any guarantees about the CIDR for pods?
-          trusted_proxies: "10.42.0.0/16"
+          #trusted_proxies: "10.42.0.0/16"
+          # TODO: this is a very much hardcoded node IP
+          trusted_proxies: "192.168.3.10/32"
+        homekit:
+          port: 31333
+          name: HASS Bridge
+
+        # logger:
+        #   default: warning
+        #   logs:
+        #     homeassistant.components.homekit: debug
+        #     pyhap: debug
 
 resources:
   limits:
