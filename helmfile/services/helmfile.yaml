@@ -1,20 +1,11 @@
 ---
 repositories:
-  - name: k8s-at-home
-    url: https://k8s-at-home.com/charts
   - name: bjw-s
     url: https://bjw-s.github.io/helm-charts
   - name: minio
     url: https://charts.min.io/
 
 releases:
-  - name: homebridge
-    namespace: homebridge
-    chart: k8s-at-home/homebridge
-    version: 5.3.2
-    values:
-      - values/homebridge.yaml.gotmpl
-
   - name: pacoloco
     namespace: pacoloco
     chart: bjw-s/app-template
