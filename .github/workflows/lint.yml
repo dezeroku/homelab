@@ -23,7 +23,7 @@ jobs:
       - uses: autero1/action-terragrunt@v1.3.2
         with:
           terragrunt_version: ${{ env.terragrunt_version }}
-      - uses: terraform-linters/setup-tflint@v3
+      - uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: ${{ env.tflint_version }}
       - uses: pre-commit/action@v3.0.0
