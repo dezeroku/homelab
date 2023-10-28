@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 33,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -45,6 +46,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -107,6 +109,7 @@
           "editorMode": "builder",
           "expr": "hass_sensor_carbon_dioxide_ppm{entity=\"sensor.wellbeing_air_purifier_eco2\"}",
           "instant": false,
+          "legendFormat": "{{__name__}}",
           "range": true,
           "refId": "A"
         }
@@ -138,6 +141,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -200,6 +204,7 @@
           "editorMode": "builder",
           "expr": "hass_sensor_temperature_celsius",
           "instant": false,
+          "legendFormat": "{{__name__}}",
           "range": true,
           "refId": "A"
         }
@@ -231,6 +236,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -318,6 +324,7 @@
           "editorMode": "builder",
           "expr": "hass_sensor_humidity_percent",
           "instant": false,
+          "legendFormat": "{{__name__}}",
           "range": true,
           "refId": "A"
         }
@@ -380,7 +387,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -445,7 +452,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -522,7 +529,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -563,6 +570,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -621,6 +629,7 @@
           "editorMode": "builder",
           "expr": "hass_sensor_pm10_u0xb5g_per_mu0xb3",
           "instant": false,
+          "legendFormat": "pm10",
           "range": true,
           "refId": "A"
         },
@@ -633,6 +642,7 @@
           "expr": "hass_sensor_pm25_u0xb5g_per_mu0xb3",
           "hide": false,
           "instant": false,
+          "legendFormat": "pm2.5",
           "range": true,
           "refId": "B"
         },
@@ -645,6 +655,7 @@
           "expr": "hass_sensor_pm1_u0xb5g_per_mu0xb3",
           "hide": false,
           "instant": false,
+          "legendFormat": "pm1",
           "range": true,
           "refId": "C"
         }
@@ -677,6 +688,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -741,6 +753,7 @@
           "expr": "hass_sensor_unit_ppb",
           "format": "time_series",
           "instant": false,
+          "legendFormat": "{{__name__}}",
           "range": true,
           "refId": "A"
         }
@@ -777,6 +790,6 @@
   "timezone": "",
   "title": "Home Overview",
   "uid": "b44a2584-f556-4f9b-903a-1d42561b46ab",
-  "version": 1667,
+  "version": 127125,
   "weekStart": ""
 }
