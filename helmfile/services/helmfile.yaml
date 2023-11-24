@@ -13,17 +13,17 @@ releases:
     values:
       - values/pacoloco.yaml.gotmpl
 
-  - name: tgtg-enhancements
-    namespace: tgtg
-    chart: ./charts/tgtg-enhancements
-    version: 0.1.0
-
-  - name: tgtg
-    namespace: tgtg
-    chart: bjw-s/app-template
-    version: 1.5.1
-    values:
-      - values/tgtg.yaml.gotmpl
+      #  - name: tgtg-enhancements
+      #    namespace: tgtg
+      #    chart: ./charts/tgtg-enhancements
+      #    version: 0.1.0
+      #
+      #  - name: tgtg
+      #    namespace: tgtg
+      #    chart: bjw-s/app-template
+      #    version: 1.5.1
+      #    values:
+      #      - values/tgtg.yaml.gotmpl
 
   - name: home-assistant-enhancements
     namespace: home-assistant
