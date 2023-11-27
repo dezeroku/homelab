@@ -2,8 +2,10 @@
 On the first run the unseal keys have to be generated and written down in a safe place, as subsequent restarts will require unsealing the vault with them.
 
 ```
-# Only once on the initial deploy
-kubectl exec -n vault -ti vault-0 -- vault operator init
+# Only once on the initial deploy, use just one key shard as it's a toy deployment anyway
+# For fun, the keys are set to be encrypted with the PGP key provided in keybase
+# The `-pgp-keys` param can be skipped if that's not needed or wanted
+kubectl exec -n vault -ti vault-0 -- vault operator init -pgp-keys keybase:<username> -key-shares=1 -key-threshold=1
 ```
 
 Now you can follow the below instructions for unsealing the vault.
@@ -11,9 +13,8 @@ Now you can follow the below instructions for unsealing the vault.
 ## Unsealing
 Unsealing is required to unlock vault's content and it must be performed when pod restarts for whatever reason (pod killed, node restarted, etc.).
 ```
+# To decrypt the key echo it through a pipe of `base64 -d | gpg --armor --decrypt`
 kubectl exec -n vault -ti vault-0 -- vault operator unseal # ... Unseal Key 1
-kubectl exec -n vault -ti vault-0 -- vault operator unseal # ... Unseal Key 2
-kubectl exec -n vault -ti vault-0 -- vault operator unseal # ... Unseal Key 3
 ```
 
 ## Accessing vault with CLI
@@ -64,11 +65,7 @@ If needed, the root token can be generated again with the following command (not
 kubectl exec -n vault -ti vault-0 -- vault operator generate-root -init
 
 kubectl exec -n vault -ti vault-0 -- vault operator generate-root
-# Provide first key
-kubectl exec -n vault -ti vault-0 -- vault operator generate-root
-# Provide second key
-kubectl exec -n vault -ti vault-0 -- vault operator generate-root
-# Provide third key and note down the "Encoded Token" value
+# Provide key and note down the "Encoded Token" value
 
 # Finally decode the obtained root token with otp obtained in the first step
 kubectl exec -n vault -ti vault-0 -- vault operator generate-root -decode <Encoded Token> -otp <OTP>
