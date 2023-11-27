@@ -13,14 +13,24 @@ It's connected via Ethernet to a separate IoT subnetwork, as defined in [network
 This comes mostly from the `Homebridge` deployment, as it needs (or at least should need) to
 be in the same network that the devices are.
 
+Initial assembly steps:
+
+- (optional, but recommended) disconnect the internal case fan, as it's pretty noisy and not really needed
+  - unscrew the case's board
+  - unscrew the fan
+  - detach the fan cable
+  - screw in the fan, so it doesn't get lost
+  - screw in the case's board (take notice of the "power" button, as it likes to fall off at this stage)
+- (optional, but recommended) switch the power button pins to position 2-3, so button doesn't need to be pressed to turn on (the default behaviour)
+- follow the provided assembly instruction
+
 # Initial steps
 
 In other words, what needs to be done when you lay your hands on the machine.
 
 1. Update the bootloader and make it boot from the USB first. `RPi Imager` > `Bootloader` > `USB Boot`
-2. (optional) Flash the Raspberry Pi OS (64-bit) and make sure that it works fine
-3. (optional) Disconnect the fan cable from Argon One case. The case itself is good enough for cooling and the fan noise is annoying
-4. Pure Debian "Bookworm" OS was chosen for this exercise.
+2. (optional) Flash the Raspberry Pi OS (64-bit) and make sure that it works fine. You can use this step to run `raspi-config` and set WLAN country
+3. Pure Debian "Bookworm" OS was chosen for this exercise.
    Install it on the Pi and make sure that you can SSH into it as `ansible_bootstrap` user and have root privileges.
    For Debian this can be done by setting up a non-root user and giving it e.g. sudo access
 
