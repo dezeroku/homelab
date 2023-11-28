@@ -6,7 +6,9 @@ RUNDIR="$(readlink -f "$(dirname "$0")")"
 pushd "${RUNDIR}"
 
 # Pass this through a magic sed to replace newlines with literal '\n' so it works in yaml context
-HOST_SSH_PUB_KEYS="$(ssh-add -L | sed ':a;N;$!ba;s/\n/\\\\n /g')"
+#HOST_SSH_PUB_KEYS="$(ssh-add -L | sed ':a;N;$!ba;s/\n/\\\\n /g')"
+HOST_SSH_PUB_KEYS_FILE="${HOST_SSH_PUB_KEYS_FILE:-$HOME/.ssh/id_smartcard_dezeroku.pub}"
+HOST_SSH_PUB_KEYS="$(cat "${HOST_SSH_PUB_KEYS_FILE}")"
 export HOST_SSH_PUB_KEYS
 
 # Maybe let's keep the default here in case we want to provision multiple devices with minimal effort?
