@@ -5,3 +5,9 @@
   community.general.timezone:
     name: "{{ vars.timezone }}"
     hwclock: UTC
+
+- name: Set hostname
+  become: true
+  become_user: root
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"

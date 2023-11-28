@@ -1,14 +1,23 @@
 ---
 - name: Set up user
-  hosts: homeserver-initial
+  hosts: nodes
   become: true
   become_user: root
+  vars:
+    # Use the bootstrapped user to perform the actions
+    ansible_user: ansible_bootstrap
+  tags:
+    - never  # don't run by default
+    - initial_setup_user
   roles:
     - server_user
 
 - name: Clean up bootstrap user
-  hosts: homeserver
+  hosts: nodes
   become: true
   become_user: root
+  tags:
+    - never  # don't run by default
+    - initial_setup_cleanup
   roles:
     - {role: cleanup_bootstrap_user, when: vars.cleanup_bootstrap_user}

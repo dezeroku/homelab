@@ -1,6 +1,6 @@
 ---
 - name: Base setup
-  hosts: homeserver
+  hosts: nodes
   become: true
   become_user: root
   roles:

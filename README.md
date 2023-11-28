@@ -3,6 +3,9 @@
 This repository is a collection of tooling, docs and configuration that defines my small homelab
 (the stable one, not a development machine).
 
+DNS setup (pointing `homeserver` to all the IPs and `homeserver-{one,two...}` to the specific machine is out of the scope of this repo).
+It is defined in [network_layout](https://github.com/dezeroku/network_layout) repository.
+
 # Hardware
 
 It's currently an RPi 4B, 8GB of RAM, 4x1.5GHz CPU.
@@ -91,22 +94,17 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i initial-inventory.yml --extra-vars user_password=<password you want to set>` command to provision the default `server` user.
-   You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default of `~/.ssh/id_rsa.pub` doesn't suit you.
+3. Run the `ansible-playbook site.yml -i inventory.yml --extra-vars user_password=<password you want to set> --tags initial_setup` command to provision the default `server` user.
+   You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default value doesn't suit you.
 
-   (optional, but recommended) Make sure that you can log in as the user (ssh as user `server` to the server)
-   This step won't be runnable later, as the underlying ansible_bootstrap user will be removed.
-   You can modify `initial-inventory.yml` to use another user if needed in the future.
-
-4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars cleanup_bootstrap_user=true --extra-vars k3s_tls_san=<domain of your choice>` and enter the password that you chose to provision the k3s cluster.
-   You don't have to pass the `cleanup_bootstrap_user` param on subsequent calls
-5. Obtain kubeconfig via `scp server@<homeserver_ip_dns>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
+5. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
    You'll have to modify the `127.0.0.1` so it points to your homeserver
 
 Note: later on you can use the above command again, but this time also make it run system updates:
 
 ```
-ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars k3s_tls_san=<domain of your choice> --extra-vars upgrade_packages=true
+ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars upgrade_packages=true
 ```
 
 This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.

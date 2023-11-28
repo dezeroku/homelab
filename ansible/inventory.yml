@@ -1,12 +1,36 @@
 ---
-all:
+nodes:
   hosts:
-    homeserver:
+    homeserver-one:
       ansible_connection: ssh
       ansible_user: server
-      ansible_host: homeserver.lan
+      k3s_etcd_datastore: true
+      k3s_control_node: true
+      k3s_tls_san:
+        - homeserver
+        - homeserver-one
+    homeserver-two:
+      ansible_connection: ssh
+      ansible_user: server
+      k3s_etcd_datastore: true
+      k3s_control_node: true
+      k3s_tls_san:
+        - homeserver
+        - homeserver-two
+    homeserver-three:
+      ansible_connection: ssh
+      ansible_user: server
+      k3s_etcd_datastore: true
+      k3s_control_node: true
+      k3s_tls_san:
+        - homeserver
+        - homeserver-three
   vars:
+    # Used for the tag initial_setup
+    user_name: server
+    ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
+    cleanup_bootstrap_user: true
+
     k3s_become: true
-    cleanup_bootstrap_user: false
     upgrade_packages: false
     timezone: Europe/Warsaw
