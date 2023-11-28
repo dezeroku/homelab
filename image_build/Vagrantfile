@@ -1,9 +1,9 @@
 $script = <<-SCRIPT
 # I just want the internet!
 sed -i 's#nameserver.*#nameserver 8.8.8.8##' /etc/resolv.conf
-apt update -y
-apt upgrade -y
-apt install -y\
+apt-get update -y
+apt-get upgrade -y
+apt-get install -y\
   vmdb2\
   dosfstools\
   qemu-utils\
@@ -17,7 +17,7 @@ apt install -y\
   make\
   git\
   zerofree
-#apt install -y fakemachine
+#apt-get install -y fakemachine
 SCRIPT
 
 Vagrant.configure("2") do |config|
