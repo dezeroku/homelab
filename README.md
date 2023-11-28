@@ -2,6 +2,7 @@
 
 This repository is a collection of tooling, docs and configuration that defines my small homelab
 (the stable one, not a development machine).
+It currently spans three nodes to get some HA and distributed storage.
 
 DNS setup (pointing `homeserver` to all the IPs and `homeserver-{one,two...}` to the specific machine is out of the scope of this repo).
 It is defined in [network_layout](https://github.com/dezeroku/network_layout) repository.
@@ -122,8 +123,8 @@ A bunch of charts to be installed, that will cover:
 1. cert-manager for certificates generation (Route53 DNS solver under the hood)
 2. ingress-nginx for reverse proxying
 3. kube-prometheus-stack for monitoring
-4. VictoriaMetrics for push-model metrics collection (and possibly more in the future)
-5. vault for secrets management. It's not really "properly" deployed but should be more than enough for the use-case, basically we just want a central storage for credentials
+4. vault for secrets management. It's not really "properly" deployed but should be more than enough for the use-case, basically we just want a central storage for credentials
+5. longhorn for distributed storage
 
 How to deploy:
 
@@ -142,6 +143,7 @@ This sets up:
 
 1. [Home Assistant](https://github.com/home-assistant) for managing smart devices
 2. [Pacoloco](https://github.com/anatol/pacoloco) for caching the archlinux packages (I have few Arch hosts running on LAN)
+3. `minio` for object storage
 
 How to deploy:
 

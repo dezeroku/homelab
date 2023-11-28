@@ -10,3 +10,6 @@ kube_prometheus_stack_prometheus_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrO
 kube_prometheus_stack_alertmanager_ingress_username = "admin"
 kube_prometheus_stack_alertmanager_ingress_password = "admin"
 kube_prometheus_stack_alertmanager_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."
+longhorn_ingress_username = "admin"
+longhorn_ingress_password = "admin"
+longhorn_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."

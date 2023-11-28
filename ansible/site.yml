@@ -9,5 +9,12 @@
   import_playbook: upgrade-packages.yml
   when: vars.upgrade_packages
 
+- name: Install k3s services dependencies
+  hosts: nodes
+  become: true
+  become_user: root
+  roles:
+    - {role: longhorn}
+
 - name: Set up k3s server
   import_playbook: k3s.yml

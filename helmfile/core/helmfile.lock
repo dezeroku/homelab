@@ -9,11 +9,14 @@ dependencies:
 - name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
   version: 48.6.0
+- name: longhorn
+  repository: https://charts.longhorn.io
+  version: 1.5.3
 - name: vault
   repository: https://helm.releases.hashicorp.com
   version: 0.25.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.2.0
-digest: sha256:9b46ed081760096fca14114afcbe8fb5ddeb223f014dcca033c3a9e76b2fca14
-generated: "2023-08-30T23:01:29.358727738+02:00"
+digest: sha256:8a49d7c0aa05c75fe7b04bd79b0383439d06f03854480cc4c9ef6f09bb7ebf86
+generated: "2023-11-28T22:15:03.767632464+01:00"

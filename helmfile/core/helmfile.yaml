@@ -10,8 +10,29 @@ repositories:
     url: https://registry.nixys.ru/chartrepo/public
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
+  - name: longhorn
+    url: https://charts.longhorn.io
 
 releases:
+  - name: vault-secrets-operator
+    namespace: vault-secrets-operator
+    chart: hashicorp/vault-secrets-operator
+    version: 0.2.0
+    values:
+      - values/vault-secrets-operator.yaml.gotmpl
+
+  - name: longhorn-enhancements
+    namespace: longhorn
+    chart: ./charts/longhorn-enhancements
+    version: 0.1.0
+
+  - name: longhorn
+    namespace: longhorn
+    chart: longhorn/longhorn
+    version: 1.5.3
+    values:
+      - values/longhorn.yaml.gotmpl
+
   - name: ingress-nginx
     namespace: ingress-nginx
     chart: ingress-nginx/ingress-nginx
@@ -25,13 +46,6 @@ releases:
     version: 0.25.0
     values:
       - values/vault.yaml.gotmpl
-
-  - name: vault-secrets-operator
-    namespace: vault-secrets-operator
-    chart: hashicorp/vault-secrets-operator
-    version: 0.2.0
-    values:
-      - values/vault-secrets-operator.yaml.gotmpl
 
   - name: cert-manager
     namespace: cert-manager

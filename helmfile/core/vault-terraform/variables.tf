@@ -29,3 +29,15 @@ variable "kube_prometheus_stack_alertmanager_ingress_password" {
 variable "kube_prometheus_stack_alertmanager_ingress_password_bcrypt_hash" {
   type = string
 }
+
+variable "longhorn_ingress_username" {
+  type = string
+}
+
+variable "longhorn_ingress_password" {
+  type = string
+}
+
+variable "longhorn_ingress_password_bcrypt_hash" {
+  type = string
+}
