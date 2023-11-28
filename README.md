@@ -58,7 +58,7 @@ In later steps, the Ansible will make sure that SSH config is properly hardened 
 When you have the image on hand you can flash it on the SSD using the tool of your choice, e.g. with `dd`
 
 ```
-dd of=<path to your SSD> bs=64k oflag=dsync status=progress
+# dd if =<path to the image> of=<path to your SSD> bs=64k oflag=dsync status=progress
 ```
 
 or using a tool like `rufus` or `etcher`.
@@ -70,11 +70,12 @@ The end-goal here is to be able to run few relatively low-resource applications,
 
 There are many ways this could be done, just running container, using `docker-compose`, etc.
 
-I've chosen to set-up a Kubernetes (k3s flavour) "cluster" of a single-node, as in my opinion
+I've chosen to set-up a Kubernetes (k3s flavour) cluster, as in my opinion
 it greatly simplifies the setup once you get through the initial learning curve and additionally
 gives you access to a lot of battle-tested tools and helpers, such as `cert-manager` or `ingress-nginx`.
+Lastly, it has some HA properties and allows for distributed storage.
 
-This may seem like an overkill (and probably is), but let's remember, that Fortune favours the bold.
+This may seem like an overkill (and in fact is), but why not do it.
 
 ## Initial provisioning
 
@@ -94,11 +95,12 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i inventory.yml --extra-vars user_password=<password you want to set> --tags initial_setup` command to provision the default `server` user.
+3. Run the `ansible-playbook site.yml -i inventory.yml --extra-vars user_password=<password you want to set> --tags initial_setup_user` command to provision the default `server` user.
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default value doesn't suit you.
 
-4. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
-5. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+4. Run the `ansible-playbook site.yml -i inventory.yml -t initial_setup_cleanup --ask-become-pass` to get rid of the `ansible_bootstrap` user, enter the password that you chose in previous step
+5. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
+6. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
    You'll have to modify the `127.0.0.1` so it points to your homeserver
 
 Note: later on you can use the above command again, but this time also make it run system updates:
