@@ -72,9 +72,9 @@ persistence:
   storage:
     enabled: true
     type: pvc
-    storageClass: local-path
+    storageClass: longhorn
     accessMode: ReadWriteOnce
-    size: 250Gi
+    size: 150Gi
     mountPath: /var/cache/pacoloco
 
   config:
