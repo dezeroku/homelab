@@ -76,9 +76,10 @@ prometheus:
           - prometheus.{{ requiredEnv "DOMAIN" }}
 
   prometheusSpec:
-    # Search for service monitors outside of its own namespace
+    # Search for monitors and rules outside of its own namespace
     podMonitorSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
 
     retention: 360d
     storageSpec:
