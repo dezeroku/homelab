@@ -18,3 +18,5 @@ grafana_dashboards:
         vault.json: b64:{{ readFile "./grafana-dashboards/vault.json" | b64enc }}
         # This is https://grafana.com/grafana/dashboards/1860-node-exporter-full/?tab=revisions rev 31
         node-exporter-full.json: b64:{{ readFile "./grafana-dashboards/node-exporter-full.json" | b64enc }}
+        # This is https://grafana.com/grafana/dashboards/16888-longhorn/ rev 8
+        longhorn.json: b64:{{ readFile "./grafana-dashboards/longhorn.json" | b64enc }}
