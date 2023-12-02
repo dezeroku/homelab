@@ -122,7 +122,7 @@ A bunch of charts to be installed, that will cover:
 
 1. cert-manager for certificates generation (Route53 DNS solver under the hood)
 2. ingress-nginx for reverse proxying
-3. kube-prometheus-stack for monitoring
+3. kube-prometheus-stack for monitoring, configured with PagerDuty and Dead Man's Snitch
 4. vault for secrets management. It's not really "properly" deployed but should be more than enough for the use-case, basically we just want a central storage for credentials
 5. longhorn for distributed storage
 

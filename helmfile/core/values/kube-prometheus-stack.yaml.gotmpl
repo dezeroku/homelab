@@ -18,7 +18,33 @@ alertmanager:
         hosts:
           - alertmanager.{{ requiredEnv "DOMAIN" }}
 
+  config:
+    route:
+      receiver: default
+      routes:
+      - receiver: pagerduty
+        matchers:
+          - alertname !~ "InfoInhibitor|Watchdog"
+      - receiver: deadman
+        group_wait: 0s
+        group_interval: 1m
+        repeat_interval: 50s
+        matchers:
+          - alertname = Watchdog
+    receivers:
+    - name: default
+    - name: pagerduty
+      pagerduty_configs:
+      - routing_key_file: /etc/alertmanager/secrets/alertmanager-pagerduty-token/token
+        send_resolved: true
+    - name: deadman
+      webhook_configs:
+      - url_file: /etc/alertmanager/secrets/alertmanager-deadmanssnitch-url/url
+
   alertmanagerSpec:
+    secrets:
+    - alertmanager-pagerduty-token
+    - alertmanager-deadmanssnitch-url
     storage:
       volumeClaimTemplate:
         spec:
@@ -94,4 +120,4 @@ prometheus:
       - job_name: node-exporter
         static_configs:
           - targets: ['devserver.lan:9100']
-          - targets: ['dezeroku-desktop.lan:9100']
+          #- targets: ['dezeroku-desktop.lan:9100']

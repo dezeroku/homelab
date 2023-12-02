@@ -14,7 +14,33 @@ resource "vault_policy" "kube-prometheus-stack-alertmanager" {
 path "kvv2/data/kube-prometheus-stack/alertmanager-ingress-basic-auth" {
   capabilities = ["read"]
 }
+path "kvv2/data/kube-prometheus-stack/alertmanager-pagerduty-token" {
+  capabilities = ["read"]
+}
+path "kvv2/data/kube-prometheus-stack/alertmanager-deadmanssnitch-url" {
+  capabilities = ["read"]
+}
 EOT
+}
+
+resource "vault_generic_secret" "kube-prometheus-stack-alertmanager-pagerduty-token" {
+  path = "kvv2/kube-prometheus-stack/alertmanager-pagerduty-token"
+
+  data_json = jsonencode(
+    {
+      "token" : var.kube_prometheus_stack_alertmanager_pagerduty_token
+    }
+  )
+}
+
+resource "vault_generic_secret" "kube-prometheus-stack-alertmanager-deadmanssnitch-url" {
+  path = "kvv2/kube-prometheus-stack/alertmanager-deadmanssnitch-url"
+
+  data_json = jsonencode(
+    {
+      "url" : var.kube_prometheus_stack_alertmanager_deadmanssnitch_url
+    }
+  )
 }
 
 resource "vault_generic_secret" "kube-prometheus-stack-alertmanager-ingress-basic-auth" {

@@ -1,0 +1,13 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: alertmanager-deadmanssnitch-url
+spec:
+  type: kv-v2
+  mount: kvv2
+  path: kube-prometheus-stack/alertmanager-deadmanssnitch-url
+  destination:
+    name: alertmanager-deadmanssnitch-url
+    create: true
+  vaultAuthRef: alertmanager
