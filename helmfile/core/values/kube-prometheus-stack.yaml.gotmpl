@@ -1,3 +1,15 @@
+# K3S specific stuff,
+# taken from https://github.com/k3s-io/k3s/issues/3619
+# Unfortunately hardcoded IPs, so just disable these for now
+# Disabling these disables a lot of the monitoring...
+# But it's on a best-effort basis
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+
 alertmanager:
   ingress:
     annotations:
@@ -20,6 +32,9 @@ alertmanager:
 
   config:
     route:
+      # Basically do not group at all
+      # we don't get that many alerts
+      group_by: ['...']
       receiver: default
       routes:
       - receiver: pagerduty
