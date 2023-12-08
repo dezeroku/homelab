@@ -77,3 +77,10 @@ releases:
     values:
       - values/kube-prometheus-stack.yaml.gotmpl
       - values/grafana-dashboards.yaml.gotmpl
+
+  - name: pgo
+    namespace: pgo
+    chart: oci://registry.developers.crunchydata.com/crunchydata/pgo
+    version: 5.5.0
+    values:
+      - values/pgo.yaml.gotmpl
