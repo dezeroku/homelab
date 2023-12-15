@@ -3,7 +3,7 @@ repositories:
   - name: bjw-s
     url: https://bjw-s.github.io/helm-charts
   - name: minio
-    url: https://charts.min.io/
+    url: https://operator.min.io/
 
 releases:
   - name: pacoloco
@@ -37,14 +37,22 @@ releases:
     values:
       - values/home-assistant.yaml.gotmpl
 
-  - name: minio-enhancements
-    namespace: minio
-    chart: ./charts/minio-enhancements
+  - name: minio-operator
+    namespace: minio-operator
+    chart: minio/operator
+    version: 5.0.11
+    values:
+      - values/minio-operator.yaml.gotmpl
+
+  # That's just a tenant's name
+  - name: minio-core-enhancements
+    namespace: minio-core
+    chart: ./charts/minio-core-enhancements
     version: 0.1.0
 
-  - name: minio
-    namespace: minio
-    chart: minio/minio
-    version: 5.0.13
+  - name: minio-core
+    namespace: minio-core
+    chart: minio/tenant
+    version: 5.0.11
     values:
-      - values/minio.yaml.gotmpl
+      - values/minio-core.yaml.gotmpl

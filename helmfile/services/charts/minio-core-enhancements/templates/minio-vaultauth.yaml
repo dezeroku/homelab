@@ -8,4 +8,6 @@ spec:
   mount: kubernetes
   kubernetes:
     role: minio
-    serviceAccount: minio-sa
+    # TODO: operator will only create the sa after the secret is already in place
+    # so let's use default for now
+    serviceAccount: default

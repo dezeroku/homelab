@@ -11,6 +11,14 @@ variable "minio_root_password" {
   type = string
 }
 
+variable "minio_dezeroku_username" {
+  type = string
+}
+
+variable "minio_dezeroku_password" {
+  type = string
+}
+
 variable "tgtg_username" {
   type = string
 }
