@@ -1,6 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ALLOWED_RPI_VERSIONS=("1" "2" "3" "4")
+RPI_VERSION="4"
+
+if [ -n "${1:-}" ]; then
+    echo "Provided RPI_VERSION=$1"
+    if [[ " ${ALLOWED_RPI_VERSIONS[*]} " = *"$1"* ]]; then
+        RPI_VERSION="$1"
+    else
+        echo "Provided RPI_VERSION is not present in the allow-list"
+        exit 1
+    fi
+fi
+
+if [ "${WIFI_SETUP:-}" == "true" ]; then
+    echo "WIFI_SETUP=true"
+    if [ -z "${WIFI_SSID:-}" ]; then
+        echo "Missing WIFI_SSID env variable"
+        exit 1
+    fi
+
+    if [ -z "${WIFI_PASSWORD:-}" ]; then
+        echo "Missing WIFI_PASSWORD env variable"
+        exit 1
+    fi
+fi
+
 RUNDIR="$(readlink -f "$(dirname "$0")")"
 
 pushd "${RUNDIR}"
@@ -15,12 +41,6 @@ export HOST_SSH_PUB_KEYS
 HOST_NAME="homeserver"
 export HOST_NAME
 
-# Prepare patch file
-RASPI_MASTER_PATCH="$(mktemp)"
-# We don't want the variables to expand, just envsubst to only substitute this single one
-# shellcheck disable=SC2016
-envsubst '$HOST_SSH_PUB_KEYS $HOST_NAME' < raspi_master.patch > "${RASPI_MASTER_PATCH}"
-
 # Set up the build environment
 vagrant up
 
@@ -28,8 +48,26 @@ vagrant up
 ssh_config="$(mktemp)"
 vagrant ssh-config > "${ssh_config}"
 
+
+# MAIN PATCH
+RASPI_MASTER_PATCH="$(mktemp)"
+# We don't want the variables to expand, just envsubst to only substitute this single one
+# shellcheck disable=SC2016
+envsubst '$HOST_SSH_PUB_KEYS $HOST_NAME' < patches/0001-misc-prepare-for-the-ansible_bootstrap.patch  > "${RASPI_MASTER_PATCH}"
+
 # Copy patch file
-scp -F "${ssh_config}" "${RASPI_MASTER_PATCH}" default:/home/vagrant/raspi_master.patch
+scp -F "${ssh_config}" "${RASPI_MASTER_PATCH}" default:/home/vagrant/0001-misc-prepare-for-the-ansible_bootstrap.patch
+
+# WIFI PATCH
+if [ "${WIFI_SETUP:-}" == "true" ]; then
+    RASPI_WIFI_PATCH="$(mktemp)"
+
+    # We don't want the variables to expand, just envsubst to only substitute the ones we need
+    # shellcheck disable=SC2016
+    envsubst '$WIFI_SSID $WIFI_PASSWORD' < patches/0002-misc-add-support-for-bootstrapping-WiFi.patch > "${RASPI_WIFI_PATCH}"
+
+    scp -F "${ssh_config}" "${RASPI_WIFI_PATCH}" default:/home/vagrant/0002-misc-add-support-for-bootstrapping-WiFi.patch
+fi
 
 # Perform the build
 vagrant ssh -c "\
@@ -44,29 +82,35 @@ vagrant ssh -c "\
 
     pushd image-specs
 
+    # Make git not complain when applying mail patches
+    git config --global user.email 'image_builder@example.com'
+    git config --global user.name 'image_builder'
+
     # Checkout correct rev
-    # Hardcoded rev from June 13 2023
-    git checkout 20b903c771ca258e092df3767967b1ea225e3901
+    # Hardcoded rev from Jan 1 2024
+    git checkout ff7fdbf07c727ba1d2277dc7f274bd234f2e2bfa
 
-    cp ~/raspi_master.patch .
-    # A dummy trick to allow multiple builds in the same dir
-    git apply raspi_master.patch || (echo 'WA for patch' && git checkout raspi_master.yaml && git apply raspi_master.patch)
+    git am < ~/0001-misc-prepare-for-the-ansible_bootstrap.patch
 
-    sudo make raspi_4_bookworm.img &&\
-    sha256sum raspi_4_bookworm.img > raspi_4_bookworm.img.sha256\
+    if [ '${WIFI_SETUP:-}' == 'true' ]; then
+        git am < ~/0002-misc-add-support-for-bootstrapping-WiFi.patch
+    fi
+
+    sudo make raspi_${RPI_VERSION}_bookworm.img &&\
+    sha256sum raspi_${RPI_VERSION}_bookworm.img > raspi_${RPI_VERSION}_bookworm.img.sha256\
     "
 
 # Download the built images
 GUEST_BUILD_DIR="/home/vagrant/image-specs"
 
 mkdir -p output
-scp -F "${ssh_config}" "default:${GUEST_BUILD_DIR}/raspi_4_bookworm.yaml" ./output
-scp -F "${ssh_config}" "default:${GUEST_BUILD_DIR}/raspi_4_bookworm.img" ./output
-scp -F "${ssh_config}" "default:${GUEST_BUILD_DIR}/raspi_4_bookworm.img.sha256" ./output
+scp -F "${ssh_config}" "default:${GUEST_BUILD_DIR}/raspi_${RPI_VERSION}_bookworm.yaml" ./output
+scp -F "${ssh_config}" "default:${GUEST_BUILD_DIR}/raspi_${RPI_VERSION}_bookworm.img" ./output
+scp -F "${ssh_config}" "default:${GUEST_BUILD_DIR}/raspi_${RPI_VERSION}_bookworm.img.sha256" ./output
 
 # Check the image just in case
 pushd output
-sha256sum -c raspi_4_bookworm.img.sha256
+sha256sum -c "raspi_${RPI_VERSION}_bookworm.img.sha256"
 popd
 
 # Clean up

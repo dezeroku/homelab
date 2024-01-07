@@ -52,6 +52,15 @@ Running the `build.sh` script will create an image that:
 
 The built image can be found in `image_build/output` directory.
 
+The `build.sh` script optionally takes a number as a parameter (defaults to `4`), below redacted excerpt from the build repo describes its meaning:
+
+- Model `1` should be used for the Raspberry Pi 0, 0w and 1, models A and B
+- Model `2` for the Raspberry Pi 2 models A and B
+- Model `3` for all models of the Raspberry Pi 3
+- Model `4` for all models of the Raspberry Pi 4.
+
+You can also optionally pass the `WIFI_SETUP`, `WIFI_SSID` and `WIFI_PASSWORD` environment variables if you want to perform a WiFi based setup.
+
 If you were to use an official image you'll have to do the user and SSH setup manually.
 
 In later steps, the Ansible will make sure that SSH config is properly hardened and `ansible_bootstrap` user is removed.
@@ -59,7 +68,7 @@ In later steps, the Ansible will make sure that SSH config is properly hardened 
 When you have the image on hand you can flash it on the SSD using the tool of your choice, e.g. with `dd`
 
 ```
-# dd if =<path to the image> of=<path to your SSD> bs=64k oflag=dsync status=progress
+# dd if=<path to the image> of=<path to your SSD> bs=64k oflag=dsync status=progress
 ```
 
 or using a tool like `rufus` or `etcher`.
