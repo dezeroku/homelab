@@ -9,6 +9,16 @@
   import_playbook: upgrade-packages.yml
   when: vars.upgrade_packages
 
+- name: Install docker-runtime
+  hosts: all
+  become: true
+  become_user: root
+  tags:
+    - never  # don't run by default
+    - docker_runtime
+  roles:
+    - {role: docker_runtime}
+
 - name: Install k3s services dependencies
   hosts: nodes
   become: true

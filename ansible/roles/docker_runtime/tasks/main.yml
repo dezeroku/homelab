@@ -1,9 +1,9 @@
 ---
-- name: Install tools
+- name: Install docker-runtime
   become: true
   become_user: root
   ansible.builtin.apt:
     name:
-      - lm-sensors
-      - neovim
+      - podman
+      - crun
     state: present
