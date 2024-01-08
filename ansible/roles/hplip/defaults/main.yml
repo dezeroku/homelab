@@ -1,0 +1,4 @@
+---
+# Can be obtained with `lsusb` or googled
+hplip_printer_vendor_product_id: ""
+hplip_print_test_page: true

@@ -4,7 +4,7 @@ This repository is a collection of tooling, docs and configuration that defines 
 (the stable one, not a development machine).
 It currently spans three nodes to get some HA and distributed storage.
 
-DNS setup (pointing `homeserver` to all the IPs and `homeserver-{one,two...}` to the specific machine is out of the scope of this repo).
+DNS setup (pointing `homeserver` to all the IPs and `homeserver-{one,two...}/printserver` to the specific machine is out of the scope of this repo).
 It is defined in [network_layout](https://github.com/dezeroku/network_layout) repository.
 
 # Hardware
@@ -105,18 +105,18 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i inventory.yml --extra-vars user_password=<password you want to set> --tags initial_setup_user` command to provision the default `server` user.
+3. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes --extra-vars user_password=<password you want to set> --tags initial_setup_user` command to provision the default `server` user.
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default value doesn't suit you.
 
-4. Run the `ansible-playbook site.yml -i inventory.yml -t initial_setup_cleanup --ask-become-pass` to get rid of the `ansible_bootstrap` user, enter the password that you chose in previous step
-5. Run the `ansible-playbook site.yml -i inventory.yml --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
+4. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes -t initial_setup_cleanup --ask-become-pass` to get rid of the `ansible_bootstrap` user, enter the password that you chose in previous step
+5. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
 6. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
    You'll have to modify the `127.0.0.1` so it points to your homeserver
 
 Note: later on you can use the above command again, but this time also make it run system updates:
 
 ```
-ansible-playbook site.yml -i inventory.yml --ask-become-pass --extra-vars upgrade_packages=true
+ansible-playbook site.yml -i inventory.yml -l k8s_nodes --ask-become-pass --extra-vars upgrade_packages=true
 ```
 
 This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
@@ -160,6 +160,35 @@ How to deploy:
 2. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls)
 
 ## Tips
+
+### Printserver
+
+This repository allows you to set up a Raspberry Pi as a CUPS printserver.
+For this to happen, you've got to follow the instructions from "Initial Steps" and "Flashing Debian" chapters, following it up
+with applying ansible playbook `printserver.yml`:
+
+1. Enter the `ansible` directory
+2. Get dependencies via `ansible-galaxy install -r requirements.yml`
+3. Run the `ansible-playbook site.yml -i inventory.yml -l printserver --extra-vars user_password=<password you want to set> --tags initial_setup_user` command to provision the default `server` user.
+   You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default value doesn't suit you.
+
+4. Run the `ansible-playbook site.yml -i inventory.yml -l printserver -t initial_setup_cleanup --ask-become-pass` to get rid of the `ansible_bootstrap` user, enter the password that you chose in previous step
+5. Run the `ansible-playbook site.yml -i inventory.yml -l printserver --ask-become-pass` and enter the password that you chose to provision the printserver
+
+Note: later on you can use the above command again, but this time also make it run system updates:
+
+```
+ansible-playbook site.yml -i inventory.yml -l printserver --ask-become-pass --extra-vars upgrade_packages=true
+```
+
+This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
+
+Currently the ansible playbook takes care of:
+
+1. setting up the CUPS server
+2. installing (properiatary) drivers for HP LaserJet Pro P1102 printer
+
+It requires the printer to be connected to the device when the playbook is being applied.
 
 ### PRs for helmfile
 

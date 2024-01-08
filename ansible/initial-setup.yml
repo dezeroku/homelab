@@ -1,6 +1,6 @@
 ---
 - name: Set up user
-  hosts: nodes
+  hosts: all
   become: true
   become_user: root
   vars:
@@ -13,7 +13,7 @@
     - server_user
 
 - name: Clean up bootstrap user
-  hosts: nodes
+  hosts: all
   become: true
   become_user: root
   tags:

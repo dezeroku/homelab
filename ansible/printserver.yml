@@ -1,0 +1,13 @@
+---
+- name: Set up printserver
+  hosts: printserver
+  become: true
+  become_user: root
+  tags:
+    - printserver
+  vars:
+    # The identifier below specifies HP LasterJet P1102
+    hplip_printer_vendor_product_id: "03f0:002a"
+  roles:
+    - role: cups
+    - role: hplip

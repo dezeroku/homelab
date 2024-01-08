@@ -1,0 +1,33 @@
+---
+- name: Install cups
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    name:
+      - cups
+    state: present
+
+# TODO: proper checks for the admin endpoints
+- name: Allow connections from LAN
+  become: true
+  become_user: root
+  notify:
+    - Restart cups
+  block:
+    - name: Allow / from LAN
+      become: true
+      become_user: root
+      ansible.builtin.lineinfile:
+        dest: /etc/cups/cupsd.conf
+        insertafter: "<Location />"
+        line: "  Allow 192.168.1.*"
+        backup: true
+
+    - name: Listen on the LAN host
+      become: true
+      become_user: root
+      ansible.builtin.lineinfile:
+        dest: /etc/cups/cupsd.conf
+        insertafter: "Listen localhost:631"
+        line: "Listen {{ ansible_hostname }}:631"
+        backup: true

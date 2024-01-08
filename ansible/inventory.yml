@@ -1,5 +1,5 @@
 ---
-nodes:
+k8s_nodes:
   hosts:
     homeserver-one:
       ansible_connection: ssh
@@ -32,5 +32,19 @@ nodes:
     cleanup_bootstrap_user: true
 
     k3s_become: true
+    upgrade_packages: false
+    timezone: Europe/Warsaw
+
+misc:
+  hosts:
+    printserver:
+      ansible_connection: ssh
+      ansible_user: server
+  vars:
+    # Used for the tag initial_setup
+    user_name: server
+    ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
+    cleanup_bootstrap_user: true
+
     upgrade_packages: false
     timezone: Europe/Warsaw

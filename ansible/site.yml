@@ -19,12 +19,8 @@
   roles:
     - {role: docker_runtime}
 
-- name: Install k3s services dependencies
-  hosts: nodes
-  become: true
-  become_user: root
-  roles:
-    - {role: longhorn}
-
 - name: Set up k3s server
   import_playbook: k3s.yml
+
+- name: Set up printserver
+  import_playbook: printserver.yml

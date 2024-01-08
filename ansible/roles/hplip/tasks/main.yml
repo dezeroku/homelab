@@ -1,0 +1,113 @@
+---
+- name: Install dependencies
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    name:
+      # For lsusb command
+      - usbutils
+      # As hp-plugin requires it
+      # Downloading this on the host is probably a way to do it,
+      # but I don't want to play with the incompatible versions and stuff
+      - gpg
+      # For scripting around the hp-plugin installer
+      - python3-pexpect
+      - hplip
+    state: present
+
+- name: Check the hplip_printer_vendor_product_id
+  ansible.builtin.fail:
+    msg: hplip_printer_vendor_product_id variable can not be empty
+  when: hplip_printer_vendor_product_id | length == 0
+
+
+- name: Check if the hplip_printer_vendor_product_id device is present
+  block:
+    - name: Check for the device
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          lsusb | grep "{{ hplip_printer_vendor_product_id }}"
+        executable: /bin/bash
+      register: usb_device_present
+      changed_when: false
+      failed_when: false
+
+    - name: Print error message
+      ansible.builtin.fail:
+        msg: "{{ hplip_printer_vendor_product_id }} device is not present in the system"
+      when: usb_device_present.rc != 0
+
+# TODO: this is pretty ugly
+# We assume that the USB device and product IDs are 3-digit numbers
+# It's probably standardized, but mentioning this just in case
+- name: Obtain the printer usb address
+  block:
+    - name: Obtain the printer bus address
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          lsusb | grep "{{ hplip_printer_vendor_product_id }}" | cut -d ":" -f1 | grep -oE "Bus [0-9]{3}" | cut -d " " -f2
+        executable: /bin/bash
+      register: usb_bus
+
+    - name: Obtain the printer device address
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          lsusb | grep "{{ hplip_printer_vendor_product_id }}" | cut -d ":" -f1 | grep -oE "Device [0-9]{3}" | cut -d " " -f2
+        executable: /bin/bash
+      register: usb_device
+
+    - name: Set the printer_usb_address variable
+      changed_when: false
+      ansible.builtin.set_fact:
+        printer_usb_address: "{{usb_bus.stdout}}:{{usb_device.stdout}}"
+
+# This assumes that there is only one printer configured on the host
+# USB address is not listed in the output
+# and I don't want to add yet another variable for the printer model name or similar
+- name: Check if the printer is already configured
+  ansible.builtin.command:
+    cmd: hp-info -i
+  failed_when: false
+  changed_when: false
+  register: hp_info
+
+- name: Set the printer_already_configured variable
+  changed_when: false
+  ansible.builtin.set_fact:
+    printer_already_configured: "{{ True if hp_info.rc == 0 else False }}"
+
+- name: Install the hplip plugin
+  # TODO: can we handle the reinstall case properly?
+  # In theory we could use something like "removes" here
+  # but in practice what if there's an hplip update?
+  # Will it work without the driver reinstallation?
+  changed_when: true
+  become: true
+  # Docs recommend to run this as non-root user
+  # but it complains about no-network then
+  become_user: root
+  ansible.builtin.expect:
+    command: hp-plugin -i
+    responses:
+      "(.*)Enter option \\(d=download\\*, p=specify path, q=quit\\)(.*)": "d"
+      "(.*)Do you accept the license terms for the plug-in \\(y=yes\\*, n=no, q=quit\\)(.*)": "y"
+      "(.*)Do you wish to download and re-install the plug-in\\? \\(y=yes\\*, n=no, q=quit\\)(.*)": "n"
+  when: not printer_already_configured
+
+- name: Configure the printer
+  changed_when: true
+  become: true
+  become_user: root
+  ansible.builtin.command:
+    cmd: hp-setup -i -a {{ '' if hplip_print_test_page else '-x' }} {{ printer_usb_address }}
+  when: not printer_already_configured
+
+# - name: Reboot the machine just in case
+#   ansible.builtin.reboot:
+#     post_reboot_delay: 60
+#   when: not printer_already_configured
