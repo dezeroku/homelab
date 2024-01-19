@@ -1,0 +1,56 @@
+# via: https://stackoverflow.com/questions/52422300/how-to-schedule-pods-restart
+# Restart every 6 hours, following the upstream recommendation
+# This also allows us to always run on the latest version of the image
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: invidious-deployment-restart
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: invidious-deployment-restart
+rules:
+  - apiGroups: ["apps", "extensions"]
+    resources: ["deployments"]
+    resourceNames: ["invidious"]
+    verbs: ["get", "patch", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: invidious-deployment-restart
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: invidious-deployment-restart
+subjects:
+  - kind: ServiceAccount
+    name: invidious-deployment-restart
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: invidious-deployment-restart
+spec:
+  concurrencyPolicy: Forbid
+  schedule: '5 */6 * * *'
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          serviceAccountName: invidious-deployment-restart
+          restartPolicy: Never
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl:1.29
+              imagePullPolicy: IfNotPresent
+              command:
+                - bash
+                - -c
+                - >-
+                  kubectl rollout restart deployment/invidious &&
+                  kubectl rollout status deployment/invidious

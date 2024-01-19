@@ -1,0 +1,11 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: invidious
+spec:
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: invidious
+    serviceAccount: default

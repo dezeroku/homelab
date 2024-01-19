@@ -42,3 +42,7 @@ variable "ses_access_key_secret" {
 variable "home_assistant_prometheus_token" {
   type = string
 }
+
+variable "invidious_hmac_key" {
+  type = string
+}

@@ -13,6 +13,18 @@ releases:
     values:
       - values/pacoloco.yaml.gotmpl
 
+  - name: invidious-enhancements
+    namespace: invidious
+    chart: ./charts/invidious-enhancements
+    version: 0.1.0
+
+  - name: invidious
+    namespace: invidious
+    chart: bjw-s/app-template
+    version: 2.5.0
+    values:
+      - values/invidious.yaml.gotmpl
+
       #  - name: tgtg-enhancements
       #    namespace: tgtg
       #    chart: ./charts/tgtg-enhancements
