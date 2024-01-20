@@ -105,12 +105,11 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes --extra-vars user_password=<password you want to set> --tags initial_setup_user` command to provision the default `server` user.
+3. Run the `ansible-playbook initial-setup.yml -i inventory.yml -l k8s_nodes --extra-vars user_password=<password you want to set>` command to provision the default `server` user.
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default value doesn't suit you.
-
-4. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes -t initial_setup_cleanup --ask-become-pass` to get rid of the `ansible_bootstrap` user, enter the password that you chose in previous step
-5. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
-6. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+   This will also remove the `ansible_bootstrap` user by default
+4. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes --ask-become-pass` and enter the password that you chose to provision the k3s cluster.
+5. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
    You'll have to modify the `127.0.0.1` so it points to your homeserver
 
 Note: later on you can use the above command again, but this time also make it run system updates:
@@ -169,11 +168,10 @@ with applying ansible playbook `printserver.yml`:
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i inventory.yml -l printserver --extra-vars user_password=<password you want to set> --tags initial_setup_user` command to provision the default `server` user.
+3. Run the `ansible-playbook initial-setup.yml -i inventory.yml -l printserver --extra-vars user_password=<password you want to set>` command to provision the default `server` user.
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` if the default value doesn't suit you.
-
-4. Run the `ansible-playbook site.yml -i inventory.yml -l printserver -t initial_setup_cleanup --ask-become-pass` to get rid of the `ansible_bootstrap` user, enter the password that you chose in previous step
-5. Run the `ansible-playbook site.yml -i inventory.yml -l printserver --ask-become-pass` and enter the password that you chose to provision the printserver
+   This will also remove the `ansible_bootstrap` user by default
+4. Run the `ansible-playbook site.yml -i inventory.yml -l printserver --ask-become-pass` and enter the password that you chose to provision the printserver
 
 Note: later on you can use the above command again, but this time also make it run system updates:
 

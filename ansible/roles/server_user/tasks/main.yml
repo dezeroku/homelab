@@ -6,6 +6,11 @@
       - bash
     state: present
 
+- name: Check if the user_password variable was provided
+  ansible.builtin.fail:
+    msg: user_password variable can not be empty
+  when: user_password | length == 0
+
 - name: Create user
   ansible.builtin.user:
     name: "{{ user_name }}"

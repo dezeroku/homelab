@@ -7,7 +7,6 @@
     # Use the bootstrapped user to perform the actions
     ansible_user: ansible_bootstrap
   tags:
-    - never  # don't run by default
     - initial_setup_user
   roles:
     - server_user
@@ -16,8 +15,10 @@
   hosts: all
   become: true
   become_user: root
+  vars:
+    # a little hack to allow this playbook to be run at once, without separation
+    ansible_become_pass: "{{ user_password | default('ansible_become_pass') }}"
   tags:
-    - never  # don't run by default
     - initial_setup_cleanup
   roles:
     - {role: cleanup_bootstrap_user, when: vars.cleanup_bootstrap_user}
