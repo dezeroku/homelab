@@ -11,3 +11,6 @@ tgtg_ses_to = "receiver@example.com"
 home_assistant_prometheus_token = "example_token"
 # Can be generated with pwgen 20 1
 invidious_hmac_key = "example_key"
+netbootxyz_ingress_username = "admin"
+netbootxyz_ingress_password = "admin"
+netbootxyz_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."

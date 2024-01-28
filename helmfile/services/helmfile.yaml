@@ -25,6 +25,18 @@ releases:
     values:
       - values/invidious.yaml.gotmpl
 
+  - name: netbootxyz-enhancements
+    namespace: netbootxyz
+    chart: ./charts/netbootxyz-enhancements
+    version: 0.1.0
+
+  - name: netbootxyz
+    namespace: netbootxyz
+    chart: bjw-s/app-template
+    version: 2.5.0
+    values:
+      - values/netbootxyz.yaml.gotmpl
+
   - name: home-assistant-enhancements
     namespace: home-assistant
     chart: ./charts/home-assistant-enhancements

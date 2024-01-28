@@ -46,3 +46,15 @@ variable "home_assistant_prometheus_token" {
 variable "invidious_hmac_key" {
   type = string
 }
+
+variable "netbootxyz_ingress_username" {
+  type = string
+}
+
+variable "netbootxyz_ingress_password" {
+  type = string
+}
+
+variable "netbootxyz_ingress_password_bcrypt_hash" {
+  type = string
+}
