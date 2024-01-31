@@ -25,7 +25,7 @@ ingress:
     ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       # TODO: make it prettier
       nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
@@ -44,7 +44,7 @@ ingress:
     ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.1.0/24"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       # TODO: make it prettier
       nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
