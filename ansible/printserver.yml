@@ -6,8 +6,7 @@
   tags:
     - printserver
   vars:
-    # The identifier below specifies HP LasterJet P1102
-    hplip_printer_vendor_product_id: "03f0:002a"
+    cups_printer_model: "P1102"
+    cups_printer_name: "HP_LaserJet_P1102"
   roles:
     - role: cups
-    - role: hplip

@@ -1,19 +1,24 @@
 ---
-- name: Install cups
+# There are some strong assumptions about foo2zjs and grep patterns in this file
+# It's still better than hardcoding thing, but it's likely that specific models
+# may require changes in this code
+# TODO: this whole thing can be rewritten using ansible.builtin.command and python instead of grepping
+- name: Install cups and foo2zjs
   become: true
   become_user: root
   ansible.builtin.apt:
     name:
       - cups
+      - printer-driver-foo2zjs
     state: present
 
-# TODO: proper checks for the admin endpoints
 - name: Allow connections from LAN
   become: true
   become_user: root
   notify:
     - Restart cups
   block:
+    # TODO: proper permissions for the endpoints
     - name: Allow / from LAN
       become: true
       become_user: root
@@ -21,7 +26,6 @@
         dest: /etc/cups/cupsd.conf
         insertafter: "<Location />"
         line: "  Allow 192.168.1.*"
-        backup: true
 
     - name: Listen on the LAN host
       become: true
@@ -30,4 +34,86 @@
         dest: /etc/cups/cupsd.conf
         insertafter: "Listen localhost:631"
         line: "Listen {{ ansible_hostname }}:631"
-        backup: true
+
+- name: Check the cups_printer_model
+  ansible.builtin.fail:
+    msg: cups_printer_model variable can not be empty
+  when: cups_printer_model | length == 0
+
+- name: Check if the printer is already configured
+  become: true
+  become_user: root
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      lpstat -a | grep "^{{ cups_printer_name | default(cups_printer_model) }}"
+    executable: /bin/bash
+  failed_when: false
+  changed_when: false
+  register: lpstat
+
+- name: Set the printer_already_configured variable
+  changed_when: false
+  ansible.builtin.set_fact:
+    printer_already_configured: "{{ True if lpstat.rc == 0 else False }}"
+
+- name: Set up the printer
+  when: not printer_already_configured
+  # Restart cups just in case
+  notify:
+    - Restart cups
+  block:
+    - name: Find the cups-device-uri of the printer
+      block:
+        - name: Check for the device
+          become: true
+          become_user: root
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail
+              lpinfo -v | grep "^direct usb" | grep "{{ cups_printer_model }}" | cut -d " " -f2
+            executable: /bin/bash
+          register: cups_device_uri_cmd
+          changed_when: false
+          failed_when: false
+
+        - name: Print error message
+          ansible.builtin.fail:
+            msg: "{{ cups_printer_model }} device is not present in the system"
+          when: cups_device_uri_cmd.rc != 0
+
+        - name: Set the cups_device_uri variable
+          changed_when: false
+          ansible.builtin.set_fact:
+            cups_device_uri: "{{ cups_device_uri_cmd.stdout }}"
+
+    - name: Find the foo2zjs driver for the printer
+      block:
+        - name: Check for the driver
+          become: true
+          become_user: root
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail
+              lpinfo -m | grep "foo2zjs" | grep "{{ cups_printer_model }}.ppd" | cut -d " " -f1
+            executable: /bin/bash
+          register: cups_device_driver_cmd
+          changed_when: false
+          failed_when: false
+
+        - name: Print error message
+          ansible.builtin.fail:
+            msg: "{{ cups_printer_model }} foo2zjs driver is not present in the system"
+          when: cups_device_driver_cmd.rc != 0
+
+        - name: Set the cups_device_driver variable
+          changed_when: false
+          ansible.builtin.set_fact:
+            cups_device_driver: "{{ cups_device_driver_cmd.stdout }}"
+
+    - name: Configure the printer
+      changed_when: true
+      become: true
+      become_user: root
+      ansible.builtin.command:
+        cmd: lpadmin -p "{{ cups_printer_name | default(cups_printer_model) }}" -E -v "{{ cups_device_uri }}" -m "{{ cups_device_driver }}"
