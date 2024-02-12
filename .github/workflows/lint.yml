@@ -26,4 +26,4 @@ jobs:
       - uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: ${{ env.tflint_version }}
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
