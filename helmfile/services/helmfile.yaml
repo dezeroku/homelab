@@ -56,3 +56,16 @@ releases:
     version: 5.0.11
     values:
       - values/minio-core.yaml.gotmpl
+
+  # That's just a tenant's name
+  - name: minio-private-enhancements
+    namespace: minio-private
+    chart: ./charts/minio-private-enhancements
+    version: 0.1.0
+
+  - name: minio-private
+    namespace: minio-private
+    chart: minio/tenant
+    version: 5.0.11
+    values:
+      - values/minio-private.yaml.gotmpl

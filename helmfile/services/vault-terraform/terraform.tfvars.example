@@ -3,6 +3,11 @@ minio_root_password = "password"
 # dezeroku is just our internal alias, the real username may be different
 minio_dezeroku_username = "dezeroku"
 minio_dezeroku_password = "password"
+minio_private_root_username = "admin"
+minio_private_root_password = "password"
+# dezeroku is just our internal alias, the real username may be different
+minio_private_dezeroku_username = "dezeroku"
+minio_private_dezeroku_password = "password"
 tgtg_username = "example_tgtg_username"
 tgtg_ses_from = "homeserver-tgtg@example.com"
 tgtg_ses_to = "receiver@example.com"
