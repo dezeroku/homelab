@@ -9,7 +9,7 @@ releases:
   - name: pacoloco
     namespace: pacoloco
     chart: bjw-s/app-template
-    version: 1.5.1
+    version: 2.6.0
     values:
       - values/pacoloco.yaml.gotmpl
 
@@ -21,7 +21,7 @@ releases:
   - name: invidious
     namespace: invidious
     chart: bjw-s/app-template
-    version: 2.5.0
+    version: 2.6.0
     values:
       - values/invidious.yaml.gotmpl
 
@@ -33,7 +33,7 @@ releases:
   - name: home-assistant
     namespace: home-assistant
     chart: bjw-s/app-template
-    version: 1.5.1
+    version: 2.6.0
     values:
       - values/home-assistant.yaml.gotmpl
 
