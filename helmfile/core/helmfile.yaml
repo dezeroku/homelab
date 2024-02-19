@@ -29,7 +29,7 @@ releases:
   - name: longhorn
     namespace: longhorn
     chart: longhorn/longhorn
-    version: 1.5.3
+    version: 1.6.0
     values:
       - values/longhorn.yaml.gotmpl
 
