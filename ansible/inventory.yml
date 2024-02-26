@@ -1,79 +1,55 @@
 ---
-# TODO: proper split into groups
-# k8s_nodes: both controlplanes and workers
-# k8s_controlplanes
-# k8s_workers
-# printserver
-#
-# proper value sharing
 k8s_controlplanes:
   hosts:
     homeserver-one:
-      ansible_connection: ssh
-      ansible_user: server
-      k3s_etcd_datastore: true
-      k3s_control_node: true
-      k3s_tls_san:
-        - homeserver
-        - homeserver-one
-      node_label:
-        - node.longhorn.io/create-default-disk=true
+      vars:
+        k3s_tls_san:
+          - homeserver
+          - homeserver-one
     homeserver-two:
-      ansible_connection: ssh
-      ansible_user: server
-      k3s_etcd_datastore: true
-      k3s_control_node: true
-      k3s_tls_san:
-        - homeserver
-        - homeserver-two
-      node_label:
-        - node.longhorn.io/create-default-disk=true
+      vars:
+        k3s_tls_san:
+          - homeserver
+          - homeserver-two
     homeserver-three:
-      ansible_connection: ssh
-      ansible_user: server
-      k3s_etcd_datastore: true
-      k3s_control_node: true
-      k3s_tls_san:
-        - homeserver
-        - homeserver-three
-      node_label:
-        - node.longhorn.io/create-default-disk=true
+      vars:
+        k3s_tls_san:
+          - homeserver
+          - homeserver-three
   vars:
-    # Used for the tag initial_setup
-    user_name: server
-    ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
-    cleanup_bootstrap_user: true
-
-    k3s_become: true
-    upgrade_packages: false
-    timezone: Europe/Warsaw
+    k3s_control_node: true
+    node_label:
+      - node.longhorn.io/create-default-disk=true
 
 k8s_workers:
   hosts:
     homeserver-four:
-      k3s_etcd_datastore: true
-      ansible_connection: ssh
-      ansible_user: server
-      node_label: []
   vars:
-    user_name: server
-    ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
-    cleanup_bootstrap_user: true
+    node_label: []
 
+k8s_nodes:
+  children:
+    k8s_controlplanes:
+    k8s_workers:
+  vars:
     k3s_become: true
-    upgrade_packages: false
-    timezone: Europe/Warsaw
+    k3s_etcd_datastore: true
+    k3s_release_version: v1.27.3+k3s1
 
 misc:
   hosts:
     printserver:
-      ansible_connection: ssh
-      ansible_user: server
+
+all:
+  children:
+    misc:
+    k8s_nodes:
   vars:
+    ansible_connection: ssh
+    ansible_user: server
     # Used for the tag initial_setup
     user_name: server
     ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
     cleanup_bootstrap_user: true
-
     upgrade_packages: false
     timezone: Europe/Warsaw
