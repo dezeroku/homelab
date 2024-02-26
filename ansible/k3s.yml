@@ -2,6 +2,7 @@
 - name: Install k3s services dependencies
   hosts:
     - k8s_controlplanes
+    - k8s_workers
   become: true
   become_user: root
   roles:
@@ -21,5 +22,17 @@
       node-label:
         - "{{ vars.node_label | mandatory }}"
       write-kubeconfig-mode: "0644"
+  roles:
+    - role: xanmanning.k3s
+
+- name: Set up k3s worker
+  hosts: k8s_workers
+  become: true
+  become_user: root
+  vars:
+    k3s_release_version: v1.27.3+k3s1
+    k3s_agent:
+      node-label:
+        - "{{ vars.node_label | mandatory }}"
   roles:
     - role: xanmanning.k3s

@@ -1,4 +1,11 @@
 ---
+# TODO: proper split into groups
+# k8s_nodes: both controlplanes and workers
+# k8s_controlplanes
+# k8s_workers
+# printserver
+#
+# proper value sharing
 k8s_controlplanes:
   hosts:
     homeserver-one:
@@ -33,6 +40,22 @@ k8s_controlplanes:
         - node.longhorn.io/create-default-disk=true
   vars:
     # Used for the tag initial_setup
+    user_name: server
+    ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
+    cleanup_bootstrap_user: true
+
+    k3s_become: true
+    upgrade_packages: false
+    timezone: Europe/Warsaw
+
+k8s_workers:
+  hosts:
+    homeserver-four:
+      k3s_etcd_datastore: true
+      ansible_connection: ssh
+      ansible_user: server
+      node_label: []
+  vars:
     user_name: server
     ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
     cleanup_bootstrap_user: true
