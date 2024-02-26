@@ -1,13 +1,14 @@
 ---
 - name: Install k3s services dependencies
-  hosts: k8s_nodes
+  hosts:
+    - k8s_controlplanes
   become: true
   become_user: root
   roles:
     - {role: longhorn}
 
 - name: Set up k3s server
-  hosts: k8s_nodes
+  hosts: k8s_controlplanes
   become: true
   become_user: root
   vars:
@@ -17,6 +18,8 @@
         - traefik
       tls-san:
         - "{{ vars.k3s_tls_san | mandatory }}"
+      node-label:
+        - "{{ vars.node_label | mandatory }}"
       write-kubeconfig-mode: "0644"
   roles:
     - role: xanmanning.k3s

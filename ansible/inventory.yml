@@ -1,5 +1,5 @@
 ---
-k8s_nodes:
+k8s_controlplanes:
   hosts:
     homeserver-one:
       ansible_connection: ssh
@@ -9,6 +9,8 @@ k8s_nodes:
       k3s_tls_san:
         - homeserver
         - homeserver-one
+      node_label:
+        - node.longhorn.io/create-default-disk=true
     homeserver-two:
       ansible_connection: ssh
       ansible_user: server
@@ -17,6 +19,8 @@ k8s_nodes:
       k3s_tls_san:
         - homeserver
         - homeserver-two
+      node_label:
+        - node.longhorn.io/create-default-disk=true
     homeserver-three:
       ansible_connection: ssh
       ansible_user: server
@@ -25,6 +29,8 @@ k8s_nodes:
       k3s_tls_san:
         - homeserver
         - homeserver-three
+      node_label:
+        - node.longhorn.io/create-default-disk=true
   vars:
     # Used for the tag initial_setup
     user_name: server
