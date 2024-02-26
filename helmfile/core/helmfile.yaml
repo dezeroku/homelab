@@ -14,6 +14,8 @@ repositories:
     url: https://charts.longhorn.io
   - name: descheduler
     url: https://kubernetes-sigs.github.io/descheduler/
+  - name: deliveryhero
+    url: https://charts.deliveryhero.io/
 
 releases:
   - name: vault-secrets-operator
@@ -93,3 +95,10 @@ releases:
     version: 0.29.0
     values:
       - values/descheduler.yaml.gotmpl
+
+  - name: node-problem-detector
+    namespace: kube-system
+    chart: deliveryhero/node-problem-detector
+    version: 2.3.12
+    values:
+      - values/node-problem-detector.yaml.gotmpl

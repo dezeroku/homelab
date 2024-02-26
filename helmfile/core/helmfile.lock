@@ -15,11 +15,14 @@ dependencies:
 - name: longhorn
   repository: https://charts.longhorn.io
   version: 1.5.3
+- name: node-problem-detector
+  repository: https://charts.deliveryhero.io/
+  version: 2.3.12
 - name: vault
   repository: https://helm.releases.hashicorp.com
   version: 0.25.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.2.0
-digest: sha256:9b0162bcaeb8ca1519191ea0a393eb178dabc695ee8dcc5b6e7770b89f5b5dd1
-generated: "2024-02-19T23:45:35.708916687+01:00"
+digest: sha256:4a19c292486420e8c54de6a481b4cb9bd4dd95a867f759881ee0cc31c7424539
+generated: "2024-02-26T22:40:07.838833889+01:00"
