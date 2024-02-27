@@ -49,3 +49,24 @@ variable "longhorn_ingress_password" {
 variable "longhorn_ingress_password_bcrypt_hash" {
   type = string
 }
+
+variable "minio_longhorn_root_username" {
+  type = string
+}
+
+variable "minio_longhorn_root_password" {
+  type = string
+}
+
+variable "minio_longhorn_longhorn_username" {
+  type = string
+}
+
+variable "minio_longhorn_longhorn_password" {
+  type = string
+}
+
+variable "minio_longhorn_endpoint" {
+  type    = string
+  default = "minio.longhorn.svc.cluster.local:443"
+}

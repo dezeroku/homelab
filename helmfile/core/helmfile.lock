@@ -18,11 +18,17 @@ dependencies:
 - name: node-problem-detector
   repository: https://charts.deliveryhero.io/
   version: 2.3.12
+- name: operator
+  repository: https://operator.min.io/
+  version: 5.0.11
+- name: tenant
+  repository: https://operator.min.io/
+  version: 5.0.11
 - name: vault
   repository: https://helm.releases.hashicorp.com
   version: 0.25.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.2.0
-digest: sha256:4a19c292486420e8c54de6a481b4cb9bd4dd95a867f759881ee0cc31c7424539
-generated: "2024-02-26T22:40:07.838833889+01:00"
+digest: sha256:e8575984597af8cf04771abb58de090934382d1a027991b450f833744dc7fc3c
+generated: "2024-02-27T02:28:46.28528084+01:00"

@@ -17,3 +17,6 @@ longhornUI:
 
 defaultSettings:
   createDefaultDiskLabeledNodes: true
+  # Region doesn't matter, but we have to set something for Longhorn to be happy
+  backupTarget: s3://backups@us-east-1/
+  backupTargetCredentialSecret: longhorn-credentials-s3
