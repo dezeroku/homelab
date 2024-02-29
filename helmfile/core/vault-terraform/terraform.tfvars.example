@@ -1,17 +1,17 @@
-kube_prometheus_stack_grafana_admin_username = "admin"
-kube_prometheus_stack_grafana_admin_password = "prom-operator"
-kube_prometheus_stack_prometheus_ingress_username = "admin"
-kube_prometheus_stack_prometheus_ingress_password = "admin"
+victoria_metrics_grafana_admin_username = "admin"
+victoria_metrics_grafana_admin_password = "prom-operator"
+victoria_metrics_prometheus_ingress_username = "admin"
+victoria_metrics_prometheus_ingress_password = "admin"
 # To generate bcrypt hash, use e.g.
 #   htpasswd -nbB admin adminPass
 # and input the content after colon character
 # When changing password, remember to also change the hash
-kube_prometheus_stack_prometheus_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."
-kube_prometheus_stack_alertmanager_ingress_username = "admin"
-kube_prometheus_stack_alertmanager_ingress_password = "admin"
-kube_prometheus_stack_alertmanager_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."
-kube_prometheus_stack_alertmanager_pagerduty_token = "example_token"
-kube_prometheus_stack_alertmanager_deadmanssnitch_url = "https://nosnch.in/some_id"
+victoria_metrics_prometheus_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."
+victoria_metrics_alertmanager_ingress_username = "admin"
+victoria_metrics_alertmanager_ingress_password = "admin"
+victoria_metrics_alertmanager_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."
+victoria_metrics_alertmanager_pagerduty_token = "example_token"
+victoria_metrics_alertmanager_deadmanssnitch_url = "https://nosnch.in/some_id"
 longhorn_ingress_username = "admin"
 longhorn_ingress_password = "admin"
 longhorn_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQPWZvKImPhzeeC.NaAp2I."

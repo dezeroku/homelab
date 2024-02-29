@@ -6,7 +6,7 @@ metadata:
 spec:
   type: kv-v2
   mount: kvv2
-  path: kube-prometheus-stack/alertmanager-deadmanssnitch-url
+  path: victoria-metrics-stack/alertmanager-deadmanssnitch-url
   destination:
     name: alertmanager-deadmanssnitch-url
     create: true

@@ -7,5 +7,5 @@ spec:
   method: kubernetes
   mount: kubernetes
   kubernetes:
-    role: kube-prometheus-stack-grafana
-    serviceAccount: kube-prometheus-stack-grafana
+    role: victoria-metrics-stack-grafana
+    serviceAccount: vm-grafana

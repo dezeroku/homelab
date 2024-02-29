@@ -10,26 +10,14 @@ kubeScheduler:
 kubeProxy:
   enabled: false
 
-alertmanager:
-  ingress:
-    annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - alertmanager"
-      nginx.ingress.kubernetes.io/auth-secret: alertmanager-ingress-basic-auth
-      nginx.ingress.kubernetes.io/auth-type: basic
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - alertmanager.{{ requiredEnv "DOMAIN" }}
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    tls:
-      - secretName: alertmanager-general-tls
-        hosts:
-          - alertmanager.{{ requiredEnv "DOMAIN" }}
+victoria-metrics-operator:
+  operator:
+    # Allow us to still use the ServiceMonitors CRDs
+    # TODO: this chart doesn't install CRDs for prometheus stuff
+    # We should do it as part of helmfile.yaml
+    disable_prometheus_converter: false
 
+alertmanager:
   config:
     route:
       # Basically do not group at all
@@ -50,21 +38,44 @@ alertmanager:
     - name: default
     - name: pagerduty
       pagerduty_configs:
-      - routing_key_file: /etc/alertmanager/secrets/alertmanager-pagerduty-token/token
+      - routing_key_file: /etc/vm/secrets/alertmanager-pagerduty-token/token
         send_resolved: true
     - name: deadman
       webhook_configs:
-      - url_file: /etc/alertmanager/secrets/alertmanager-deadmanssnitch-url/url
-
-  alertmanagerSpec:
+      - url_file: /etc/vm/secrets/alertmanager-deadmanssnitch-url/url
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - alertmanager"
+      nginx.ingress.kubernetes.io/auth-secret: alertmanager-ingress-basic-auth
+      nginx.ingress.kubernetes.io/auth-type: basic
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - alertmanager.{{ requiredEnv "DOMAIN" }}
+    paths:
+      - /
+    pathType: ImplementationSpecific
+    tls:
+      - secretName: alertmanager-general-tls
+        hosts:
+          - alertmanager.{{ requiredEnv "DOMAIN" }}
+  spec:
+    image:
+      # TODO: we manually bump to this version to have support for url_file webhook config
+      # get rid of this when a new enough version is vendored in the chart itself
+      tag: v0.27.0
+    externalURL: https://alertmanager.{{ requiredEnv "DOMAIN" }}
     secrets:
     - alertmanager-pagerduty-token
     - alertmanager-deadmanssnitch-url
     storage:
       volumeClaimTemplate:
         spec:
+          accessModes:
+            - ReadWriteOnce
           storageClassName: longhorn
-          accessModes: ["ReadWriteOnce"]
           resources:
             requests:
               storage: 5Gi
@@ -96,7 +107,7 @@ grafana:
         hosts:
           - grafana.{{ requiredEnv "DOMAIN" }}
 
-prometheus:
+vmsingle:
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
@@ -116,23 +127,35 @@ prometheus:
         hosts:
           - prometheus.{{ requiredEnv "DOMAIN" }}
 
-  prometheusSpec:
-    # Search for monitors and rules outside of its own namespace
-    podMonitorSelectorNilUsesHelmValues: false
-    serviceMonitorSelectorNilUsesHelmValues: false
-    ruleSelectorNilUsesHelmValues: false
-
-    retention: 360d
-    storageSpec:
+  spec:
+    retentionPeriod: "360d"
+    storage:
       volumeClaimTemplate:
         spec:
+          accessModes:
+            - ReadWriteOnce
           storageClassName: longhorn
-          accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 250Gi
-    additionalScrapeConfigs:
-      - job_name: node-exporter
-        static_configs:
-          - targets: ['devserver.lan:9100']
-          #- targets: ['dezeroku-desktop.lan:9100']
+              storage: 5Gi
+
+vmagent:
+  # Give it some room to breathe, defaults cause it to throttle
+  # Maybe let's get rid of these completely?
+  spec:
+    resources:
+      requests:
+        cpu: 250m
+      limits:
+        cpu: 1
+  additionalScrapeConfigs: |
+    - job_name: node-exporter
+      static_configs:
+        - targets: ['devserver.lan:9100']
+        #- targets: ['dezeroku-desktop.lan:9100']
+
+vmalert:
+  spec:
+    extraArgs:
+      # TODO: this feels a little bit hacky, but seems this option can't be defined in a different way?
+      external.url: https://prometheus.{{ requiredEnv "DOMAIN" }}

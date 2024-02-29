@@ -7,5 +7,5 @@ spec:
   method: kubernetes
   mount: kubernetes
   kubernetes:
-    role: kube-prometheus-stack-alertmanager
-    serviceAccount: kube-prometheus-stack-alertmanager
+    role: victoria-metrics-stack-alertmanager
+    serviceAccount: vmalertmanager-vm-victoria-metrics-k8s-stack

@@ -1,7 +1,7 @@
 ---
 repositories:
-  - name: prometheus-community
-    url: https://prometheus-community.github.io/helm-charts
+  - name: victoria-metrics
+    url: https://victoriametrics.github.io/helm-charts/
   - name: ingress-nginx
     url: https://kubernetes.github.io/ingress-nginx
   - name: jetstack
@@ -67,21 +67,21 @@ releases:
     values:
       - values/cert-manager-cluster-issuer.yaml
 
-  - name: kube-prometheus-stack-enhancements
-    namespace: kube-prometheus-stack
-    chart: ./charts/kube-prometheus-stack-enhancements
+  - name: victoria-metrics-stack-enhancements
+    namespace: victoria-metrics-stack
+    chart: ./charts/victoria-metrics-stack-enhancements
     version: 0.1.0
 
-  - name: kube-prometheus-stack
-    namespace: kube-prometheus-stack
-    chart: prometheus-community/kube-prometheus-stack
-    version: 54.2.2
+  - name: vm
+    namespace: victoria-metrics-stack
+    chart: victoria-metrics/victoria-metrics-k8s-stack
+    version: 0.19.2
     dependencies:
       - chart: nixys/universal-chart
         version: 2.4.0
         alias: grafana_dashboards
     values:
-      - values/kube-prometheus-stack.yaml.gotmpl
+      - values/victoria-metrics-stack.yaml.gotmpl
       - values/grafana-dashboards.yaml.gotmpl
 
   - name: pgo
@@ -112,15 +112,15 @@ releases:
     values:
       - values/minio-operator.yaml.gotmpl
 
-  # That's just a tenant's name
-  - name: minio-longhorn-enhancements
-    namespace: longhorn
-    chart: ./charts/minio-longhorn-enhancements
-    version: 0.1.0
+# That's just a tenant's name
+#  - name: minio-longhorn-enhancements
+#    namespace: longhorn
+#    chart: ./charts/minio-longhorn-enhancements
+#    version: 0.1.0
 
-  - name: minio-longhorn
-    namespace: longhorn
-    chart: minio/tenant
-    version: 5.0.11
-    values:
-      - values/minio-longhorn.yaml.gotmpl
+#  - name: minio-longhorn
+#    namespace: longhorn
+#    chart: minio/tenant
+#    version: 5.0.11
+#    values:
+#      - values/minio-longhorn.yaml.gotmpl

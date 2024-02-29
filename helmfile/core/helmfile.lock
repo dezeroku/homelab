@@ -9,9 +9,6 @@ dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
   version: 4.7.1
-- name: kube-prometheus-stack
-  repository: https://prometheus-community.github.io/helm-charts
-  version: 54.2.2
 - name: longhorn
   repository: https://charts.longhorn.io
   version: 1.5.3
@@ -21,14 +18,14 @@ dependencies:
 - name: operator
   repository: https://operator.min.io/
   version: 5.0.11
-- name: tenant
-  repository: https://operator.min.io/
-  version: 5.0.11
 - name: vault
   repository: https://helm.releases.hashicorp.com
   version: 0.25.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.2.0
-digest: sha256:e8575984597af8cf04771abb58de090934382d1a027991b450f833744dc7fc3c
-generated: "2024-02-27T02:28:46.28528084+01:00"
+- name: victoria-metrics-k8s-stack
+  repository: https://victoriametrics.github.io/helm-charts/
+  version: 0.19.2
+digest: sha256:9fabafb692afa9226c21993d73cd0bd282d8beb5d755a6972e8b8ecb55a31666
+generated: "2024-02-29T02:42:04.617901153+01:00"

@@ -6,7 +6,7 @@ metadata:
 spec:
   type: kv-v2
   mount: kvv2
-  path: kube-prometheus-stack/alertmanager-pagerduty-token
+  path: victoria-metrics-stack/alertmanager-pagerduty-token
   destination:
     name: alertmanager-pagerduty-token
     create: true
