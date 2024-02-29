@@ -14,11 +14,10 @@ spec:
       path: /api/prometheus
       port: http
       scheme: http
-      authorization:
-        credentials:
-          key: token
-          name: home-assistant-prometheus
-          optional: false
+      bearerTokenSecret:
+        key: token
+        name: home-assistant-prometheus
+        optional: false
       tlsConfig:
         insecureSkipVerify: true
   namespaceSelector:
