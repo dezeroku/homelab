@@ -128,6 +128,11 @@ vmsingle:
           - prometheus.{{ requiredEnv "DOMAIN" }}
 
   spec:
+    resources:
+      requests:
+        memory: 1000Mi
+      limits:
+        memory: 2250Mi
     retentionPeriod: "360d"
     storage:
       volumeClaimTemplate:
