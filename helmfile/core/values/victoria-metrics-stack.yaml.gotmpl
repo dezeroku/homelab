@@ -135,14 +135,12 @@ vmsingle:
         memory: 2250Mi
     retentionPeriod: "360d"
     storage:
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          storageClassName: longhorn
-          resources:
-            requests:
-              storage: 5Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 30Gi
 
 vmagent:
   # Give it some room to breathe, defaults cause it to throttle
