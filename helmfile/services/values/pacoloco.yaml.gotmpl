@@ -35,7 +35,7 @@ configMaps:
     data:
       config.yaml: |
         download_timeout: 3600  ## downloads will timeout if not completed after 3600 sec, 0 to disable timeout
-        purge_files_after: 7776000  ## purge file after 90 days
+        purge_files_after: 259200  ## purge file after 30 days
         # archlinux:
         #   urls: ## add or change official mirror urls as desired, see https://archlinux.org/mirrors/status/
         #     - http://mirror.lty.me/archlinux
@@ -45,7 +45,7 @@ configMaps:
             mirrorlist: /reflector-output/mirrorlist
         # prefetch: ## optional section, add it if you want to enable prefetching
         #  cron: 0 0 3 * * * * ## standard cron expression (https://en.wikipedia.org/wiki/Cron#CRON_expression) to define how frequently prefetch, see https://github.com/gorhill/cronexpr#implementation for documentation.
-        #  ttl_unaccessed_in_days: 30  ## defaults to 30, set it to a higher value than the number of consecutive days you don't update your systems
+        ttl_unaccessed_in_days: 14
         ## It deletes and stops prefetching packages (and db links) when not downloaded after "ttl_unaccessed_in_days" days that it has been updated.
         #  ttl_unupdated_in_days: 300 ## defaults to 300, it deletes and stops prefetching packages which haven't been either updated upstream or requested for "ttl_unupdated_in_days".
 
@@ -72,9 +72,9 @@ persistence:
   storage:
     enabled: true
     type: pvc
-    storageClass: longhorn
+    storageClass: longhorn-single-replica
     accessMode: ReadWriteOnce
-    size: 150Gi
+    size: 60Gi
     mountPath: /var/cache/pacoloco
 
   config:
