@@ -27,17 +27,17 @@ releases:
     values:
       - values/vault-secrets-operator.yaml.gotmpl
 
-  - name: longhorn-enhancements
-    namespace: longhorn
-    chart: ./charts/longhorn-enhancements
-    version: 0.1.0
-
   - name: longhorn
     namespace: longhorn
     chart: longhorn/longhorn
     version: 1.5.3
     values:
       - values/longhorn.yaml.gotmpl
+
+  - name: longhorn-enhancements
+    namespace: longhorn
+    chart: ./charts/longhorn-enhancements
+    version: 0.1.0
 
   - name: ingress-nginx
     namespace: ingress-nginx
