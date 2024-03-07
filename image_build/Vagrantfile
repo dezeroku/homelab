@@ -4,20 +4,9 @@ sed -i 's#nameserver.*#nameserver 8.8.8.8##' /etc/resolv.conf
 apt-get update -y
 apt-get upgrade -y
 apt-get install -y\
-  vmdb2\
-  dosfstools\
-  qemu-utils\
-  qemu-user-static\
-  debootstrap\
-  binfmt-support\
-  time\
-  kpartx\
-  bmap-tools\
-  python3\
-  make\
-  git\
-  zerofree
-#apt-get install -y fakemachine
+  docker.io
+
+usermod -aG docker vagrant
 SCRIPT
 
 Vagrant.configure("2") do |config|
@@ -42,4 +31,5 @@ Vagrant.configure("2") do |config|
   #config.vm.synced_folder './image-specs', '/image-specs'
 
   config.vm.provision "shell", inline: $script
+  config.vm.provision 'shell', reboot: true
 end

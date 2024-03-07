@@ -1,2 +1,5 @@
 output
 .vagrant
+.packer_cache
+*.img
+packer-builder-arm
