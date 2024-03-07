@@ -23,7 +23,7 @@ releases:
   - name: vault-secrets-operator
     namespace: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
-    version: 0.2.0
+    version: 0.5.1
     values:
       - values/vault-secrets-operator.yaml.gotmpl
 
