@@ -24,8 +24,6 @@ k8s_controlplanes:
 k8s_workers:
   hosts:
     homeserver-four:
-      poe_plus_hat: true
-      raspi_os: true
   vars:
     node_label: []
 
@@ -41,6 +39,16 @@ k8s_nodes:
 misc:
   hosts:
     printserver:
+
+rack_rpis:
+  hosts:
+    homeserver-one:
+    homeserver-two:
+    homeserver-three:
+    homeserver-four:
+  vars:
+    poe_plus_hat: true
+    raspi_os: true
 
 all:
   children:
