@@ -8,3 +8,4 @@
     - {role: hardening}
     - {role: tooling}
     - {role: poe_plus_hat}
+    - {role: raspi_cgroups}

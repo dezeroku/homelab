@@ -1,0 +1,26 @@
+---
+- name: Enable cgroups in kernel params
+  become: true
+  become_user: root
+  when: raspi_os | default("false") | bool
+  notify:
+    - Reboot the node
+  block:
+    - name: Get the current cmdlint.txt file for check
+      ansible.builtin.slurp:
+        src: /boot/cmdline.txt
+      register: cmdline_file
+
+    - name: Decode the content
+      changed_when: false
+      ansible.builtin.set_fact:
+        cmdline_content: "{{ cmdline_file['content'] | b64decode }}"
+
+    - name: Modify the cmdline.txt file
+      when: raspi_cgroups_cmdline_append not in cmdline_content
+      ansible.builtin.lineinfile:
+        path: /boot/cmdline.txt
+        # Catch the first (and only) line
+        regexp: '^(.*)(?!{{ raspi_cgroups_cmdline_append }})'
+        line: '\1 {{ raspi_cgroups_cmdline_append }}'
+        backrefs: true
