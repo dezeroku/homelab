@@ -7,3 +7,4 @@
     - {role: general}
     - {role: hardening}
     - {role: tooling}
+    - {role: poe_plus_hat}

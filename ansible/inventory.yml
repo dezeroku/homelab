@@ -24,6 +24,8 @@ k8s_controlplanes:
 k8s_workers:
   hosts:
     homeserver-four:
+      vars:
+        poe_plus_hat: true
   vars:
     node_label: []
 

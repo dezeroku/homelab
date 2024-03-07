@@ -1,0 +1,21 @@
+---
+- name: Fine-tune Poe+ Hat fan speeds
+  become: true
+  become_user: root
+  when: poe_plus_hat | default("false") | bool
+  notify:
+    - Reboot the node
+  ansible.builtin.lineinfile:
+    path: /boot/config.txt
+    regexp: '^dtparam=poe_fan_temp{{ item.number }}='
+    line: dtparam=poe_fan_temp{{ item.number }}={{ item.temp }}
+  loop:
+    # 50, 60, 70 and 80 degrees
+    - number: 0
+      temp: 50000
+    - number: 1
+      temp: 60000
+    - number: 2
+      temp: 70000
+    - number: 3
+      temp: 80000
