@@ -1,23 +1,53 @@
 ---
-- name: Set up user
+- name: Check if the host is already bootstrapped
+  hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: Check if the host is already bootstrapped
+      changed_when: false
+      check_mode: false
+      ignore_errors: true
+      ignore_unreachable: true
+      ansible.builtin.raw: /bin/true
+      register: bootstrap_check
+
+    - name: Save proper ansible_user config
+      ansible.builtin.set_fact:
+        ansible_user_original: "{{ ansible_user }}"
+        ansible_become_pass_original: "{{ ansible_become_pass | default('') }}"
+
+    - name: Set the bootstrap user
+      when: bootstrap_check.get('unreachable')
+      ansible.builtin.set_fact:
+        # Use the hardcoded bootstrap user to perform the actions if the "normal" one is not yet created
+        ansible_user: "{{ ansible_bootstrap_user }}"
+        ansible_bootstrap_user_become_pass: ""
+
+- name: Create user
   hosts: all
   become: true
   become_user: root
   vars:
-    # Use the bootstrapped user to perform the actions
-    ansible_user: ansible_bootstrap
+    ansible_become_pass: "{{ ansible_bootstrap_user_become_pass | default(ansible_become_pass_original) }}"
+    user_name: "{{ ansible_user_original }}"
   tags:
     - initial_setup_user
   roles:
     - server_user
 
+- name: Set the proper variables again
+  hosts: all
+  tasks:
+    - name: Set the "normal" user
+      when: bootstrap_check.get('unreachable')
+      ansible.builtin.set_fact:
+        # Use the "normal" user once it's created
+        ansible_user: "{{ ansible_user_original }}"
+
 - name: Clean up bootstrap user
   hosts: all
   become: true
   become_user: root
-  vars:
-    # a little hack to allow this playbook to be run at once, without separation
-    ansible_become_pass: "{{ user_password | default('ansible_become_pass') }}"
   tags:
     - initial_setup_cleanup
   roles:

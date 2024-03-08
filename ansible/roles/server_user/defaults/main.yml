@@ -1,4 +1,5 @@
 ---
 user_name: server
+salt_file_path: /etc/{{ user_name }}_salt
 user_password: ""
 ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub

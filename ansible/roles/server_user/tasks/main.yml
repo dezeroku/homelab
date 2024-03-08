@@ -11,10 +11,36 @@
     msg: user_password variable can not be empty
   when: user_password | length == 0
 
+- name: Create salt to be used for password hashing
+  become: true
+  become_user: root
+  block:
+    - name: Check if salt file exists
+      ansible.builtin.stat:
+        path: "{{ salt_file_path }}"
+      register: salt_file
+
+    - name: Save random salt
+      when: not salt_file.stat.exists
+      ansible.builtin.copy:
+        content: "{{ lookup('community.general.random_string', length=16, upper=true, lower=true, number=true, special=false) }}"
+        dest: "{{ salt_file_path }}"
+        mode: 0600
+
+    - name: Read the password salt
+      ansible.builtin.slurp:
+        src: "{{ salt_file_path }}"
+      register: salt_file
+
+    - name: Decode the salt
+      changed_when: false
+      ansible.builtin.set_fact:
+        password_salt: "{{ salt_file['content'] | b64decode }}"
+
 - name: Create user
   ansible.builtin.user:
     name: "{{ user_name }}"
-    password: "{{ user_password | password_hash('sha512') }}"
+    password: "{{ user_password | ansible.builtin.password_hash('sha512', password_salt) }}"
     shell: "/bin/bash"
     state: present
 

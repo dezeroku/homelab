@@ -1,4 +1,32 @@
 ---
+- name: Obtain user_password from Bitwarden, if it's not explicitly provided
+  hosts: all
+  tags:
+    - always
+  gather_facts: false
+  pre_tasks:
+    # Get password from Bitwarden if neither user_password nor ansible_become_pass is provided
+    - name: Obtain user_password from Bitwarden
+      # Throttle to one, so the rbw can keep the password in memory
+      throttle: 1
+      ansible.builtin.command:
+        cmd: rbw get homeserver
+      check_mode: false
+      changed_when: false
+      delegate_to: 127.0.0.1
+      register: user_password_bitwarden
+      when: user_password | default(ansible_become_pass) | default("") | length < 1
+
+    - name: Set user_password from Bitwarden
+      when: user_password | default(ansible_become_pass) | default("") | length < 1
+      ansible.builtin.set_fact:
+        # TODO: This looks like a hot mess, refactor the whole approach later
+        user_password: "{{ user_password_bitwarden.stdout }}"
+        ansible_become_pass: "{{ user_password_bitwarden.stdout }}"
+
+- name: Initial setup
+  import_playbook: initial-setup.yml
+
 - name: Base setup
   import_playbook: base-setup.yml
 

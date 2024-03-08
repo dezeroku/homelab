@@ -13,6 +13,25 @@
     path: /etc/sudoers.d/01-ansible_bootstrap
     state: absent
 
+- name: Check if the bootstrap user exists
+  become: true
+  become_user: root
+  ansible.builtin.getent:
+    database: shadow
+    key: "{{ ansible_bootstrap_user }}"
+    split: ":"
+    fail_key: false
+
+# This helps in ensuring all the SSH sessions and similar are closed
+# before the removal happens
+- name: Reboot the node if user exists
+  become: true
+  become_user: root
+  # If entry is not null then user still exists
+  when: ansible_facts.getent_shadow['ansible_bootstrap']
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+
 - name: Make sure ansible_bootstrap user is gone
   become: true
   become_user: root

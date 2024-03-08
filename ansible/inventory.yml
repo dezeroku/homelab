@@ -57,8 +57,8 @@ all:
   vars:
     ansible_connection: ssh
     ansible_user: server
-    # Used for the tag initial_setup
-    user_name: server
+    # username to use during the initial provisioning
+    ansible_bootstrap_user: ansible_bootstrap
     ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
     cleanup_bootstrap_user: true
     upgrade_packages: false
