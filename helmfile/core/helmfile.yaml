@@ -56,7 +56,7 @@ releases:
   - name: cert-manager
     namespace: cert-manager
     chart: jetstack/cert-manager
-    version: 1.12.3
+    version: 1.14.4
     values:
       - values/cert-manager.yaml.gotmpl
 

@@ -4,6 +4,7 @@ enableCertificateOwnerRef: true
 
 resources:
   requests:
+    cpu: 10m
     memory: 128Mi
   limits:
     memory: 128Mi
@@ -11,13 +12,15 @@ resources:
 webhook:
   resources:
     requests:
-      memory: 128Mi
+      cpu: 10m
+      memory: 64Mi
     limits:
-      memory: 128Mi
+      memory: 64Mi
 
 cainjector:
   resources:
     requests:
+      cpu: 10m
       memory: 128Mi
     limits:
       memory: 128Mi
