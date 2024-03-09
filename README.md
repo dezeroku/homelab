@@ -9,24 +9,14 @@ It is defined in [network_layout](https://github.com/dezeroku/network_layout) re
 
 # Hardware
 
-It's currently an RPi 4B, 8GB of RAM, 4x1.5GHz CPU.
+I currently use RPis 4B, 8GB of RAM, 4x1.5GHz CPU.
 Because of that, probably some tooling will be chosen with ARM in mind, but it shouldn't matter too much.
-Argon One (with M2 extension board) is chosen for a case + some cheap M.2 SATA SSD on top to increase speeds.
+RPis are mounted in rack using the [3d printed frames](https://www.thingiverse.com/thing:4078710),
+M.2 SSD to USB adapters are used for storage.
+Power is provided via official PoE+ hats.
 
 It's connected via Ethernet to a separate IoT subnetwork, as defined in [network_layout](https://github.com/dezeroku/network_layout).
-This comes mostly from the `Homebridge` deployment, as it needs (or at least should need) to
-be in the same network that the devices are.
-
-Initial assembly steps:
-
-- (optional, but recommended) disconnect the internal case fan, as it's pretty noisy and not really needed
-  - unscrew the case's board
-  - unscrew the fan
-  - detach the fan cable
-  - screw in the fan, so it doesn't get lost
-  - screw in the case's board (take notice of the "power" button, as it likes to fall off at this stage)
-- (optional, but recommended) switch the power button pins to position 2-3, so button doesn't need to be pressed to turn on (the default behaviour)
-- follow the provided assembly instruction
+This comes mostly from the `home-assistant` deployment, as I didn't have time to spend resolving mDNS connectivity between networks yet.
 
 # Initial steps
 
