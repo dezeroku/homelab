@@ -6,6 +6,20 @@
   roles:
     - {role: longhorn}
 
+- name: Run k3s preflight tasks
+  hosts: k8s_nodes
+  become: true
+  become_user: root
+  tasks:
+    - name: Disable swap (RPios)
+      when: raspi_os | default("false") | bool
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        name: dphys-swapfile
+        state: stopped
+        enabled: false
+
 - name: Set up k3s
   hosts: k8s_nodes
   become: true
