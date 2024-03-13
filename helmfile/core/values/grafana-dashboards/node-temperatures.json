@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "VictoriaMetrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -102,7 +102,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "VictoriaMetrics"
           },
           "editorMode": "builder",
           "expr": "node_hwmon_temp_celsius{sensor=\"temp0\"}",
@@ -117,7 +117,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "VictoriaMetrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -176,7 +176,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "VictoriaMetrics"
           },
           "editorMode": "builder",
           "expr": "node_hwmon_temp_celsius{sensor=\"temp0\"}",

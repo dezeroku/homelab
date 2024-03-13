@@ -12,11 +12,7 @@ grafana_dashboards:
         # Commit: 101ab06010f80990009c212d7cb5c187e6502648
         # Jan 19, 2023
         nginx.json: b64:{{ readFile "./grafana-dashboards/nginx.json" | b64enc }}
+
+        # Custom dashboards
         home-overview.json: b64:{{ readFile "./grafana-dashboards/home-overview.json" | b64enc }}
         node-temperatures.json: b64:{{ readFile "./grafana-dashboards/node-temperatures.json" | b64enc }}
-        # This is https://grafana.com/grafana/dashboards/12904-hashicorp-vault/ rev 2
-        vault.json: b64:{{ readFile "./grafana-dashboards/vault.json" | b64enc }}
-        # This is https://grafana.com/grafana/dashboards/1860-node-exporter-full/?tab=revisions rev 31
-        node-exporter-full.json: b64:{{ readFile "./grafana-dashboards/node-exporter-full.json" | b64enc }}
-        # This is https://grafana.com/grafana/dashboards/16888-longhorn/ rev 8
-        longhorn.json: b64:{{ readFile "./grafana-dashboards/longhorn.json" | b64enc }}
