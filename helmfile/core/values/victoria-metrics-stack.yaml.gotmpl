@@ -81,6 +81,12 @@ alertmanager:
               storage: 5Gi
 
 grafana:
+  additionalDataSources:
+    # TODO: expose both VM clusters under a common proxy
+    # and split based on the label name
+    - name: VictoriaMetricsHASS
+      url: http://vmsingle-vm-hass-victoria-metrics-k8s-stack.victoria-metrics-stack.svc:8429/
+      type: prometheus
   admin:
     existingSecret: "grafana-admin-credentials"
     userKey: admin-username
@@ -147,11 +153,11 @@ vmsingle:
         memory: 1000Mi
       limits:
         memory: 2250Mi
-    retentionPeriod: "360d"
+    retentionPeriod: "30d"
     storage:
       accessModes:
         - ReadWriteOnce
-      storageClassName: longhorn
+      storageClassName: longhorn-single-replica
       resources:
         requests:
           storage: 30Gi
@@ -170,6 +176,16 @@ vmagent:
       static_configs:
         - targets: ['devserver.lan:9100']
         #- targets: ['dezeroku-desktop.lan:9100']
+  additionalRemoteWrites:
+    # TODO: don't write hass data to the main cluster
+    # This seems to not be easily achievable without using global options, that would break
+    # the below integration
+
+    # Save the hass data to the IoT cluster (by dropping everything non-hass)
+    - url: http://vmsingle-vm-hass-victoria-metrics-k8s-stack.victoria-metrics-stack.svc:8429/api/v1/write
+      inlineUrlRelabelConfig:
+        - if: '{__name__!~"hass_.*"}'
+          action: drop
 
 vmalert:
   spec:

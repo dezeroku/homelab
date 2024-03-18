@@ -84,6 +84,16 @@ releases:
       - values/victoria-metrics-stack.yaml.gotmpl
       - values/grafana-dashboards.yaml.gotmpl
 
+  # A separate stack with longer retention period
+  # for IoT related data
+  # We only care about vmsingle here
+  - name: vm-hass
+    namespace: victoria-metrics-stack
+    chart: victoria-metrics/victoria-metrics-k8s-stack
+    version: 0.19.2
+    values:
+      - values/victoria-metrics-hass.yaml.gotmpl
+
   - name: pgo
     namespace: pgo
     chart: oci://registry.developers.crunchydata.com/crunchydata/pgo

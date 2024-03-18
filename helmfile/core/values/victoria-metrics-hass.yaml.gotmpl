@@ -1,0 +1,78 @@
+# Most of this is deployed already in the main VM helm chart
+# We use operator here too to get the CRD usage for free
+# And not play with a victoria-metrics-single separate deployment
+
+# Disable the duplicated stuff
+victoria-metrics-operator:
+  enabled: false
+
+defaultRules:
+  create: false
+
+defaultDashboardsEnabled: false
+experimentalDashboardsEnabled: false
+
+alertmanager:
+  enabled: false
+
+vmalert:
+  enabled: false
+
+vmagent:
+  enabled: false
+
+grafana:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+kubelet:
+  enabled: false
+kubeApiServer:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+coreDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+crds:
+  enabled: false
+
+# And for the part we care about
+vmsingle:
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - prometheus"
+      # Reuse the secret from core VM deployment
+      nginx.ingress.kubernetes.io/auth-secret: prometheus-ingress-basic-auth
+      nginx.ingress.kubernetes.io/auth-type: basic
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - prometheus-hass.{{ requiredEnv "DOMAIN" }}
+    paths:
+      - /
+    pathType: ImplementationSpecific
+    tls:
+      - secretName: prometheus-hass-general-tls
+        hosts:
+          - prometheus-hass.{{ requiredEnv "DOMAIN" }}
+
+  spec:
+    retentionPeriod: "5y"
+    storage:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 30Gi
