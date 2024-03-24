@@ -121,16 +121,3 @@ releases:
     version: 5.0.11
     values:
       - values/minio-operator.yaml.gotmpl
-
-# That's just a tenant's name
-#  - name: minio-longhorn-enhancements
-#    namespace: longhorn
-#    chart: ./charts/minio-longhorn-enhancements
-#    version: 0.1.0
-
-#  - name: minio-longhorn
-#    namespace: longhorn
-#    chart: minio/tenant
-#    version: 5.0.11
-#    values:
-#      - values/minio-longhorn.yaml.gotmpl
