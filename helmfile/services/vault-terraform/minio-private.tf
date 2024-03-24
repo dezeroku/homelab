@@ -25,8 +25,6 @@ resource "vault_generic_secret" "minio-private-root-credentials" {
 
   data_json = jsonencode(
     {
-      # TODO: do this properly when https://github.com/hashicorp/vault-secrets-operator/issues/135 is done
-      "config.env" : "export MINIO_ROOT_USER=${var.minio_private_root_username}\nexport MINIO_ROOT_PASSWORD=${var.minio_private_root_password}"
       "rootUser" : var.minio_private_root_username,
       "rootPassword" : var.minio_private_root_password
     }
@@ -38,9 +36,6 @@ resource "vault_generic_secret" "minio-private-dezeroku-credentials" {
 
   data_json = jsonencode(
     {
-      # TODO: do this properly when https://github.com/hashicorp/vault-secrets-operator/issues/135 is done
-      "CONSOLE_ACCESS_KEY" : var.minio_private_dezeroku_username,
-      "CONSOLE_SECRET_KEY" : var.minio_private_dezeroku_password,
       "username" : var.minio_private_dezeroku_username,
       "password" : var.minio_private_dezeroku_password
     }
