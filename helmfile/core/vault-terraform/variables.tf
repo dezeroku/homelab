@@ -62,3 +62,15 @@ variable "minio_longhorn_backup_endpoint" {
   type    = string
   default = "minio.longhorn.svc.cluster.local:443"
 }
+
+variable "users" {
+  type = map(map(string))
+}
+
+variable "domain" {
+  type = string
+}
+
+variable "oauth2_proxy_cookie_secret" {
+  type = string
+}

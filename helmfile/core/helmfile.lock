@@ -15,17 +15,23 @@ dependencies:
 - name: node-problem-detector
   repository: https://charts.deliveryhero.io/
   version: 2.3.12
+- name: oauth2-proxy
+  repository: https://oauth2-proxy.github.io/manifests
+  version: 7.1.0
 - name: operator
   repository: https://operator.min.io/
   version: 5.0.11
 - name: vault
   repository: https://helm.releases.hashicorp.com
-  version: 0.25.0
+  version: 0.27.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.5.1
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.19.2
-digest: sha256:50985a48e7a7a7060c6eed54d16fc0db088a7af853b2e9affb30441d1b0f777e
-generated: "2024-03-09T20:00:25.978294769+01:00"
+- name: victoria-metrics-k8s-stack
+  repository: https://victoriametrics.github.io/helm-charts/
+  version: 0.19.2
+digest: sha256:90f4c4062d99b00d270ce192a19ec3260e069723df154f58770a1ef95a2cabbf
+generated: "2024-04-28T23:27:19.24081226+02:00"

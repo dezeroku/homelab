@@ -18,6 +18,8 @@ repositories:
     url: https://charts.deliveryhero.io/
   - name: minio
     url: https://operator.min.io/
+  - name: oauth2-proxy
+    url: https://oauth2-proxy.github.io/manifests
 
 releases:
   - name: vault-secrets-operator
@@ -49,7 +51,7 @@ releases:
   - name: vault
     namespace: vault
     chart: hashicorp/vault
-    version: 0.25.0
+    version: 0.27.0
     values:
       - values/vault.yaml.gotmpl
 
@@ -121,3 +123,15 @@ releases:
     version: 5.0.11
     values:
       - values/minio-operator.yaml.gotmpl
+
+  - name: oauth2-proxy-enhancements
+    namespace: oauth2-proxy
+    chart: ./charts/oauth2-proxy-enhancements
+    version: 0.1.0
+
+  - name: oauth2-proxy
+    namespace: oauth2-proxy
+    chart: oauth2-proxy/oauth2-proxy
+    version: 7.1.0
+    values:
+      - values/oauth2-proxy.yaml.gotmpl
