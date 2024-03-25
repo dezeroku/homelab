@@ -1,0 +1,11 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: oauth2-proxy
+spec:
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: oauth2-proxy
+    serviceAccount: oauth2-proxy

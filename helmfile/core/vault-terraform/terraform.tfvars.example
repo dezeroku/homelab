@@ -18,4 +18,10 @@ longhorn_ingress_password_bcrypt_hash = "$2y$05$ylnhlfrOeh7GNLQ0OTtBjOJZ5HcgxSuQ
 # longhorn is just our internal alias, the real username may be different
 minio_longhorn_backup_username = "longhorn"
 minio_longhorn_backup_password = "password"
-minio_longhorn_backup_endpoint                                = "http://some-external-minio"
+minio_longhorn_backup_endpoint = "http://some-external-minio"
+user_dezeroku_username = "dezeroku"
+user_dezeroku_password = "somePassword"
+# This is the same value as set in Vault ingress
+domain = "your-domain-exposed-via-ingress"
+# generate e.g. with `dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d -- '\n' | tr -- '+/' '-_' ; echo`
+oauth2_proxy_cookie_secret = "someSecret"

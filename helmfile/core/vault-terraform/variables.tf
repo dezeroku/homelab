@@ -62,3 +62,19 @@ variable "minio_longhorn_backup_endpoint" {
   type    = string
   default = "minio.longhorn.svc.cluster.local:443"
 }
+
+variable "user_dezeroku_username" {
+  type = string
+}
+
+variable "user_dezeroku_password" {
+  type = string
+}
+
+variable "domain" {
+  type = string
+}
+
+variable "oauth2_proxy_cookie_secret" {
+  type = string
+}
