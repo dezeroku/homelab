@@ -8,11 +8,11 @@ injector:
     enabled: true
   resources:
     requests:
-      memory: 256Mi
-      cpu: 250m
+      memory: 64Mi
+      cpu: 100m
     limits:
       memory: 256Mi
-      cpu: 250m
+      cpu: 1
 
   webhook:
     # Don't instantiate pods if insertion fails
