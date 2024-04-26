@@ -171,11 +171,6 @@ vmagent:
         cpu: 250m
       limits:
         cpu: 1
-  additionalScrapeConfigs: |
-    - job_name: node-exporter
-      static_configs:
-        - targets: ['devserver.lan:9100']
-        #- targets: ['dezeroku-desktop.lan:9100']
   additionalRemoteWrites:
     # TODO: don't write hass data to the main cluster
     # This seems to not be easily achievable without using global options, that would break

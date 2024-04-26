@@ -1,0 +1,11 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMStaticScrape
+metadata:
+  name: vmstaticscrape-sample
+spec:
+  jobName: node-exporter
+  targetEndpoints:
+    - targets:
+        - devserver.lan:9100
+        # - dezeroku-desktop.lan:9100

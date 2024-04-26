@@ -69,6 +69,8 @@ releases:
     values:
       - values/cert-manager-cluster-issuer.yaml
 
+  # TODO: this contains parts that require CRDs from VM
+  # first deploy VM CRDs, then enhancements, then VM itself
   - name: victoria-metrics-stack-enhancements
     namespace: victoria-metrics-stack
     chart: ./charts/victoria-metrics-stack-enhancements
