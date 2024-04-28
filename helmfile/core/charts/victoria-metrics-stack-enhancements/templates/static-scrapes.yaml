@@ -8,4 +8,5 @@ spec:
   targetEndpoints:
     - targets:
         - devserver.lan:9100
+        - 192.168.3.1:9100
         # - dezeroku-desktop.lan:9100
