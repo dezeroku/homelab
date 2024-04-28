@@ -62,3 +62,11 @@ variable "home_assistant_prometheus_token" {
 variable "invidious_hmac_key" {
   type = string
 }
+
+#variable "redbot_owner" {
+#  type = string
+#}
+
+variable "redbot_token" {
+  type = string
+}

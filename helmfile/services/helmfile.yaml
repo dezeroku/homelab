@@ -25,6 +25,18 @@ releases:
     values:
       - values/invidious.yaml.gotmpl
 
+  - name: redbot-enhancements
+    namespace: redbot
+    chart: ./charts/redbot-enhancements
+    version: 0.1.0
+
+  - name: redbot
+    namespace: redbot
+    chart: bjw-s/app-template
+    version: 3.1.0
+    values:
+      - values/redbot.yaml.gotmpl
+
   - name: home-assistant-enhancements
     namespace: home-assistant
     chart: ./charts/home-assistant-enhancements
