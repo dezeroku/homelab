@@ -79,7 +79,7 @@ releases:
   - name: vm
     namespace: victoria-metrics-stack
     chart: victoria-metrics/victoria-metrics-k8s-stack
-    version: 0.19.2
+    version: 0.23.2
     dependencies:
       - chart: nixys/universal-chart
         version: 2.4.0
@@ -94,7 +94,7 @@ releases:
   - name: vm-hass
     namespace: victoria-metrics-stack
     chart: victoria-metrics/victoria-metrics-k8s-stack
-    version: 0.19.2
+    version: 0.23.2
     values:
       - values/victoria-metrics-hass.yaml.gotmpl
 
