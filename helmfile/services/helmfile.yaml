@@ -9,7 +9,7 @@ releases:
   - name: pacoloco
     namespace: pacoloco
     chart: bjw-s/app-template
-    version: 1.5.1
+    version: 3.1.0
     values:
       - values/pacoloco.yaml.gotmpl
 
