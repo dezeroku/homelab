@@ -52,7 +52,7 @@ releases:
   - name: home-assistant
     namespace: home-assistant
     chart: bjw-s/app-template
-    version: 1.5.1
+    version: 3.1.0
     values:
       - values/home-assistant.yaml.gotmpl
 

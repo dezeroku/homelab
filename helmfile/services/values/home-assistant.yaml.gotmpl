@@ -1,14 +1,36 @@
 ---
 hostNetwork: true
 
-controller:
-  type: statefulset
-image:
-  repository: ghcr.io/home-assistant/home-assistant
-  tag: 2024.5.2
-  pullPolicy: IfNotPresent
+controllers:
+  main:
+    type: statefulset
+    replicas: 1
+    pod:
+      hostNetwork: true
+    containers:
+      main:
+        image:
+          repository: ghcr.io/home-assistant/home-assistant
+          tag: 2024.5.2
+          pullPolicy: IfNotPresent
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+          startup:
+            enabled: true
+            spec:
+              failureThreshold: 15
+        resources:
+          limits:
+            memory: 1000Mi
+          requests:
+            memory: 250Mi
+
 service:
   main:
+    controller: main
     ports:
       http:
         port: 8123
@@ -16,7 +38,7 @@ service:
 ingress:
   main:
     enabled: true
-    ingressClassName: nginx
+    className: nginx
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
@@ -29,25 +51,28 @@ ingress:
         paths:
           - path: /
             pathType: ImplementationSpecific
+            service:
+              identifier: main
 
 persistence:
   config-storage:
     enabled: true
-    type: pvc
+    type: persistentVolumeClaim
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 1Gi
-    mountPath: /config
+    globalMounts:
+      - path: /config
 
   config:
     enabled: true
-    type: custom
-    volumeSpec:
-      configMap:
-        name: home-assistant-config
-    subPath:
-      - path: configuration.yaml
-        mountPath: /config/configuration.yaml
+    type: configMap
+    name: home-assistant-config
+    advancedMounts:
+      main:
+        main:
+          - path: /config/configuration.yaml
+            subPath: configuration.yaml
 
 configMaps:
   config:
@@ -87,9 +112,3 @@ configMaps:
         #   logs:
         #     homeassistant.components.homekit: debug
         #     pyhap: debug
-
-resources:
-  limits:
-    memory: 1000Mi
-  requests:
-    memory: 250Mi

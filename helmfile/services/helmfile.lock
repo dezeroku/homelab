@@ -2,21 +2,24 @@ version: 0.0.0-dev
 dependencies:
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 1.5.1
-- name: app-template
-  repository: https://bjw-s.github.io/helm-charts
-  version: 2.5.0
+  version: 3.1.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
   version: 3.1.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 1.5.1
+  version: 3.1.0
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 3.1.0
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 3.1.0
 - name: tenant
   repository: https://operator.min.io/
   version: 5.0.11
 - name: tenant
   repository: https://operator.min.io/
   version: 5.0.11
-digest: sha256:44d108d9ab90a9b76d806db4cda9b572aafeda2d9871c57df0cc0728b0aaa920
-generated: "2024-04-28T02:07:23.0081917+02:00"
+digest: sha256:9bcb59fa02953a053a889df35a3566fbffe9dc2cca48b01d5bbc300913e91b01
+generated: "2024-07-13T01:05:23.550324287+02:00"
