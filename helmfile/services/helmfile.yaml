@@ -13,22 +13,15 @@ releases:
     values:
       - values/pacoloco.yaml.gotmpl
 
-  - name: invidious-enhancements
-    namespace: invidious
-    chart: ./charts/invidious-enhancements
-    version: 0.1.0
-
   - name: invidious
     namespace: invidious
     chart: bjw-s/app-template
     version: 3.1.0
     values:
       - values/invidious.yaml.gotmpl
-
-  - name: redbot-enhancements
-    namespace: redbot
-    chart: ./charts/redbot-enhancements
-    version: 0.1.0
+    dependencies:
+      - chart: ./charts/invidious-enhancements
+        version: 0.1.0
 
   - name: redbot
     namespace: redbot
@@ -36,6 +29,9 @@ releases:
     version: 3.1.0
     values:
       - values/redbot.yaml.gotmpl
+    dependencies:
+      - chart: ./charts/redbot-enhancements
+        version: 0.1.0
 
   - name: netbootxyz
     namespace: netbootxyz
@@ -44,23 +40,15 @@ releases:
     values:
       - values/netbootxyz.yaml.gotmpl
 
-  - name: home-assistant-enhancements
-    namespace: home-assistant
-    chart: ./charts/home-assistant-enhancements
-    version: 0.1.0
-
   - name: home-assistant
     namespace: home-assistant
     chart: bjw-s/app-template
     version: 3.1.0
     values:
       - values/home-assistant.yaml.gotmpl
-
-  # That's just a tenant's name
-  - name: minio-core-enhancements
-    namespace: minio-core
-    chart: ./charts/minio-core-enhancements
-    version: 0.1.0
+    dependencies:
+      - chart: ./charts/home-assistant-enhancements
+        version: 0.1.0
 
   - name: minio-core
     namespace: minio-core
@@ -68,12 +56,9 @@ releases:
     version: 5.0.11
     values:
       - values/minio-core.yaml.gotmpl
-
-  # That's just a tenant's name
-  - name: minio-private-enhancements
-    namespace: minio-private
-    chart: ./charts/minio-private-enhancements
-    version: 0.1.0
+    dependencies:
+      - chart: ./charts/minio-core-enhancements
+        version: 0.1.0
 
   - name: minio-private
     namespace: minio-private
@@ -81,3 +66,6 @@ releases:
     version: 5.0.11
     values:
       - values/minio-private.yaml.gotmpl
+    dependencies:
+      - chart: ./charts/minio-private-enhancements
+        version: 0.1.0
