@@ -37,6 +37,13 @@ releases:
     values:
       - values/redbot.yaml.gotmpl
 
+  - name: netbootxyz
+    namespace: netbootxyz
+    chart: bjw-s/app-template
+    version: 3.1.0
+    values:
+      - values/netbootxyz.yaml.gotmpl
+
   - name: home-assistant-enhancements
     namespace: home-assistant
     chart: ./charts/home-assistant-enhancements

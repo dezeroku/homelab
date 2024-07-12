@@ -1,0 +1,147 @@
+---
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    pod:
+      nodeSelector:
+        kubernetes.io/hostname: homeserver-one
+    containers:
+      main:
+        image:
+          # TODO: switch to upstream after dnsmasq MR is merged
+          # This fork allows --tftp-single-port, so we only need to care
+          # about exposing a single 69/udp port "properly"
+          repository: ghcr.io/dezeroku/docker-netbootxyz
+          tag: master
+          pullPolicy: Always
+        env:
+          TFTPD_OPTS: --tftp-single-port
+          SKIP_INITIALIZATION: "true"
+          #TZ: Europe/Warsaw
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 64Mi
+    initContainers:
+      initial-setup:
+        image:
+          # TODO: switch to upstream after dnsmasq MR is merged
+          # This fork allows --tftp-single-port, so we only need to care
+          # about exposing a single 69/udp port "properly"
+          repository: ghcr.io/dezeroku/docker-netbootxyz
+          tag: master
+          pullPolicy: Always
+        env:
+          MENU_VERSION: 2.0.76
+          ONLY_INITIALIZE: "true"
+        resources: {}
+      url-fixer:
+        image:
+          repository: busybox
+          tag: 1.35
+          pullPolicy: IfNotPresent
+        command: sed
+        args:
+          - s#set live_endpoint.*#set live_endpoint https://assets.netbootxyz.{{ requiredEnv "DOMAIN"}}#
+          - -i
+          - /config/menus/boot.cfg
+        resources: {}
+service:
+  http:
+    primary: true
+    controller: main
+    ports:
+      http:
+        port: 3000
+
+  assets:
+    controller: main
+    ports:
+      assets:
+        port: 80
+
+  tftp:
+    controller: main
+    ports:
+      tftp:
+        port: 69
+        # It's either this or running the double-pod scenario with hostNetworking
+        # TODO: Opting for a service to hopefully find a cleaner ingress/gateway based approach
+        # in the future
+        # https://github.com/linuxserver/docker-netbootxyz/issues/22
+        # On top of this port being hardcoded here, there's also a router-level
+        # port forward from 69 to 32169 in case of the homeserver-one
+        # https://github.com/dezeroku/network_layout/commit/8517859f65b5b108e4d9a21b222a71816669fdbe
+        nodePort: 32169
+        protocol: UDP
+    type: NodePort
+    externalTrafficPolicy: Local
+
+ingress:
+  web:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    tls:
+      - secretName: netbootxyz-web-tls
+        hosts:
+          - netbootxyz.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: netbootxyz.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: http
+  assets:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24"
+      #nginx.ingress.kubernetes.io/proxy-body-size: "25M"
+      #nginx.ingress.kubernetes.io/server-snippet: |
+      #  client_max_body_size 25M;
+    # TODO: Disabling TLS for assets, as netbootxyz doesn't seem to like the Let's Encrypt certs
+    # at least when trying to download files from unpacked Windows ISO
+#    tls:
+#      - secretName: netbootxyz-assets-tls
+#        hosts:
+#          - assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: assets
+
+persistence:
+  assets:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 25Gi
+    globalMounts:
+      - path: /assets
+
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /config
