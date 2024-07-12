@@ -17,19 +17,19 @@
   block:
     - name: Check if salt file exists
       ansible.builtin.stat:
-        path: "{{ salt_file_path }}"
+        path: "{{ server_user_salt_file_path }}"
       register: salt_file
 
     - name: Save random salt
       when: not salt_file.stat.exists
       ansible.builtin.copy:
         content: "{{ lookup('community.general.random_string', length=16, upper=true, lower=true, number=true, special=false) }}"
-        dest: "{{ salt_file_path }}"
+        dest: "{{ server_user_salt_file_path }}"
         mode: 0600
 
     - name: Read the password salt
       ansible.builtin.slurp:
-        src: "{{ salt_file_path }}"
+        src: "{{ server_user_salt_file_path }}"
       register: salt_file
 
     - name: Decode the salt
