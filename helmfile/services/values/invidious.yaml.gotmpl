@@ -3,7 +3,6 @@
 ---
 defaultPodOptions:
   securityContext:
-    allowPrivilegeEscalation: false
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
@@ -37,14 +36,13 @@ controllers:
                 key: key
         probes:
           readiness:
-            httpGet:
-              port: 3000
-              path: /
+            enabled: true
           liveness:
-            httpGet:
-              port: 3000
-              path: /
-            initialDelaySeconds: 15
+            enabled: true
+          startup:
+            enabled: true
+            spec:
+              failureThreshold: 15
         resources:
           limits:
             memory: 1024Mi
@@ -85,6 +83,7 @@ controllers:
 
 service:
   main:
+    controller: main
     ports:
       http:
         port: 3000
@@ -112,8 +111,7 @@ ingress:
         paths:
           - path: /
             service:
-              name: main
-              port: http
+              identifier: main
 
 configMaps:
   config:
