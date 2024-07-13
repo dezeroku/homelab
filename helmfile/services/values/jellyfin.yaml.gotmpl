@@ -1,0 +1,46 @@
+global:
+  fallbackDefaults:
+    storageClass: longhorn
+
+resources:
+  limits:
+    memory: 4Gi
+
+podOptions:
+  nodeSelector:
+    # Upstream hardcodes amd64 here, get rid of it
+    kubernetes.io/arch: "arm64"
+
+persistence:
+  config:
+    size: 1Gi
+
+  metube:
+    enabled: true
+    type: pvc
+    mountPath: /metube
+    targetSelectAll: true
+    existingClaim: metube-downloads
+
+portal:
+  open:
+    enabled: false
+
+ingress:
+  main:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+    ingressClassName: nginx
+    integrations:
+      traefik:
+        enabled: false
+    hosts:
+      - host: jellyfin.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+    tls:
+      - secretName: jellyfin-tls
+        hosts:
+          - jellyfin.{{ requiredEnv "DOMAIN" }}

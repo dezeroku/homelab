@@ -50,6 +50,13 @@ releases:
       - chart: ./charts/home-assistant-enhancements
         version: 0.1.0
 
+  - name: jellyfin
+    namespace: media
+    chart: oci://tccr.io/truecharts/jellyfin
+    version: 20.1.6
+    values:
+      - values/jellyfin.yaml.gotmpl
+
   - name: minio-core
     namespace: minio-core
     chart: minio/tenant
