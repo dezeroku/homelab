@@ -1,0 +1,46 @@
+global:
+  fallbackDefaults:
+    storageClass: longhorn
+
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+
+podOptions:
+  nodeSelector:
+    # Upstream hardcodes amd64 here, get rid of it
+    kubernetes.io/arch: "arm64"
+
+persistence:
+  config:
+    size: 1Gi
+  downloads:
+    size: 100Gi
+    accessModes:
+      - ReadWriteMany
+
+portal:
+  open:
+    enabled: false
+
+ingress:
+  main:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    ingressClassName: nginx
+    integrations:
+      traefik:
+        enabled: false
+    hosts:
+      - host: metube.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+    tls:
+      - secretName: metube-tls
+        hosts:
+          - metube.{{ requiredEnv "DOMAIN" }}
