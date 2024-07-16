@@ -1,10 +1,7 @@
 ---
 controllers:
   main:
-    #strategy: Recreate
-    strategy: RollingUpdate
-    # invidious is single-threaded, so bumping number
-    # of replicas significantly speeds up things such as loading thumbnails
+    strategy: Recreate
     replicas: 1
     containers:
       main:
@@ -54,9 +51,9 @@ ingress:
               identifier: main
 
 persistence:
-  config:
+  data:
     enabled: true
     type: persistentVolumeClaim
-    existingClaim: metube-downloads
+    existingClaim: media-storage-main
     globalMounts:
       - path: /srv

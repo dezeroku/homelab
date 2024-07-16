@@ -15,12 +15,12 @@ persistence:
   config:
     size: 1Gi
 
-  metube:
+  media-storage-main:
     enabled: true
     type: pvc
-    mountPath: /metube
+    mountPath: /media-storage-main
     targetSelectAll: true
-    existingClaim: metube-downloads
+    existingClaim: media-storage-main
 
 portal:
   open:

@@ -58,18 +58,16 @@ releases:
       - values/media-storage.yaml.gotmpl
 
   - name: filebrowser
-    namespace: jellyfin
+    namespace: media
     chart: bjw-s/app-template
     version: 3.1.0
     values:
       - values/filebrowser.yaml.gotmpl
 
   - name: metube
-    namespace: jellyfin
-    # TODO: quay.io returns 429 with every try, fix before merging
-    # chart: oci://tccr.io/truecharts/metube
-    chart: ./metube-14.2.3.tgz
-    version: 14.2.3
+    namespace: media
+    chart: bjw-s/app-template
+    version: 3.1.0
     values:
       - values/metube.yaml.gotmpl
 

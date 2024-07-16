@@ -1,46 +1,64 @@
-global:
-  fallbackDefaults:
-    storageClass: longhorn
+---
+defaultPodOptions:
+  securityContext:
+    # Stay consistent with jellyfin deployment
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
 
-resources:
-  limits:
-    cpu: 1
-    memory: 1Gi
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/alexta69/metube
+          tag: 2024-07-14
+          pullPolicy: IfNotPresent
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 128Mi
 
-podOptions:
-  nodeSelector:
-    # Upstream hardcodes amd64 here, get rid of it
-    kubernetes.io/arch: "arm64"
-
-persistence:
-  config:
-    size: 1Gi
-  downloads:
-    size: 100Gi
-    accessModes:
-      - ReadWriteMany
-
-portal:
-  open:
-    enabled: false
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8081
 
 ingress:
   main:
     enabled: true
+    className: nginx
     annotations:
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth"
       nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-    ingressClassName: nginx
-    integrations:
-      traefik:
-        enabled: false
-    hosts:
-      - host: metube.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
     tls:
       - secretName: metube-tls
         hosts:
           - metube.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: metube.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    existingClaim: media-storage-main
+    globalMounts:
+      - path: /downloads
+        subPath: metube
