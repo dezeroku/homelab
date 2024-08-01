@@ -1,0 +1,22 @@
+{{ if .Capabilities.APIVersions.Has "argoproj.io/v1alpha1" -}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ default .Release.Name .Values.targetName }}
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/dezeroku/homelab'
+    path: {{ .Values.helmfileDirectory }}
+    targetRevision: HEAD
+    plugin:
+      env:
+        - name: DOMAIN
+          value: {{ .Values.domain }}
+        - name: HELMFILE_GLOBAL_OPTIONS
+          value: "--selector name={{ default .Release.Name .Values.targetName }}"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: {{ default .Release.Name .Values.targetNamespace }}
+{{ end -}}

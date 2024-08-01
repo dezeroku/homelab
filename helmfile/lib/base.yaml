@@ -1,0 +1,13 @@
+---
+templates:
+  default:
+    namespace: "{{`{{ .Release.Name }}`}}"
+    values:
+      - values/{{`{{ .Release.Name }}`}}.yaml.gotmpl
+  argocd-app:
+    namespace: argocd
+    chart: ../lib/charts/argocd-app
+    version: 0.1.0
+    values:
+      - domain: '{{ requiredEnv "DOMAIN" }}'
+        helmfileDirectory: '{{ exec "git" (list "rev-parse" "--show-prefix") }}'

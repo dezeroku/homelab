@@ -1,4 +1,7 @@
 ---
+bases:
+  - ../lib/base.yaml
+
 repositories:
   - name: bjw-s
     url: https://bjw-s.github.io/helm-charts
@@ -7,93 +10,127 @@ repositories:
 
 releases:
   - name: pacoloco
-    namespace: pacoloco
     chart: bjw-s/app-template
     version: 3.1.0
-    values:
-      - values/pacoloco.yaml.gotmpl
+    inherit:
+      - template: default
+  - name: pacoloco
+    inherit:
+      - template: argocd-app
 
   - name: invidious
-    namespace: invidious
     chart: bjw-s/app-template
     version: 3.1.0
-    values:
-      - values/invidious.yaml.gotmpl
     dependencies:
       - chart: ./charts/invidious-enhancements
         version: 0.1.0
+    inherit:
+      - template: default
+  - name: invidious
+    inherit:
+      - template: argocd-app
 
   - name: redbot
-    namespace: redbot
     chart: bjw-s/app-template
     version: 3.1.0
-    values:
-      - values/redbot.yaml.gotmpl
     dependencies:
       - chart: ./charts/redbot-enhancements
         version: 0.1.0
+    inherit:
+      - template: default
+  - name: redbot
+    inherit:
+      - template: argocd-app
 
   - name: netbootxyz
-    namespace: netbootxyz
     chart: bjw-s/app-template
     version: 3.1.0
-    values:
-      - values/netbootxyz.yaml.gotmpl
+    inherit:
+      - template: default
+  - name: netbootxyz
+    inherit:
+      - template: argocd-app
 
   - name: home-assistant
-    namespace: home-assistant
     chart: bjw-s/app-template
     version: 3.1.0
-    values:
-      - values/home-assistant.yaml.gotmpl
     dependencies:
       - chart: ./charts/home-assistant-enhancements
         version: 0.1.0
+    inherit:
+      - template: default
+  - name: home-assistant
+    inherit:
+      - template: argocd-app
 
   - name: media-storage
     namespace: media
     chart: bjw-s/app-template
     version: 3.1.0
+    inherit:
+      - template: default
+  - name: media-storage
     values:
-      - values/media-storage.yaml.gotmpl
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app
 
   - name: filebrowser
     namespace: media
     chart: bjw-s/app-template
     version: 3.1.0
+    inherit:
+      - template: default
+  - name: filebrowser
     values:
-      - values/filebrowser.yaml.gotmpl
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app
 
   - name: metube
     namespace: media
     chart: bjw-s/app-template
     version: 3.1.0
+    inherit:
+      - template: default
+  - name: metube
     values:
-      - values/metube.yaml.gotmpl
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app
 
   - name: jellyfin
     namespace: media
     chart: oci://tccr.io/truecharts/jellyfin
     version: 20.1.6
+    inherit:
+      - template: default
+  - name: jellyfin
     values:
-      - values/jellyfin.yaml.gotmpl
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app
 
   - name: minio-core
-    namespace: minio-core
     chart: minio/tenant
     version: 5.0.11
-    values:
-      - values/minio-core.yaml.gotmpl
+    inherit:
+      - template: default
     dependencies:
       - chart: ./charts/minio-core-enhancements
         version: 0.1.0
+  - name: minio-core
+    inherit:
+      - template: argocd-app
 
   - name: minio-private
-    namespace: minio-private
     chart: minio/tenant
     version: 5.0.11
-    values:
-      - values/minio-private.yaml.gotmpl
+    inherit:
+      - template: default
     dependencies:
       - chart: ./charts/minio-private-enhancements
         version: 0.1.0
+  - name: minio-private
+    inherit:
+      - template: argocd-app
