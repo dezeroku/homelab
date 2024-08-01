@@ -1,0 +1,53 @@
+global:
+  domain: argocd.{{ requiredEnv "DOMAIN" }}
+
+configs:
+  cm:
+    admin.enabled: false
+    oidc.config: |
+      name: Vault
+      issuer: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
+      clientID: $oidc:client_id
+      clientSecret: $oidc:client_secret
+      requestedScopes:
+        - openid
+        - groups
+        - email
+  rbac:
+    policy.default: 'role:admin'
+
+server:
+  certificate:
+    enabled: true
+    issuer:
+      kind: ClusterIssuer
+      name: letsencrypt-dns-prod
+  ingress:
+    enabled: true
+    tls: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
+repoServer:
+  volumes:
+    - emptyDir: {}
+      name: helmfile-cmp-tmp
+  extraContainers:
+    - name: helmfile-plugin
+      image: travisghansen/argo-cd-helmfile:v0.3.11
+      command: [/var/run/argocd/argocd-cmp-server]
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      volumeMounts:
+        - mountPath: /var/run/argocd
+          name: var-files
+        - mountPath: /home/argocd/cmp-server/plugins
+          name: plugins
+        - mountPath: /tmp
+          name: helmfile-cmp-tmp
+
+dex:
+  enabled: false

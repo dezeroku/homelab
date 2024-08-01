@@ -20,6 +20,8 @@ repositories:
     url: https://operator.min.io/
   - name: oauth2-proxy
     url: https://oauth2-proxy.github.io/manifests
+  - name: argo-helm
+    url: https://argoproj.github.io/argo-helm
 
 releases:
   - name: vault-secrets-operator
@@ -137,3 +139,13 @@ releases:
     version: 7.1.0
     values:
       - values/oauth2-proxy.yaml.gotmpl
+
+  - name: argocd
+    namespace: argocd
+    chart: argo-helm/argo-cd
+    version: 7.3.11
+    values:
+      - values/argocd.yaml.gotmpl
+    dependencies:
+      - chart: ./charts/argocd-enhancements
+        version: 0.1.0
