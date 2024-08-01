@@ -15,7 +15,7 @@ spec:
         - name: DOMAIN
           value: {{ .Values.domain }}
         - name: HELMFILE_GLOBAL_OPTIONS
-          value: "--selector name={{ default .Release.Name .Values.targetName }}"
+          value: "--selector name={{ default .Release.Name .Values.targetName }},argocd-app!=true"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: {{ default .Release.Name .Values.targetNamespace }}

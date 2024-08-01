@@ -6,6 +6,8 @@ templates:
       - values/{{`{{ .Release.Name }}`}}.yaml.gotmpl
   argocd-app:
     namespace: argocd
+    labels:
+      argocd-app: true
     chart: ../lib/charts/argocd-app
     version: 0.1.0
     values:
