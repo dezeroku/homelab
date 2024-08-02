@@ -29,3 +29,5 @@ users = {
     password = "example-password"
   }
 }
+cert_manager_aws_access_key_id = "ID"
+cert_manager_aws_secret_access_key = "Secret"

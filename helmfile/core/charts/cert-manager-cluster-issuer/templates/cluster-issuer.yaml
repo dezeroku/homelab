@@ -16,8 +16,9 @@ spec:
         dns01:
           route53:
             region: {{.Values.region | required ".Values.region' is required"}}
-            hostedZoneID: {{.Values.hostedZoneID | required ".Values.hostedZoneID' is required"}}
-            accessKeyID: {{.Values.accessKeyID | required ".Values.accessKeyID' is required"}}
+            accessKeyIDSecretRef:
+              name: letsencrypt-dns-prod-credentials-secret
+              key: AWS_ACCESS_KEY_ID
             secretAccessKeySecretRef:
               name: letsencrypt-dns-prod-credentials-secret
-              key: secret-access-key
+              key: AWS_SECRET_ACCESS_KEY

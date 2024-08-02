@@ -69,8 +69,6 @@ releases:
   - name: cert-manager
     chart: jetstack/cert-manager
     version: 1.14.4
-    values:
-      - values/cert-manager-cluster-issuer.yaml
     inherit:
       - template: default
     dependencies:
