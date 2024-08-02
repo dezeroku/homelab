@@ -78,7 +78,10 @@ releases:
     inherit:
       - template: argocd-app
 
-  - name: victoria-metrics-stack
+  # Using vm instead of victoria-metrics-stack, because the latter causes
+  # issues with with names extending 63 characters
+  - name: vm
+    namespace: victoria-metrics-stack
     chart: victoria-metrics/victoria-metrics-k8s-stack
     version: 0.19.2
     values:
@@ -91,7 +94,9 @@ releases:
         alias: grafana_dashboards
       - chart: ./charts/victoria-metrics-stack-enhancements
         version: 0.1.0
-  - name: victoria-metrics-stack
+  - name: vm
+    values:
+      - targetNamespace: victoria-metrics-stack
     inherit:
       - template: argocd-app
 
