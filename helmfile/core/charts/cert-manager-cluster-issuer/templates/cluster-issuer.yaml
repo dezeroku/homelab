@@ -10,10 +10,7 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-dns-prod
     solvers:
-      - selector:
-        dnsZones:
-          - {{.Values.domain | required ".Values.domain' is required"}}
-        dns01:
+      - dns01:
           route53:
             region: {{.Values.region | required ".Values.region' is required"}}
             accessKeyIDSecretRef:
