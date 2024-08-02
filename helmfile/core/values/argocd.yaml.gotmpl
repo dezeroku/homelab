@@ -16,19 +16,26 @@ configs:
   rbac:
     policy.default: 'role:admin'
 
+  params:
+    # We terminate TLS on ingress' level
+    server.insecure: true
+
 server:
-  certificate:
-    enabled: true
-    issuer:
-      kind: ClusterIssuer
-      name: letsencrypt-dns-prod
   ingress:
     enabled: true
     tls: true
     ingressClassName: nginx
     annotations:
-      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+
+  ingressGrpc:
+    enabled: true
+    tls: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
 
 repoServer:
   volumes:
