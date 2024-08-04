@@ -38,7 +38,7 @@ releases:
 
   - name: longhorn
     chart: longhorn/longhorn
-    version: 1.5.3
+    version: 1.6.2
     inherit:
       - template: default
     dependencies:
