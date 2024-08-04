@@ -51,9 +51,15 @@ ingress:
               identifier: main
 
 persistence:
-  data:
+  main:
     enabled: true
     type: persistentVolumeClaim
     existingClaim: media-storage-main
     globalMounts:
-      - path: /srv
+      - path: /srv/main
+  downloads:
+    enabled: true
+    type: persistentVolumeClaim
+    existingClaim: media-storage-downloads
+    globalMounts:
+      - path: /srv/downloads

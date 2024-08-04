@@ -1,7 +1,17 @@
 persistence:
+  # The actual "library"
   main:
     enabled: true
     type: persistentVolumeClaim
     storageClass: longhorn
+    accessMode: ReadWriteMany
+    size: 100Gi
+
+  # Temporary storage to be organized in the main one
+  # Not replicated in the same fashion
+  downloads:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn-single-replica
     accessMode: ReadWriteMany
     size: 100Gi
