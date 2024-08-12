@@ -38,18 +38,6 @@ variable "victoria_metrics_alertmanager_deadmanssnitch_url" {
   type = string
 }
 
-variable "longhorn_ingress_username" {
-  type = string
-}
-
-variable "longhorn_ingress_password" {
-  type = string
-}
-
-variable "longhorn_ingress_password_bcrypt_hash" {
-  type = string
-}
-
 variable "minio_longhorn_backup_username" {
   type = string
 }

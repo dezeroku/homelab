@@ -32,5 +32,6 @@ module "user" {
     monitoring-viewers = vault_identity_group.monitoring_viewers.id
     monitoring-admins  = vault_identity_group.monitoring_admins.id
     netbootxyz-admins  = vault_identity_group.netbootxyz_admins.id
+    storage-admins     = vault_identity_group.storage_admins.id
   }
 }

@@ -53,3 +53,10 @@ resource "vault_identity_group" "netbootxyz_admins" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "storage_admins" {
+  name                       = "storage-admins"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}
