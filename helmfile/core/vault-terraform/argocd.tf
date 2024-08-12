@@ -3,6 +3,19 @@ resource "vault_identity_oidc_assignment" "argocd" {
   group_ids = [vault_identity_group.users.id]
 }
 
+resource "vault_policy" "argocd" {
+  name = "argocd"
+
+  policy = <<EOT
+path "identity/oidc/client/argocd" {
+  capabilities = ["read"]
+}
+path "kvv2/data/core/argocd/credentials/*" {
+  capabilities = ["read"]
+}
+EOT
+}
+
 resource "vault_identity_oidc_client" "argocd" {
   name = "argocd"
   redirect_uris = [
@@ -22,12 +35,14 @@ resource "vault_kubernetes_auth_backend_role" "argocd" {
   token_policies                   = ["argocd"]
 }
 
-resource "vault_policy" "argocd" {
-  name = "argocd"
+resource "vault_generic_secret" "argocd-credentials-homelab" {
+  path = "kvv2/core/argocd/credentials/homelab"
 
-  policy = <<EOT
-path "identity/oidc/client/argocd" {
-  capabilities = ["read"]
-}
-EOT
+  data_json = jsonencode(
+    {
+      "type" : "git",
+      "url" : "git@github.com:dezeroku/homelab.git"
+      "sshPrivateKey" : var.argocd_credentials_homelab_private_key
+    }
+  )
 }

@@ -31,3 +31,4 @@ users = {
 }
 cert_manager_aws_access_key_id = "ID"
 cert_manager_aws_secret_access_key = "Secret"
+argocd_credentials_homelab_private_key = "Private Key"

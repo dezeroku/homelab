@@ -82,3 +82,7 @@ variable "cert_manager_aws_access_key_id" {
 variable "cert_manager_aws_secret_access_key" {
   type = string
 }
+
+variable "argocd_credentials_homelab_private_key" {
+  type = string
+}
