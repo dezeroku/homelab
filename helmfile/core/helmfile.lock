@@ -20,7 +20,7 @@ dependencies:
   version: 2.3.12
 - name: oauth2-proxy
   repository: https://oauth2-proxy.github.io/manifests
-  version: 7.1.0
+  version: 7.6.0
 - name: operator
   repository: https://operator.min.io/
   version: 5.0.11
@@ -33,5 +33,5 @@ dependencies:
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.19.2
-digest: sha256:f3836dab21865007dca4b651e65ca9094ddf17172aedbece9effbf458ad2ca6d
-generated: "2024-08-04T18:08:42.299909581+02:00"
+digest: sha256:d47f814a405a0b97d77751b734aed123f039bb51b16fdd15a3f2c75f0c0cfd10
+generated: "2024-08-13T00:50:59.945330743+02:00"

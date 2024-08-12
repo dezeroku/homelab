@@ -27,6 +27,7 @@ config:
     upstreams = [
         "file://dev/null"
     ]
+    scope = "openid email profile groups"
     oidc_issuer_url = "https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main"
     redirect_url = "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
 

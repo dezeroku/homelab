@@ -159,7 +159,7 @@ releases:
 
   - name: oauth2-proxy
     chart: oauth2-proxy/oauth2-proxy
-    version: 7.1.0
+    version: 7.6.0
     inherit:
       - template: default
     dependencies:

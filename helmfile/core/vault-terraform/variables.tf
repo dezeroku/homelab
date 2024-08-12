@@ -64,7 +64,11 @@ variable "minio_longhorn_backup_endpoint" {
 }
 
 variable "users" {
-  type = map(map(string))
+  type = map(object({
+    email    = string
+    password = string
+    groups   = list(string)
+  }))
 }
 
 variable "domain" {

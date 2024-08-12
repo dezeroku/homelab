@@ -19,8 +19,16 @@ resource "vault_identity_entity_alias" "alias" {
   canonical_id   = vault_identity_entity.user.id
 }
 
+// Add every user to the "users" groups by default
 resource "vault_identity_group_member_entity_ids" "users_member" {
   member_entity_ids = [vault_identity_entity.user.id]
   exclusive         = false
-  group_id          = var.users_group_id
+  group_id          = var.groups_mapping["users"]
+}
+
+resource "vault_identity_group_member_entity_ids" "group_member" {
+  for_each          = toset(var.groups)
+  member_entity_ids = [vault_identity_entity.user.id]
+  exclusive         = false
+  group_id          = var.groups_mapping[each.value]
 }

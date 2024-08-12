@@ -14,6 +14,10 @@ variable "userpass_accessor" {
   type = string
 }
 
-variable "users_group_id" {
-  type = string
+variable "groups" {
+  type = list(string)
+}
+
+variable "groups_mapping" {
+  type = map(string)
 }

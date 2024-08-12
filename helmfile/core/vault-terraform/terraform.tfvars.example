@@ -27,6 +27,10 @@ users = {
   dezeroku = {
     email = "dezeroku@gmail.com"
     password = "example-password"
+    groups = [
+        "media-viewers",
+        "example-group"
+        ]
   }
 }
 cert_manager_aws_access_key_id = "ID"
