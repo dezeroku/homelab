@@ -32,7 +32,8 @@ resource "vault_identity_oidc_provider" "main" {
   issuer_host   = "vault.${var.domain}"
   allowed_client_ids = [
     vault_identity_oidc_client.oauth2-proxy.client_id,
-    vault_identity_oidc_client.argocd.client_id
+    vault_identity_oidc_client.argocd.client_id,
+    vault_identity_oidc_client.argocd-cli.client_id,
   ]
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,

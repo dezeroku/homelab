@@ -9,6 +9,7 @@ configs:
       issuer: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
       clientID: $oidc:client_id
       clientSecret: $oidc:client_secret
+      cliClientID: $oidc-cli:client_id
       requestedScopes:
         - openid
         - groups

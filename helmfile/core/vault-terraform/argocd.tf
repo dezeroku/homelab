@@ -10,6 +10,9 @@ resource "vault_policy" "argocd" {
 path "identity/oidc/client/argocd" {
   capabilities = ["read"]
 }
+path "identity/oidc/client/argocd-cli" {
+  capabilities = ["read"]
+}
 path "kvv2/data/core/argocd/credentials/*" {
   capabilities = ["read"]
 }
@@ -21,6 +24,17 @@ resource "vault_identity_oidc_client" "argocd" {
   redirect_uris = [
     "https://argocd.${var.domain}/auth/callback",
   ]
+  assignments      = [vault_identity_oidc_assignment.argocd.name]
+  id_token_ttl     = 2400
+  access_token_ttl = 7200
+}
+
+resource "vault_identity_oidc_client" "argocd-cli" {
+  name = "argocd-cli"
+  redirect_uris = [
+    "http://localhost:8085/auth/callback",
+  ]
+  client_type      = "public"
   assignments      = [vault_identity_oidc_assignment.argocd.name]
   id_token_ttl     = 2400
   access_token_ttl = 7200
