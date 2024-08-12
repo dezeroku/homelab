@@ -134,9 +134,8 @@ vmsingle:
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - prometheus"
-      nginx.ingress.kubernetes.io/auth-secret: prometheus-ingress-basic-auth
-      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
     enabled: true
     ingressClassName: nginx
     hosts:
