@@ -13,3 +13,4 @@ templates:
     values:
       - domain: '{{ requiredEnv "DOMAIN" }}'
         helmfileDirectory: '{{ exec "git" (list "rev-parse" "--show-prefix") }}'
+        repoURL: '{{ exec "git" (list "ls-remote" "--get-url" "origin") }}'
