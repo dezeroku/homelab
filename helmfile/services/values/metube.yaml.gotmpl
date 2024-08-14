@@ -55,10 +55,10 @@ ingress:
               identifier: main
 
 persistence:
-  config:
+  storage:
     enabled: true
     type: persistentVolumeClaim
-    existingClaim: media-storage-downloads
+    existingClaim: media-storage-main
     globalMounts:
       - path: /downloads
         subPath: metube

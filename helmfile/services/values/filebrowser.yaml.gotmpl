@@ -56,10 +56,4 @@ persistence:
     type: persistentVolumeClaim
     existingClaim: media-storage-main
     globalMounts:
-      - path: /srv/main
-  downloads:
-    enabled: true
-    type: persistentVolumeClaim
-    existingClaim: media-storage-downloads
-    globalMounts:
-      - path: /srv/downloads
+      - path: /srv
