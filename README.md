@@ -95,7 +95,7 @@ What you need to do (this step assumes that your homeserver is available as `hom
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i inventory.yml -l k8s_nodes`
+3. Run the `ansible-playbook site.yml -l k8s_nodes`
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` and `--extra-vars user_password=<password you want to set>` if the default values don't suit you.
    This will also remove the `ansible_bootstrap` user by default.
    The user_password is obtained from Bitwarden by default
@@ -106,7 +106,7 @@ What you need to do (this step assumes that your homeserver is available as `hom
 Note: later on you can use the above command again, but this time also make it run system updates:
 
 ```
-ansible-playbook site.yml -i inventory.yml -l k8s_nodes --extra-vars upgrade_packages=true
+ansible-playbook site.yml -l k8s_nodes --extra-vars upgrade_packages=true
 ```
 
 This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
@@ -159,7 +159,7 @@ with applying ansible playbook `printserver.yml`:
 
 1. Enter the `ansible` directory
 2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -i inventory.yml -l printserver`
+3. Run the `ansible-playbook site.yml -l printserver`
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` and `--extra-vars user_password=<password you want to set>` if the default values don't suit you.
    This will also remove the `ansible_bootstrap` user by default.
    The user_password is obtained from Bitwarden by default
@@ -167,7 +167,7 @@ with applying ansible playbook `printserver.yml`:
 Note: later on you can use the above command again, but this time also make it run system updates:
 
 ```
-ansible-playbook site.yml -i inventory.yml -l printserver -extra-vars upgrade_packages=true
+ansible-playbook site.yml -l printserver -extra-vars upgrade_packages=true
 ```
 
 This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
