@@ -6,7 +6,7 @@
   notify:
     - Reboot the node
   ansible.builtin.lineinfile:
-    path: /boot/config.txt
+    path: /boot/firmware/config.txt
     regexp: '^dtparam=poe_fan_temp{{ item.number }}='
     line: dtparam=poe_fan_temp{{ item.number }}={{ item.temp }}
   loop:
