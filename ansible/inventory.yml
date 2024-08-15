@@ -2,20 +2,8 @@
 k8s_controlplanes:
   hosts:
     homeserver-one:
-      vars:
-        k3s_tls_san:
-          - homeserver
-          - homeserver-one
     homeserver-two:
-      vars:
-        k3s_tls_san:
-          - homeserver
-          - homeserver-two
     homeserver-three:
-      vars:
-        k3s_tls_san:
-          - homeserver
-          - homeserver-three
   vars:
     k3s_control_node: true
     node_label:
@@ -35,6 +23,8 @@ k8s_nodes:
     k3s_become: true
     k3s_etcd_datastore: true
     k3s_release_version: v1.30.3+k3s1
+    k3s_tls_san:
+      - homeserver.lan
 
 misc:
   hosts:
