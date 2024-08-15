@@ -94,19 +94,20 @@ are properly configured and versioned.
 What you need to do (this step assumes that your homeserver is available as `homeserver.lan`. Modify the inventories if it's not true):
 
 1. Enter the `ansible` directory
-2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -l k8s_nodes`
+2. Set up the workspace with `poetry install`
+3. Get dependencies via `poetry run ansible-galaxy install -r requirements.yml`
+4. Run the `poetry run ansible-playbook site.yml -l k8s_nodes`
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` and `--extra-vars user_password=<password you want to set>` if the default values don't suit you.
    This will also remove the `ansible_bootstrap` user by default.
    The user_password is obtained from Bitwarden by default
 
-4. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+5. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
    You'll have to modify the `127.0.0.1` so it points to your homeserver
 
 Note: later on you can use the above command again, but this time also make it run system updates:
 
 ```
-ansible-playbook site.yml -l k8s_nodes --extra-vars upgrade_packages=true
+poetry run ansible-playbook site.yml -l k8s_nodes --extra-vars upgrade_packages=true
 ```
 
 This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
@@ -158,8 +159,9 @@ For this to happen, you've got to follow the instructions from "Initial Steps" a
 with applying ansible playbook `printserver.yml`:
 
 1. Enter the `ansible` directory
-2. Get dependencies via `ansible-galaxy install -r requirements.yml`
-3. Run the `ansible-playbook site.yml -l printserver`
+2. Set up the workspace with `poetry install`
+3. Get dependencies via `poetry run ansible-galaxy install -r requirements.yml`
+4. Run the `poetry run ansible-playbook site.yml -l printserver`
    You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` and `--extra-vars user_password=<password you want to set>` if the default values don't suit you.
    This will also remove the `ansible_bootstrap` user by default.
    The user_password is obtained from Bitwarden by default
@@ -167,7 +169,7 @@ with applying ansible playbook `printserver.yml`:
 Note: later on you can use the above command again, but this time also make it run system updates:
 
 ```
-ansible-playbook site.yml -l printserver -extra-vars upgrade_packages=true
+poetry run ansible-playbook site.yml -l printserver -extra-vars upgrade_packages=true
 ```
 
 This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.

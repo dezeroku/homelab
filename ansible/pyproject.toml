@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "ansible-setup"
+version = "0.1.0"
+description = ""
+authors = ["dezeroku <contact@dezeroku.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+ansible = "^10.3.0"
+passlib = "^1.7.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
