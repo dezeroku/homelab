@@ -11,7 +11,7 @@ dependencies:
   version: 0.29.0
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.7.1
+  version: 4.11.1
 - name: longhorn
   repository: https://charts.longhorn.io
   version: 1.6.2
@@ -33,5 +33,5 @@ dependencies:
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.24.5
-digest: sha256:79bccb68027d7e11d7f96abc45e709280a159b4e84a0e7462659c3d8b4f131fc
-generated: "2024-08-15T03:04:04.31399605+02:00"
+digest: sha256:53c8dc7aaf94282327e0d3caa695db09dc8d3520d7dcb682ee3caac1e8720382
+generated: "2024-08-16T02:24:26.177308628+02:00"
