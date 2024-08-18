@@ -11,7 +11,7 @@ repositories:
 releases:
   - name: pacoloco
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     inherit:
       - template: default
   - name: pacoloco
@@ -20,7 +20,7 @@ releases:
 
   - name: invidious
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     dependencies:
       - chart: ./charts/invidious-enhancements
         version: 0.1.0
@@ -32,7 +32,7 @@ releases:
 
   - name: redbot
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     dependencies:
       - chart: ./charts/redbot-enhancements
         version: 0.1.0
@@ -44,7 +44,7 @@ releases:
 
   - name: netbootxyz
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     inherit:
       - template: default
   - name: netbootxyz
@@ -53,7 +53,7 @@ releases:
 
   - name: home-assistant
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     dependencies:
       - chart: ./charts/home-assistant-enhancements
         version: 0.1.0
@@ -66,7 +66,7 @@ releases:
   - name: media-storage
     namespace: media
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     inherit:
       - template: default
   - name: media-storage
@@ -78,7 +78,7 @@ releases:
   - name: filebrowser
     namespace: media
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     inherit:
       - template: default
   - name: filebrowser
@@ -90,7 +90,7 @@ releases:
   - name: metube
     namespace: media
     chart: bjw-s/app-template
-    version: 3.1.0
+    version: 3.3.2
     inherit:
       - template: default
   - name: metube
