@@ -107,8 +107,8 @@ releases:
   # We only care about vmsingle here
   - name: vm-hass
     namespace: victoria-metrics-stack
-    chart: victoria-metrics/victoria-metrics-k8s-stack
-    version: 0.24.5
+    chart: bjw-s/app-template
+    version: 3.3.2
     inherit:
       - template: default
   - name: vm-hass

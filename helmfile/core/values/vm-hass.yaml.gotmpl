@@ -1,76 +1,47 @@
-# Most of this is deployed already in the main VM helm chart
-# We use operator here too to get the CRD usage for free
-# And not play with a victoria-metrics-single separate deployment
-
-# Disable the duplicated stuff
-victoria-metrics-operator:
-  enabled: false
-
-defaultRules:
-  create: false
-
-defaultDashboardsEnabled: false
-experimentalDashboardsEnabled: false
-
-alertmanager:
-  enabled: false
-
-vmalert:
-  enabled: false
-
-vmagent:
-  enabled: false
-
-grafana:
-  enabled: false
-
-prometheus-node-exporter:
-  enabled: false
-
-kube-state-metrics:
-  enabled: false
-
-kubelet:
-  enabled: false
-kubeApiServer:
-  enabled: false
-kubeControllerManager:
-  enabled: false
-coreDns:
-  enabled: false
-kubeEtcd:
-  enabled: false
-kubeScheduler:
-  enabled: false
-crds:
-  enabled: false
-
-# And for the part we care about
-vmsingle:
+rawResources:
+  vmsingle:
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMSingle
+    spec:
+      spec:
+        extraArgs: {}
+        image:
+          tag: v1.102.1
+        replicaCount: 1
+        retentionPeriod: 5y
+        storage:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 30Gi
+          storageClassName: longhorn
   ingress:
+    # It would be much better to use the app-template's mechanisms,
+    # but the VM operator is responsible for creating services and such
+    # and I don't want to hit any conflicts with it
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.home.dezeroku.com/oauth2/start?rd=https://$host$escaped_request_uri"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.home.dezeroku.com/oauth2/auth?allowed_groups=monitoring-admins"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
-      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - prometheus-hass.{{ requiredEnv "DOMAIN" }}
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    tls:
-      - secretName: prometheus-hass-general-tls
-        hosts:
-          - prometheus-hass.{{ requiredEnv "DOMAIN" }}
-
-  spec:
-    retentionPeriod: "5y"
-    storage:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: longhorn
-      resources:
-        requests:
-          storage: 30Gi
+    spec:
+      spec:
+        ingressClassName: nginx
+        tls:
+          - hosts:
+            - prometheus-hass.home.dezeroku.com
+            secretName: prometheus-hass-general-tls
+        rules:
+          - host: prometheus-hass.home.dezeroku.com
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: vmsingle-vm-hass-vmsingle
+                      port:
+                        number: 8429

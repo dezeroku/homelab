@@ -87,7 +87,7 @@ grafana:
     # TODO: expose both VM clusters under a common proxy
     # and split based on the label name
     - name: VictoriaMetricsHASS
-      url: http://vmsingle-vm-hass-victoria-metrics-k8s-stack.victoria-metrics-stack.svc:8429/
+      url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/
       type: prometheus
   admin:
     existingSecret: "grafana-admin-credentials"
@@ -178,7 +178,7 @@ vmagent:
     # the below integration
 
     # Save the hass data to the IoT cluster (by dropping everything non-hass)
-    - url: http://vmsingle-vm-hass-victoria-metrics-k8s-stack.victoria-metrics-stack.svc:8429/api/v1/write
+    - url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/api/v1/write
       inlineUrlRelabelConfig:
         - if: '{__name__!~"hass_.*"}'
           action: drop
