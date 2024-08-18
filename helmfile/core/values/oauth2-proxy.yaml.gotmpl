@@ -43,15 +43,55 @@ extraEnv:
   - name: OAUTH2_PROXY_CLIENT_ID
     valueFrom:
       secretKeyRef:
-        name: oauth2-proxy
+        name: oauth2-proxy-oidc-secret
         key: client_id
   - name: OAUTH2_PROXY_CLIENT_SECRET
     valueFrom:
       secretKeyRef:
-        name: oauth2-proxy
+        name: oauth2-proxy-oidc-secret
         key: client_secret
   - name: OAUTH2_PROXY_COOKIE_SECRET
     valueFrom:
       secretKeyRef:
-        name: cookie-secret
+        name: oauth2-proxy-cookie-secret
         key: cookie-secret
+
+app-template:
+  rawResources:
+    vault-auth:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
+      spec:
+        spec:
+          method: kubernetes
+          mount: kubernetes
+          kubernetes:
+            role: oauth2-proxy
+            serviceAccount: oauth2-proxy
+    cookie-secret:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/oauth2-proxy/cookie-secret
+        destination:
+          name: oauth2-proxy-cookie-secret
+          create: true
+        vaultAuthRef: oauth2-proxy-vault-auth
+    oidc-secret:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v1
+          mount: /identity
+          path: oidc/client/oauth2-proxy
+          destination:
+            name: oauth2-proxy-oidc-secret
+            create: true
+            transformation:
+              includes:
+                - client_id
+                - client_secret
+          vaultAuthRef: oauth2-proxy-vault-auth
