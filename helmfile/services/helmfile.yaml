@@ -21,9 +21,6 @@ releases:
   - name: invidious
     chart: bjw-s/app-template
     version: 3.3.2
-    dependencies:
-      - chart: ./charts/invidious-enhancements
-        version: 0.1.0
     inherit:
       - template: default
   - name: invidious

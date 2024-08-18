@@ -32,7 +32,7 @@ controllers:
           INVIDIOUS_HMAC_KEY:
             valueFrom:
               secretKeyRef:
-                name: invidious-hmac
+                name: invidious-hmac-secret
                 key: key
         probes:
           readiness:
@@ -80,7 +80,54 @@ controllers:
           - -c
           - until pg_isready -h "$(DB_HOST)" -p "$(DB_PORT)" -U "$(DB_USER)" -d "$(DB_NAME)"; do echo waiting for database; sleep 2; done;
         resources: {}
+  deployment-restart:
+    type: cronjob
+    cronjob:
+      concurrencyPolicy: Forbid
+      schedule: '5 */6 * * *'
+      backoffLimit: 2
+      # TODO: wait for this field to be supported
+      # activeDeadlineSeconds: 600
+      #restartPolicy: Never
+    containers:
+      main:
+        image:
+          repository: bitnami/kubectl
+          tag: 1.29
+          pullPolicy: IfNotPresent
+        command:
+          - bash
+          - -c
+          - >-
+            kubectl rollout restart deployment/invidious-main &&
+            kubectl rollout status deployment/invidious-main
 
+
+#apiVersion: batch/v1
+#kind: CronJob
+#metadata:
+#  name: invidious-deployment-restart
+#spec:
+#  concurrencyPolicy: Forbid
+#  schedule: '5 */6 * * *'
+#  jobTemplate:
+#    spec:
+#      backoffLimit: 2
+#      template:
+#        spec:
+#          serviceAccountName: invidious-deployment-restart
+#          restartPolicy: Never
+#          containers:
+#            - name: kubectl
+#              image: bitnami/kubectl:1.29
+#              imagePullPolicy: IfNotPresent
+#              command:
+#                - bash
+#                - -c
+#                - >-
+#                  kubectl rollout restart deployment/invidious &&
+#                  kubectl rollout status deployment/invidious
+#
 service:
   main:
     controller: main
@@ -140,3 +187,93 @@ persistence:
     volumeSpec:
       configMap:
         name: invidious-config
+
+serviceAccount:
+  # TODO: don't use this SA for the main deployment
+  name: invidious-deployment-restart
+  create: true
+
+rawResources:
+  db:
+    apiVersion: postgres-operator.crunchydata.com/v1beta1
+    kind: PostgresCluster
+    spec:
+      spec:
+        postgresVersion: 15
+        users:
+          - name: invidious
+            databases:
+              - invidious
+            # TODO: These permissions can be probably much more fine-grained
+            # We want to keep them quite lax, as the program itself is responsible
+            # for creating the initial table layout.
+            # This takes the burden off of our shoulders.
+            options: "SUPERUSER"
+        instances:
+          - name: invidious-db
+            dataVolumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 20Gi
+        backups:
+          pgbackrest:
+            repos:
+              - name: repo1
+                volume:
+                  volumeClaimSpec:
+                    accessModes:
+                      - "ReadWriteOnce"
+                    resources:
+                      requests:
+                        storage: 20Gi
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: kubernetes
+        kubernetes:
+          role: invidious
+          serviceAccount: default
+  hmac-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/invidious/hmac
+        destination:
+          name: invidious-hmac-secret
+          create: true
+        vaultAuthRef: invidious-vault-auth
+  deployment-restart-role:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    spec:
+      rules:
+        - apiGroups:
+            - apps
+          resources:
+            - deployments
+          resourceNames:
+            - invidious-main
+          verbs:
+            - get
+            - patch
+            - list
+            - watch
+  deployment-restart-role-binding:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    spec:
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: invidious-deployment-restart-role
+      subjects:
+        - kind: ServiceAccount
+          name: invidious-deployment-restart
