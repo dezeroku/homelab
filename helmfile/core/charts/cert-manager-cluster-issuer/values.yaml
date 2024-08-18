@@ -1,5 +1,0 @@
----
-# AWS region with the user
-region: us-east-1
-# Email to be used during ACME calls
-email: null

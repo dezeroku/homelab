@@ -74,8 +74,8 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: ./charts/cert-manager-cluster-issuer
-        version: 0.1.0
+      - chart: bjw-s/app-template
+        version: 3.3.2
   - name: cert-manager
     inherit:
       - template: argocd-app
