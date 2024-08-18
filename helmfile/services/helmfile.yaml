@@ -54,9 +54,6 @@ releases:
   - name: home-assistant
     chart: bjw-s/app-template
     version: 3.3.2
-    dependencies:
-      - chart: ./charts/home-assistant-enhancements
-        version: 0.1.0
     inherit:
       - template: default
   - name: home-assistant

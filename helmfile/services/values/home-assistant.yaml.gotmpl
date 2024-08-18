@@ -112,3 +112,46 @@ configMaps:
         #   logs:
         #     homeassistant.components.homekit: debug
         #     pyhap: debug
+
+serviceMonitor:
+  main:
+    enabled: true
+    serviceName: home-assistant
+    endpoints:
+      - interval: 1m
+        params:
+          format:
+            - prometheus
+        path: /api/prometheus
+        port: http
+        scheme: http
+        bearerTokenSecret:
+          key: token
+          name: home-assistant-hass-prometheus-secret
+          optional: false
+        tlsConfig:
+          insecureSkipVerify: true
+
+rawResources:
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+       method: kubernetes
+       mount: kubernetes
+       kubernetes:
+         role: home-assistant
+         serviceAccount: default
+  hass-prometheus-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/home-assistant/prometheus
+        destination:
+          name: home-assistant-hass-prometheus-secret
+          create: true
+        vaultAuthRef: home-assistant-vault-auth
