@@ -40,7 +40,7 @@ ingress:
     enabled: true
     className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
     tls:
       - secretName: home-assistant-general-tls

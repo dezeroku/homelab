@@ -27,7 +27,7 @@ server:
     tls: true
     ingressClassName: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
   ingressGrpc:
@@ -35,7 +35,7 @@ server:
     tls: true
     ingressClassName: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
 
 repoServer:

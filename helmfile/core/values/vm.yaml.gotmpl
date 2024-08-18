@@ -47,7 +47,7 @@ alertmanager:
       - url_file: /etc/vm/secrets/alertmanager-deadmanssnitch-url/url
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       # TODO: redirects don't work correctly on the initial request if they have a path after the slash
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
@@ -115,7 +115,7 @@ grafana:
   #    enabled: true
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
     enabled: true
     ingressClassName: nginx
@@ -132,7 +132,7 @@ grafana:
 vmsingle:
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
       nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
