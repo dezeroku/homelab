@@ -25,6 +25,8 @@ repositories:
     url: https://oauth2-proxy.github.io/manifests
   - name: argo-helm
     url: https://argoproj.github.io/argo-helm
+  - name: bjw-s
+    url: https://bjw-s.github.io/helm-charts
 
 releases:
   - name: vault-secrets-operator
@@ -175,8 +177,8 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: ./charts/argocd-enhancements
-        version: 0.1.0
+      - chart: bjw-s/app-template
+        version: 3.3.2
   - name: argocd-app
     values:
       - targetNamespace: argocd

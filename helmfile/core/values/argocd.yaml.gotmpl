@@ -7,9 +7,9 @@ configs:
     oidc.config: |
       name: Vault
       issuer: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
-      clientID: $oidc:client_id
-      clientSecret: $oidc:client_secret
-      cliClientID: $oidc-cli:client_id
+      clientID: $argocd-oidc:client_id
+      clientSecret: $argocd-oidc:client_secret
+      cliClientID: $argocd-oidc-cli:client_id
       requestedScopes:
         - openid
         - groups
@@ -59,3 +59,65 @@ repoServer:
 
 dex:
   enabled: false
+
+app-template:
+  rawResources:
+    vault-auth:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
+      spec:
+        spec:
+          method: kubernetes
+          mount: kubernetes
+          kubernetes:
+            role: argocd
+            serviceAccount: argocd-server
+    credentials-homelab:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: core/argocd/credentials/homelab
+          destination:
+            name: credentials-homelab
+            labels:
+              argocd.argoproj.io/secret-type: repository
+            create: true
+          vaultAuthRef: argocd-vault-auth
+    oidc:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v1
+          mount: /identity
+          path: oidc/client/argocd
+          destination:
+            name: oidc
+            create: true
+            labels:
+              app.kubernetes.io/part-of: argocd
+            transformation:
+              includes:
+                - client_id
+                - client_secret
+          vaultAuthRef: argocd-vault-auth
+    oidc-cli:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v1
+          mount: /identity
+          path: oidc/client/argocd-cli
+          destination:
+            name: oidc-cli
+            create: true
+            labels:
+              app.kubernetes.io/part-of: argocd
+            transformation:
+              includes:
+                - client_id
+          vaultAuthRef: argocd-vault-auth
