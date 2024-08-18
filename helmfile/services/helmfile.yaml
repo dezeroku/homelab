@@ -120,8 +120,8 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: ./charts/minio-private-enhancements
-        version: 0.1.0
+      - chart: bjw-s/app-template
+        version: 3.3.2
   - name: minio-private
     inherit:
       - template: argocd-app

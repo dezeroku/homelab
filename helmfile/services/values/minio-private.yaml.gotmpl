@@ -1,10 +1,10 @@
 secrets:
-  existingSecret: minio-root-credentials
+  existingSecret: minio-private-root-credentials
 
 tenant:
   name: private
   configuration:
-    name: minio-root-credentials
+    name: minio-private-root-credentials
   pools:
     - servers: 1
       volumesPerServer: 1
@@ -19,7 +19,7 @@ tenant:
     - name: test
     - name: misc
   users:
-    - name: minio-dezeroku-user-secret
+    - name: minio-private-dezeroku-user-secret
 ingress:
   api:
     enabled: true
@@ -59,3 +59,60 @@ ingress:
         hosts:
           - private.minio.{{ requiredEnv "DOMAIN" }}
     host: private.minio.{{ requiredEnv "DOMAIN" }}
+
+app-template:
+  rawResources:
+    vault-auth:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
+      spec:
+        spec:
+          method: kubernetes
+          mount: kubernetes
+          kubernetes:
+            role: minio-private
+            # TODO: operator will only create the sa after the secret is already in place
+            # so let's use default for now
+            serviceAccount: default
+    root-credentials:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: services/minio/private/root-credentials
+          destination:
+            name: minio-private-root-credentials
+            create: true
+            transformation:
+              excludes:
+                - .*
+              templates:
+                config.env:
+                  text: |
+                    export MINIO_ROOT_USER={{ "{{`{{" }}.Secrets.rootUser{{ "}}`}}" }}
+                    export MINIO_ROOT_PASSWORD={{ "{{`{{" }}.Secrets.rootPassword{{ "}}`}}" }}
+          vaultAuthRef: minio-private-vault-auth
+    dezeroku-user-secret:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: services/minio/private/dezeroku-credentials
+          destination:
+            name: minio-private-dezeroku-user-secret
+            create: true
+            transformation:
+              excludes:
+                - .*
+              templates:
+                CONSOLE_ACCESS_KEY:
+                  text: |
+                    {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                CONSOLE_SECRET_KEY:
+                  text: |
+                    {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+          vaultAuthRef: minio-private-vault-auth
