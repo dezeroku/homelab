@@ -4,6 +4,7 @@ k8s_controlplanes:
     homeserver-one:
     homeserver-two:
     homeserver-three:
+    homeserver-five:
   vars:
     k3s_control_node: true
     node_label:
@@ -39,6 +40,10 @@ rack_rpis:
   vars:
     poe_plus_hat: true
     raspi_os: true
+
+rack_dells:
+  hosts:
+    homeserver-five:
 
 all:
   children:
