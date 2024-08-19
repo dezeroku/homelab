@@ -1,5 +1,3 @@
-victoria_metrics_grafana_admin_username = "admin"
-victoria_metrics_grafana_admin_password = "prom-operator"
 victoria_metrics_alertmanager_pagerduty_token = "example_token"
 victoria_metrics_alertmanager_deadmanssnitch_url = "https://nosnch.in/some_id"
 # longhorn is just our internal alias, the real username may be different

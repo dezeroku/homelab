@@ -1,6 +1,6 @@
 resource "vault_identity_oidc_assignment" "argocd" {
   name      = "argocd"
-  group_ids = [vault_identity_group.users.id]
+  group_ids = [vault_identity_group.cluster_admins.id]
 }
 
 resource "vault_policy" "argocd" {

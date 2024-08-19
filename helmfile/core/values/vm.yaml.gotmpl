@@ -83,16 +83,25 @@ alertmanager:
               storage: 5Gi
 
 grafana:
+  # We disable the admin account creation via grafana.ini
+  # This value is added here just to avoid unnecessary secret changes
+  adminPassword: admin
+
+  envValueFrom:
+    GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
+      secretKeyRef:
+        name: vm-grafana-oidc-secret
+        key: client_id
+    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
+      secretKeyRef:
+        name: vm-grafana-oidc-secret
+        key: client_secret
   additionalDataSources:
     # TODO: expose both VM clusters under a common proxy
     # and split based on the label name
     - name: VictoriaMetricsHASS
       url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/
       type: prometheus
-  admin:
-    existingSecret: "grafana-admin-credentials"
-    userKey: admin-username
-    passwordKey: admin-password
   defaultDashboardsTimezone: Europe/Warsaw
   plugins:
     - grafana-piechart-panel
@@ -110,9 +119,27 @@ grafana:
         gnetId: 16888
         rev: 8
 
-  #grafana.ini:
-  #  auth.anonymous:
-  #    enabled: true
+  grafana.ini:
+    # log:
+    #  level: debug
+    server:
+      root_url: https://grafana.{{ requiredEnv "DOMAIN" }}
+    security:
+      disable_initial_admin_creation: true
+    auth.generic_oauth:
+      enabled: true
+      name: Vault
+      allow_sign_up: true
+      auto_login: true
+      scopes: "openid profile email groups"
+      auth_url: https://vault.{{ requiredEnv "DOMAIN" }}/ui/vault/identity/oidc/provider/main/authorize
+      token_url: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/token
+      api_url: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/userinfo
+      # These are set directly through env variables
+      # client_id: ""
+      # client_secret: ""
+      role_attribute_path: contains(groups[*], 'monitoring-admins') && 'GrafanaAdmin' || contains(groups[*], 'monitoring-editors') && 'Editor' || 'Viewer'
+      allow_assign_grafana_admin: true
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"

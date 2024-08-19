@@ -40,6 +40,13 @@ resource "vault_identity_group" "monitoring_viewers" {
   external_member_entity_ids = true
 }
 
+resource "vault_identity_group" "monitoring_editors" {
+  name                       = "monitoring-editors"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}
+
 resource "vault_identity_group" "monitoring_admins" {
   name                       = "monitoring-admins"
   type                       = "internal"
@@ -56,6 +63,13 @@ resource "vault_identity_group" "netbootxyz_admins" {
 
 resource "vault_identity_group" "storage_admins" {
   name                       = "storage-admins"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}
+
+resource "vault_identity_group" "cluster_admins" {
+  name                       = "cluster-admins"
   type                       = "internal"
   policies                   = []
   external_member_entity_ids = true

@@ -34,6 +34,7 @@ resource "vault_identity_oidc_provider" "main" {
     vault_identity_oidc_client.oauth2-proxy.client_id,
     vault_identity_oidc_client.argocd.client_id,
     vault_identity_oidc_client.argocd-cli.client_id,
+    vault_identity_oidc_client.grafana.client_id,
   ]
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,

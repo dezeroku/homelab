@@ -1,11 +1,3 @@
-variable "victoria_metrics_grafana_admin_username" {
-  type = string
-}
-
-variable "victoria_metrics_grafana_admin_password" {
-  type = string
-}
-
 variable "victoria_metrics_alertmanager_pagerduty_token" {
   type = string
 }
