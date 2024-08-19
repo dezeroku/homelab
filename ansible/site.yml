@@ -46,6 +46,8 @@
 
 - name: Set up k3s server
   import_playbook: k3s.yml
+  tags:
+    - k3s
 
 - name: Set up printserver
   import_playbook: printserver.yml
