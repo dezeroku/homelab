@@ -72,13 +72,14 @@ app-template:
       apiVersion: secrets.hashicorp.com/v1beta1
       kind: VaultStaticSecret
       spec:
-        type: kv-v2
-        mount: kvv2
-        path: core/oauth2-proxy/cookie-secret
-        destination:
-          name: oauth2-proxy-cookie-secret
-          create: true
-        vaultAuthRef: oauth2-proxy-vault-auth
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: core/oauth2-proxy/cookie-secret
+          destination:
+            name: oauth2-proxy-cookie-secret
+            create: true
+          vaultAuthRef: oauth2-proxy-vault-auth
     oidc-secret:
       apiVersion: secrets.hashicorp.com/v1beta1
       kind: VaultStaticSecret
