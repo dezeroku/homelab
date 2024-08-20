@@ -27,7 +27,8 @@ repositories:
     url: https://argoproj.github.io/argo-helm
   - name: bjw-s
     url: https://bjw-s.github.io/helm-charts
-
+  - name: nfd
+    url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
 releases:
   - name: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
@@ -183,5 +184,14 @@ releases:
     values:
       - targetNamespace: argocd
       - targetName: argocd
+    inherit:
+      - template: argocd-app
+
+  - name: node-feature-discovery
+    chart: nfd/node-feature-discovery
+    version: 0.16.4
+    inherit:
+      - template: default
+  - name: node-feature-discovery
     inherit:
       - template: argocd-app

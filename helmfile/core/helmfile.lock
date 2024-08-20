@@ -18,6 +18,9 @@ dependencies:
 - name: longhorn
   repository: https://charts.longhorn.io
   version: 1.6.2
+- name: node-feature-discovery
+  repository: https://kubernetes-sigs.github.io/node-feature-discovery/charts
+  version: 0.16.4
 - name: node-problem-detector
   repository: https://charts.deliveryhero.io/
   version: 2.3.12
@@ -36,5 +39,5 @@ dependencies:
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.24.5
-digest: sha256:c50d56df52f580e3c27abbdd9db8a6d80ba8ecf7fc0d49084a1453f45ffb438f
-generated: "2024-08-18T23:16:45.954159515+02:00"
+digest: sha256:80a4f3452f36237258d31911cc28744556c79a08cf2b392350fb78311fcde595
+generated: "2024-08-21T00:51:22.021094276+02:00"
