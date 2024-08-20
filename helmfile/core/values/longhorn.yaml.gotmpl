@@ -13,7 +13,11 @@ ingress:
 longhornUI:
   replicas: 1
 
+persistence:
+  defaultDataLocality: best-effort
+
 defaultSettings:
+  defaultDataLocality: best-effort
   createDefaultDiskLabeledNodes: true
   # Region doesn't matter, but we have to set something for Longhorn to be happy
   backupTarget: s3://backups@us-east-1/
