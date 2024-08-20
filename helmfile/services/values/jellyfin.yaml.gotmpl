@@ -4,12 +4,11 @@ global:
 
 resources:
   limits:
-    memory: 4Gi
+    memory: 8Gi
 
 podOptions:
   nodeSelector:
-    # Upstream hardcodes amd64 here, get rid of it
-    kubernetes.io/arch: "arm64"
+    dezeroku.com/role: media-server
 
 persistence:
   config:
