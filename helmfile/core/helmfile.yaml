@@ -29,6 +29,8 @@ repositories:
     url: https://bjw-s.github.io/helm-charts
   - name: nfd
     url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
+  - name: intel
+    url: https://intel.github.io/helm-charts
 releases:
   - name: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
@@ -193,5 +195,32 @@ releases:
     inherit:
       - template: default
   - name: node-feature-discovery
+    inherit:
+      - template: argocd-app
+
+  - name: intel-device-plugins-operator
+    chart: intel/intel-device-plugins-operator
+    namespace: intel
+    version: 0.30.0
+    inherit:
+      - template: default
+  - name: intel-device-plugin-operator
+    values:
+      - targetNamespace: intel
+    inherit:
+      - template: argocd-app
+
+  - name: intel-device-plugins-gpu
+    chart: intel/intel-device-plugins-gpu
+    namespace: intel
+    version: 0.30.0
+    inherit:
+      - template: default
+    needs:
+      # We need CRDs
+      - intel-device-plugins-operator
+  - name: intel-gpu-device-plugin
+    values:
+      - targetNamespace: intel
     inherit:
       - template: argocd-app

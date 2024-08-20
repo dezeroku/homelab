@@ -15,6 +15,12 @@ dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
   version: 4.11.1
+- name: intel-device-plugins-gpu
+  repository: https://intel.github.io/helm-charts
+  version: 0.30.0
+- name: intel-device-plugins-operator
+  repository: https://intel.github.io/helm-charts
+  version: 0.30.0
 - name: longhorn
   repository: https://charts.longhorn.io
   version: 1.6.2
@@ -39,5 +45,5 @@ dependencies:
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.24.5
-digest: sha256:80a4f3452f36237258d31911cc28744556c79a08cf2b392350fb78311fcde595
-generated: "2024-08-21T00:51:22.021094276+02:00"
+digest: sha256:d3b19b4cb5f198dc543aee0dc618fe496e668f293aa7091cc584477e5ef60422
+generated: "2024-08-21T01:43:32.134685456+02:00"
