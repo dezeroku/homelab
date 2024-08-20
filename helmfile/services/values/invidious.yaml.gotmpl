@@ -6,6 +6,10 @@ defaultPodOptions:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
+  nodeSelector:
+    # TODO: currently Invidious does not provide multi-manifest images and pushes
+    # all the architectures under different tags. Create a PR to change that
+    kubernetes.io/arch: arm64
 
 controllers:
   main:
