@@ -2,9 +2,19 @@ global:
   fallbackDefaults:
     storageClass: longhorn
 
+securityContext:
+  pod:
+    # ID of the "video" and "render" groups in Debian
+    # For proper hardware acceleration support
+    # TODO: shouldn't this be handled by the plugin somehow?
+    supplementalGroups:
+      - 44
+      - 105
+
 resources:
   limits:
     memory: 8Gi
+    gpu.intel.com/i915: "1"
 
 podOptions:
   nodeSelector:
