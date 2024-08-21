@@ -4,6 +4,10 @@ defaultPodOptions:
 #    runAsUser: 1000
 #    runAsGroup: 1000
     fsGroup: 1000
+  nodeSelector:
+    # Lock the arch to arm64 to avoid problems with venv
+    # TODO: maybe let's make the whole venv ephemeral?
+    kubernetes.io/arch: arm64
 
 controllers:
   main:
