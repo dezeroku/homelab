@@ -31,6 +31,26 @@ controllers:
             memory: 256Mi
           requests:
             memory: 64Mi
+      filebrowser:
+        image:
+          repository: filebrowser/filebrowser
+          tag: v2.30.0
+          pullPolicy: IfNotPresent
+        env:
+          # Auth via oauth2-proxy
+          FB_NOAUTH: true
+          FB_PORT: "8080"
+          FB_ROOT: "/assets"
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 128Mi
+          requests:
+            memory: 64Mi
     initContainers:
       initial-setup:
         image:
@@ -41,7 +61,7 @@ controllers:
           tag: master
           pullPolicy: Always
         env:
-          MENU_VERSION: 2.0.76
+          MENU_VERSION: 2.0.81
           ONLY_INITIALIZE: "true"
         resources: {}
       url-fixer:
@@ -68,6 +88,12 @@ service:
     ports:
       assets:
         port: 80
+
+  filebrowser:
+    controller: main
+    ports:
+      http:
+        port: 8080
 
   tftp:
     controller: main
@@ -116,16 +142,37 @@ ingress:
       #  client_max_body_size 25M;
     # TODO: Disabling TLS for assets, as netbootxyz doesn't seem to like the Let's Encrypt certs
     # at least when trying to download files from unpacked Windows ISO
-#    tls:
-#      - secretName: netbootxyz-assets-tls
-#        hosts:
-#          - assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: netbootxyz-assets-tls
+        hosts:
+          - assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
     hosts:
       - host: assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
         paths:
           - path: /
             service:
               identifier: assets
+  filebrowser:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=netbootxyz-admins"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/server-snippet: |
+        client_max_body_size 0;
+    tls:
+      - secretName: filebrowser-tls
+        hosts:
+          - filebrowser.assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: filebrowser.assets.netbootxyz.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: filebrowser
 
 persistence:
   assets:
