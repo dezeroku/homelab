@@ -30,11 +30,11 @@ In other words, what needs to be done when you lay your hands on the machine.
 
 # Flashing Debian
 
-To make the whole process a bit easier, a custom Debian image (that fulfills the requirements listed above)
+To make the whole process a bit easier, a custom Debian/Raspbian image (that fulfills the requirements listed above)
 can be built using the scripts in `image_build` directory.
 It requires `vagrant` and `ssh` to be available on the build host
 
-Running the `build.sh` script will create an image that:
+Running the `build_raspbian.sh/build_debian.sh` script will create an image that:
 
 1. is based on the newest `bookworm` release packages available to date
 2. contains `ansible_bootstrap` user with passwordless sudo, which can be logged in via SSH using any of the keys defined in file under `HOST_SSH_PUB_KEYS_FILE` variable
@@ -62,6 +62,9 @@ When you have the image on hand you can flash it on the SSD using the tool of yo
 ```
 
 or using a tool like `rufus` or `etcher`.
+
+In case of "normal" machines a preseed file is burned into the image and is responsible for the initial setup.
+Beware, you have to use the _Install_ (not graphical) option for the preseed file to be taken into account.
 
 # Software
 
