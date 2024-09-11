@@ -10,22 +10,21 @@ k8s_controlplanes:
       - node.longhorn.io/create-default-disk=true
 
 k8s_workers:
+  # TODO: an empty node_label list breaks the initialization and flannel
+  # for now let's just add a label for each node, falling back to dummylabel
   hosts:
     homeserver-one:
-      vars:
-        node_label:
-          - node.longhorn.io/create-default-disk=true
+      node_label:
+        - node.longhorn.io/create-default-disk=true
     homeserver-two:
-      vars:
-        node_label:
-          - node.longhorn.io/create-default-disk=true
+      node_label:
+        - node.longhorn.io/create-default-disk=true
     homeserver-three:
+      node_label:
+        - node.longhorn.io/create-default-disk=true
     homeserver-four:
-      vars:
-        node_label:
-          - node.longhorn.io/create-default-disk=true
-  vars:
-    node_label: []
+      node_label:
+        - dezeroku.com/dummy-label=true
 
 k8s_nodes:
   children:

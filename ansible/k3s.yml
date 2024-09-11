@@ -34,9 +34,8 @@
         - "{{ vars.node_label | mandatory }}"
       write-kubeconfig-mode: "0644"
     k3s_agent:
-    # TODO: default labels
-    # an empty list breaks the initialization and flannel
-    # node-label:
-    #   - "{{ vars.node_label | mandatory }}"
+      # an empty list breaks the initialization and flannel
+      node-label:
+        - "{{ vars.node_label | mandatory }}"
   roles:
     - role: xanmanning.k3s
