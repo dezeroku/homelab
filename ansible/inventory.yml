@@ -1,9 +1,9 @@
 ---
 k8s_controlplanes:
   hosts:
-    homeserver-one:
-    homeserver-two:
     homeserver-five:
+    homeserver-six:
+    homeserver-seven:
   vars:
     k3s_control_node: true
     node_label:
@@ -11,6 +11,14 @@ k8s_controlplanes:
 
 k8s_workers:
   hosts:
+    homeserver-one:
+      vars:
+        node_label:
+          - node.longhorn.io/create-default-disk=true
+    homeserver-two:
+      vars:
+        node_label:
+          - node.longhorn.io/create-default-disk=true
     homeserver-three:
     homeserver-four:
       vars:
@@ -47,6 +55,8 @@ rack_rpis:
 rack_dells:
   hosts:
     homeserver-five:
+    homeserver-six:
+    homeserver-seven:
 
 all:
   children:
