@@ -24,6 +24,11 @@ rawResources:
     kind: Ingress
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Metrics provider for IoT data
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: victoriametrics.png
+      gethomepage.dev/name: VictoriaMetrics (HASS)
       nginx.ingress.kubernetes.io/auth-signin: "https://sso.home.dezeroku.com/oauth2/start?rd=https://$host$escaped_request_uri"
       nginx.ingress.kubernetes.io/auth-url: "https://sso.home.dezeroku.com/oauth2/auth?allowed_groups=monitoring-admins"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"

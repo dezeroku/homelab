@@ -48,6 +48,11 @@ alertmanager:
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Alerts routing
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: alertmanager.png
+      gethomepage.dev/name: AlertManager
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       # TODO: redirects don't work correctly on the initial request if they have a path after the slash
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
@@ -143,6 +148,11 @@ grafana:
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Dashboards
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: grafana.png
+      gethomepage.dev/name: Grafana
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
     enabled: true
     ingressClassName: nginx
@@ -160,6 +170,11 @@ vmsingle:
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Metrics provider
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: victoriametrics.png
+      gethomepage.dev/name: VictoriaMetrics
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
       nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
@@ -213,6 +228,11 @@ vmagent:
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Metrics scraper
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: vmagent.png
+      gethomepage.dev/name: VMAgent
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       # TODO: redirects don't work correctly on the initial request if they have a path after the slash
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"

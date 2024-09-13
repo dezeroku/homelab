@@ -28,6 +28,11 @@ server:
     ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: GitOps management system for Kubernetes
+      gethomepage.dev/group: Cluster
+      gethomepage.dev/icon: argocd.png
+      gethomepage.dev/name: ArgoCD
       nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
   ingressGrpc:

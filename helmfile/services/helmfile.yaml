@@ -125,3 +125,12 @@ releases:
   - name: minio-private
     inherit:
       - template: argocd-app
+
+  - name: homepage
+    chart: bjw-s/app-template
+    version: 3.3.2
+    inherit:
+      - template: default
+  - name: homepage
+    inherit:
+      - template: argocd-app

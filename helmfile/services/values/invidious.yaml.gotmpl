@@ -145,6 +145,11 @@ ingress:
     className: nginx
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Alternative UI for Youtube
+      gethomepage.dev/group: Media
+      gethomepage.dev/icon: invidious.png
+      gethomepage.dev/name: Invidious
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24"
       # These below are useful for importing the history
       # probably could be lowered to something like 5MBs too

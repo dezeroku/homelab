@@ -42,6 +42,11 @@ ingress:
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Home Assistant
+      gethomepage.dev/group: IoT
+      gethomepage.dev/icon: home-assistant.png
+      gethomepage.dev/name: Home Automation
     tls:
       - secretName: home-assistant-general-tls
         hosts:

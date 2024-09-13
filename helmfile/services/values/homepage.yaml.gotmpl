@@ -1,0 +1,195 @@
+# Mostly based on https://github.com/jameswynn/helm-charts/tree/main/charts/homepage
+# but converted to pure app-template for more control and easier upgrades
+
+controllers:
+  main:
+    #strategy: Recreate
+    strategy: RollingUpdate
+    containers:
+      main:
+        image:
+          repository: ghcr.io/gethomepage/homepage
+          tag: v0.9.9
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          # TODO: we currently use service discovery for ingresses, but still have to
+          # explicitly specify VSO secrets here
+          HOMEPAGE_VAR_JELLYFIN_API_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: jellyfin
+                key: apikey
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+          startup:
+            enabled: true
+            spec:
+              failureThreshold: 30
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 3000
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    tls:
+      - secretName: homepage-general-tls
+        hosts:
+          - {{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: {{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+serviceAccount:
+  create: true
+
+configMaps:
+  config:
+    enabled: true
+    data:
+      bookmarks.yaml: ""
+      docker.yaml: ""
+      kubernetes.yaml: |
+        mode: cluster
+      services.yaml: ""
+      settings.yaml: ""
+      widgets.yaml: |
+        - kubernetes:
+            cluster:
+              cpu: true
+              label: homeserver
+              memory: true
+              show: true
+              showLabel: true
+            nodes:
+              cpu: true
+              memory: true
+              show: false
+              showLabel: true
+
+persistence:
+  config:
+    enabled: true
+    type: configMap
+    name: homepage-config
+    advancedMounts:
+      main:
+        main:
+          - path: /app/config/bookmarks.yaml
+            subPath: bookmarks.yaml
+          - path: /app/config/docker.yaml
+            subPath: docker.yaml
+          - path: /app/config/kubernetes.yaml
+            subPath: kubernetes.yaml
+          - path: /app/config/services.yaml
+            subPath: services.yaml
+          - path: /app/config/settings.yaml
+            subPath: settings.yaml
+          - path: /app/config/widgets.yaml
+            subPath: widgets.yaml
+  logs:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /app/config/logs
+rawResources:
+  cluster-role:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    spec:
+      rules:
+        - apiGroups:
+            - ""
+          resources:
+            - namespaces
+            - pods
+            - nodes
+          verbs:
+            - get
+            - list
+        - apiGroups:
+            - extensions
+            - networking.k8s.io
+          resources:
+            - ingresses
+          verbs:
+            - get
+            - list
+        - apiGroups:
+            - traefik.containo.us
+            - traefik.io
+          resources:
+            - ingressroutes
+          verbs:
+            - get
+            - list
+        - apiGroups:
+            - metrics.k8s.io
+          resources:
+            - nodes
+            - pods
+          verbs:
+            - get
+            - list
+        - apiGroups:
+            - apiextensions.k8s.io
+          resources:
+            - customresourcedefinitions/status
+          verbs:
+            - get
+  cluster-role-binding:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    spec:
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: homepage-cluster-role
+      subjects:
+        - kind: ServiceAccount
+          name: homepage
+          namespace: homepage
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: kubernetes
+        kubernetes:
+          role: homepage
+          serviceAccount: homepage
+  jellyfin:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/homepage/jellyfin
+        destination:
+          name: jellyfin
+          create: true
+        vaultAuthRef: homepage-vault-auth

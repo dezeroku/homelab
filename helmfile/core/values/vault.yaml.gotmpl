@@ -26,6 +26,11 @@ server:
     ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Authentication and secret storage
+      gethomepage.dev/group: Cluster
+      gethomepage.dev/icon: vault.png
+      gethomepage.dev/name: Vault
       # TODO: Adding a k8s IP range so oauth2-proxy can talk with Vault via the ingress
       # It can probably be done prettier
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.3.0/24,192.168.69.0/24,10.42.0.0/16"
