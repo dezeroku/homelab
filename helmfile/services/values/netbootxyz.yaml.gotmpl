@@ -5,7 +5,10 @@ controllers:
     replicas: 1
     pod:
       nodeSelector:
-        kubernetes.io/hostname: homeserver-one
+        # TODO: even though NodePorts are supposed to work on all nodes
+        # it seems that this pod has to be scheduled exactly on the node
+        # defined as a TFTP server on router level
+        kubernetes.io/hostname: homeserver-five
     containers:
       main:
         image:
