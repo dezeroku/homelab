@@ -8,8 +8,11 @@ defaultPodOptions:
     fsGroup: 1000
   nodeSelector:
     # TODO: currently Invidious does not provide multi-manifest images and pushes
-    # all the architectures under different tags. Create a PR to change that
-    kubernetes.io/arch: arm64
+    # all the architectures under different tags
+    # Details can be found under:
+    # * https://github.com/iv-org/invidious/issues/4669
+    # * https://github.com/iv-org/invidious/issues/2648
+    kubernetes.io/arch: amd64
 
 controllers:
   main:
@@ -22,7 +25,7 @@ controllers:
       main:
         image:
           repository: quay.io/invidious/invidious
-          tag: latest-arm64
+          tag: latest
           pullPolicy: Always
         env:
           # https://github.com/iv-org/invidious/issues/2970
