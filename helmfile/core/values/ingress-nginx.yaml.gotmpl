@@ -1,5 +1,7 @@
 ---
 controller:
+  nodeSelector:
+    node-role.kubernetes.io/loadbalancer: "true"
   metrics:
     enabled: true
     serviceMonitor:
