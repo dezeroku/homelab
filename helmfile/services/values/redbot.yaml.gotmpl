@@ -5,9 +5,9 @@ defaultPodOptions:
 #    runAsGroup: 1000
     fsGroup: 1000
   nodeSelector:
-    # Lock the arch to arm64 to avoid problems with venv
+    # Lock the arch to amd64 to avoid problems with venv
     # TODO: maybe let's make the whole venv ephemeral?
-    kubernetes.io/arch: arm64
+    kubernetes.io/arch: amd64
 
 controllers:
   main:
@@ -36,7 +36,7 @@ controllers:
                 key: token
         resources:
           limits:
-            memory: 1024Mi
+            memory: 1536Mi
           requests:
             memory: 256Mi
 
