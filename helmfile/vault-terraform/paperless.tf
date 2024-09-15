@@ -37,6 +37,9 @@ path "kvv2/data/services/paperless/admin" {
 path "kvv2/data/services/paperless/redis" {
   capabilities = ["read"]
 }
+path "kvv2/data/services/paperless/smtp" {
+  capabilities = ["read"]
+}
 path "identity/oidc/client/paperless" {
   capabilities = ["read"]
 }
@@ -71,6 +74,19 @@ resource "vault_generic_secret" "paperless-redis" {
   data_json = jsonencode(
     {
       "password" : var.paperless_redis_password,
+    }
+  )
+}
+
+# TODO: this is currently not used by the app
+resource "vault_generic_secret" "paperless-smtp" {
+  path = "kvv2/services/paperless/smtp"
+
+  data_json = jsonencode(
+    {
+      "username" : var.ses_smtp_username,
+      "password" : var.ses_smtp_password,
+      "host" : var.ses_smtp_host,
     }
   )
 }

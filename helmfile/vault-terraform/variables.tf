@@ -140,3 +140,15 @@ variable "paperless_admin_email" {
 variable "paperless_redis_password" {
   type = string
 }
+
+variable "ses_smtp_username" {
+  type = string
+}
+
+variable "ses_smtp_password" {
+  type = string
+}
+
+variable "ses_smtp_host" {
+  type = string
+}
