@@ -138,7 +138,7 @@ How to deploy:
 
 While the steps above cover the deployment, there's some special treatment needed to initialize vault.
 Please follow the [helmfile/core/vault-setup.md](helmfile/core/vault-setup.md).
-Make sure that you have entered the required values for both `helmfile/core/vault-terraform/terraform.tfvars` and `helmfile/services/vault-terraform/terraform.tfvars`.
+Make sure that you have entered the required values for `helmfile/vault-terraform/terraform.tfvars`.
 
 ## End applications
 

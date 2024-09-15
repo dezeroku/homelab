@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "invidious" {
-  backend                          = var.vault_auth_backend_kubernetes_path
+  backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "invidious"
   bound_service_account_namespaces = ["invidious"]
   token_ttl                        = 3600
