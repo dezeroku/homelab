@@ -12,7 +12,8 @@ repositories:
     url: https://operator.min.io/
   - name: itzg
     url: https://itzg.github.io/minecraft-server-charts/
-
+  - name: immich
+    url: https://immich-app.github.io/immich-charts
 releases:
   - name: pacoloco
     chart: bjw-s/app-template
@@ -197,5 +198,30 @@ releases:
     inherit:
       - template: default
   - name: it-tools
+    inherit:
+      - template: argocd-app
+
+  - name: immich
+    chart: immich/immich
+    version: 0.9.0
+    inherit:
+      - template: default
+  - name: immich
+    inherit:
+      - template: argocd-app
+
+  # TODO: specifying this as direct dependency of immich
+  # seems to break the 'common library' chart
+  # immich chart is based on too old version of the library chart to
+  # use rawResources, thus we need this -enhancements one
+  - name: immich-enhancements
+    namespace: immich
+    chart: bjw-s/app-template
+    version: 3.5.1
+    inherit:
+      - template: default
+  - name: immich-enhancements
+    values:
+      - targetNamespace: immich
     inherit:
       - template: argocd-app

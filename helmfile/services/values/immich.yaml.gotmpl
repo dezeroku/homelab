@@ -1,0 +1,53 @@
+env:
+  # To have it easier with PGO images
+  DB_VECTOR_EXTENSION: pgvector
+  A_DB_URL:
+    valueFrom:
+      secretKeyRef:
+        #name: immich-app
+        name: immich-enhancements-db-pguser-immich
+        key: uri
+  # Funnily enough it doesn't work without the SSL mangling
+  DB_URL: $(A_DB_URL)?sslmode=require&sslmode=no-verify
+# image:
+  # tag: v1.125.3
+
+immich:
+  metrics:
+    enabled: true
+
+  persistence:
+    library:
+      existingClaim: immich-enhancements-library
+
+redis:
+  enabled: true
+
+server:
+  ingress:
+    main:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: Photos storage
+        gethomepage.dev/group: Media
+        gethomepage.dev/icon: immich.png
+        gethomepage.dev/name: Immich
+        nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.71.0/24"
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      hosts:
+        - host: immich.{{ requiredEnv "DOMAIN" }}
+          paths:
+            - path: /
+      tls:
+        - secretName: immich-general-tls
+          hosts:
+            - immich.{{ requiredEnv "DOMAIN" }}
+
+machine-learning:
+  persistence:
+    cache:
+      type: pvc
+      storageClass: longhorn-single-replica

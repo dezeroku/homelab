@@ -35,5 +35,6 @@ module "user" {
     storage-admins     = vault_identity_group.storage_admins.id
     cluster-admins     = vault_identity_group.cluster_admins.id
     paperless          = vault_identity_group.paperless.id
+    immich             = vault_identity_group.immich.id
   }
 }

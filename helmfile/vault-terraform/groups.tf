@@ -81,3 +81,10 @@ resource "vault_identity_group" "paperless" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "immich" {
+  name                       = "immich"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}

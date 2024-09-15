@@ -1,0 +1,81 @@
+persistence:
+  library:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 60Gi
+
+serviceAccount:
+  name: immich
+  create: true
+
+rawResources:
+  db:
+    apiVersion: postgres-operator.crunchydata.com/v1beta1
+    kind: PostgresCluster
+    spec:
+      spec:
+        postgresVersion: 16
+        users:
+          - name: immich
+            databases:
+              - immich
+            # TODO: These permissions can be probably much more fine-grained
+            # We want to keep them quite lax, as the program itself is responsible
+            # for creating the initial table layout.
+            # This takes the burden off of our shoulders.
+            options: "SUPERUSER"
+        instances:
+          - name: immich-db
+            dataVolumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 10Gi
+        backups:
+          pgbackrest:
+            configuration:
+              - secret:
+                  name: immich-pgo-backup-s3-secret
+            global:
+              repo1-s3-uri-style: path
+              repo1-retention-full: "2"
+            repos:
+              - name: repo1
+                s3:
+                  bucket: immich
+                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                  region: default
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: immich
+          serviceAccount: immich
+  pgo-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: immich-pgo-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              s3.conf:
+                text: |
+                  [global]
+                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: immich-enhancements-vault-auth
