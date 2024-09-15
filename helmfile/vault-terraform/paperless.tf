@@ -1,3 +1,20 @@
+resource "vault_identity_oidc_assignment" "paperless" {
+  name = "paperless"
+  group_ids = [
+    vault_identity_group.paperless.id,
+  ]
+}
+
+resource "vault_identity_oidc_client" "paperless" {
+  name = "paperless"
+  redirect_uris = [
+    "https://paperless.${var.domain}/accounts/oidc/vault/login/callback/"
+  ]
+  assignments      = [vault_identity_oidc_assignment.paperless.name]
+  id_token_ttl     = 2400
+  access_token_ttl = 7200
+}
+
 resource "vault_kubernetes_auth_backend_role" "paperless" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "paperless"
@@ -18,6 +35,9 @@ path "kvv2/data/services/paperless/admin" {
   capabilities = ["read"]
 }
 path "kvv2/data/services/paperless/redis" {
+  capabilities = ["read"]
+}
+path "identity/oidc/client/paperless" {
   capabilities = ["read"]
 }
 EOT

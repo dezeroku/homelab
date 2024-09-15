@@ -74,3 +74,10 @@ resource "vault_identity_group" "cluster_admins" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "paperless" {
+  name                       = "paperless"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}

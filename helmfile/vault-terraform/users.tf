@@ -34,5 +34,6 @@ module "user" {
     netbootxyz-admins  = vault_identity_group.netbootxyz_admins.id
     storage-admins     = vault_identity_group.storage_admins.id
     cluster-admins     = vault_identity_group.cluster_admins.id
+    paperless          = vault_identity_group.paperless.id
   }
 }

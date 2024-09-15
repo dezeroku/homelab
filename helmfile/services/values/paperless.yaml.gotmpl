@@ -15,6 +15,16 @@ controllers:
           tag: 2.12.0
           pullPolicy: IfNotPresent
         env:
+          A_OIDC_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-oidc-secret
+                key: client_id
+          A_OIDC_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-oidc-secret
+                key: client_secret
           A_REDIS_PASSWORD:
             valueFrom:
               secretKeyRef:
@@ -61,6 +71,23 @@ controllers:
               secretKeyRef:
                 name: paperless-admin
                 key: email
+          PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+          PAPERLESS_SOCIALACCOUNT_PROVIDERS: |
+            {
+              "openid_connect": {
+                "APPS": [
+                  {
+                  "provider_id": "vault",
+                  "name": "Vault",
+                  "client_id": "$(A_OIDC_CLIENT_ID)",
+                  "secret": "$(A_OIDC_CLIENT_SECRET)",
+                  "settings": {
+                      "server_url": "https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/.well-known/openid-configuration"
+                    }
+                  }
+                ]
+              }
+            }
           PAPERLESS_URL: https://paperless.{{ requiredEnv "DOMAIN" }}
           PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
           PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
@@ -249,4 +276,32 @@ rawResources:
         destination:
           name: paperless-redis
           create: true
+        vaultAuthRef: paperless-vault-auth
+  redis:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/paperless/redis
+        destination:
+          name: paperless-redis
+          create: true
+        vaultAuthRef: paperless-vault-auth
+  oidc-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v1
+        mount: /identity
+        path: oidc/client/paperless
+        destination:
+          name: paperless-oidc-secret
+          create: true
+          transformation:
+            includes:
+              - client_id
+              - client_secret
         vaultAuthRef: paperless-vault-auth
