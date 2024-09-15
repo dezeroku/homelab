@@ -1,3 +1,8 @@
+# On a first startup:
+# * Set PAPERLESS_DISABLE_REGULAR_LOGIN: "false"
+# * Log in as admin user and connect the account with OIDC provider
+# * Set PAPERLESS_DISABLE_REGULAR_LOGIN back to "true"
+
 defaultPodOptions:
   securityContext:
     #runAsUser: 1000
@@ -71,6 +76,25 @@ controllers:
               secretKeyRef:
                 name: paperless-admin
                 key: email
+          #PAPERLESS_EMAIL_HOST:
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: paperless-smtp
+          #      key: host
+          ## Use TLS Wrapper
+          #PAPERLESS_EMAIL_PORT: "465"
+          #PAPERLESS_EMAIL_HOST_USER:
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: paperless-smtp
+          #      key: username
+          #PAPERLESS_EMAIL_FROM: paperless@{{ requiredEnv "DOMAIN" }}
+          #PAPERLESS_EMAIL_HOST_PASSWORD:
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: paperless-smtp
+          #      key: password
+          #PAPERLESS_EMAIL_USE_TLS: "true"
           PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
           PAPERLESS_SOCIALACCOUNT_PROVIDERS: |
             {
@@ -289,6 +313,18 @@ rawResources:
           name: paperless-redis
           create: true
         vaultAuthRef: paperless-vault-auth
+#  smtp:
+#    apiVersion: secrets.hashicorp.com/v1beta1
+#    kind: VaultStaticSecret
+#    spec:
+#      spec:
+#        type: kv-v2
+#        mount: kvv2
+#        path: services/paperless/smtp
+#        destination:
+#          name: paperless-smtp
+#          create: true
+#        vaultAuthRef: paperless-vault-auth
   oidc-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret
