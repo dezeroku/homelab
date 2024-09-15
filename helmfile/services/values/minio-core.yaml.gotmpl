@@ -37,8 +37,8 @@ ingress:
     tls:
       - secretName: minio-api-general-tls
         hosts:
-          - api.minio.{{ requiredEnv "DOMAIN" }}
-    host: api.minio.{{ requiredEnv "DOMAIN" }}
+          - api.core.minio.{{ requiredEnv "DOMAIN" }}
+    host: api.core.minio.{{ requiredEnv "DOMAIN" }}
   console:
     enabled: true
     ingressClassName: nginx
@@ -61,8 +61,8 @@ ingress:
     tls:
       - secretName: minio-console-general-tls
         hosts:
-          - minio.{{ requiredEnv "DOMAIN" }}
-    host: minio.{{ requiredEnv "DOMAIN" }}
+          - core.minio.{{ requiredEnv "DOMAIN" }}
+    host: core.minio.{{ requiredEnv "DOMAIN" }}
 
 app-template:
   rawResources:
