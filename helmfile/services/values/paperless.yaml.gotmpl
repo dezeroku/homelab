@@ -1,0 +1,252 @@
+defaultPodOptions:
+  securityContext:
+    #runAsUser: 1000
+    #runAsGroup: 1000
+    fsGroup: 1000
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/paperless-ngx/paperless-ngx
+          tag: 2.12.0
+          pullPolicy: IfNotPresent
+        env:
+          A_REDIS_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-redis
+                key: password
+          PAPERLESS_REDIS: redis://:$(A_REDIS_PASSWORD)@paperless-redis-master:6379
+          PAPERLESS_DBHOST:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-db-pguser-paperless
+                key: host
+          PAPERLESS_DBNAME:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-db-pguser-paperless
+                key: dbname
+          PAPERLESS_DBUSER:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-db-pguser-paperless
+                key: user
+          PAPERLESS_DBPASS:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-db-pguser-paperless
+                key: password
+          PAPERLESS_SECRET_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-secret-key
+                key: key
+          PAPERLESS_ADMIN_USER:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-admin
+                key: username
+          PAPERLESS_ADMIN_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-admin
+                key: password
+          PAPERLESS_ADMIN_MAIL:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-admin
+                key: email
+          PAPERLESS_URL: https://paperless.{{ requiredEnv "DOMAIN" }}
+          PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
+          PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
+          PAPERLESS_OCR_LANGUAGE: pol+eng
+          PAPERLESS_TIME_ZONE: Europe/Warsaw
+          PAPERLESS_OCR_LANGUAGES: pol
+          PAPERLESS_EMPTY_TRASH_DIR: /usr/src/paperless/trash
+          PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{title}"
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            cpu: 6
+            memory: 4Gi
+          requests:
+            cpu: 500m
+            memory: 128Mi
+    # TODO: tika setup
+
+serviceAccount:
+  create: true
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8000
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Document Management
+      gethomepage.dev/group: Storage
+      gethomepage.dev/icon: paperless.png
+      gethomepage.dev/name: Paperless
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.71.0/24"
+      #nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=download-admins"
+      #nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    tls:
+      - secretName: paperless-tls
+        hosts:
+          - paperless.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: paperless.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /usr/src/paperless/data
+  media:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /usr/src/paperless/media
+  export:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /usr/src/paperless/export
+  consume:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /usr/src/paperless/consume
+  trash:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /usr/src/paperless/trash
+
+redis:
+  architecture: standalone
+  auth:
+    existingSecret: paperless-redis
+    existingSecretPasswordKey: password
+  persistence:
+    storageClass: longhorn
+    size: 5Gi
+
+rawResources:
+  db:
+    apiVersion: postgres-operator.crunchydata.com/v1beta1
+    kind: PostgresCluster
+    spec:
+      spec:
+        postgresVersion: 16
+        users:
+          - name: paperless
+            databases:
+              - paperless
+            # TODO: These permissions can be probably much more fine-grained
+            # We want to keep them quite lax, as the program itself is responsible
+            # for creating the initial table layout.
+            # This takes the burden off of our shoulders.
+            options: "SUPERUSER"
+        instances:
+          - name: paperless-db
+            dataVolumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 5Gi
+        backups:
+          pgbackrest:
+            repos:
+              - name: repo1
+                volume:
+                  volumeClaimSpec:
+                    accessModes:
+                      - "ReadWriteOnce"
+                    resources:
+                      requests:
+                        storage: 5Gi
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: kubernetes
+        kubernetes:
+          role: paperless
+          serviceAccount: paperless
+  secret-key:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/paperless/secret-key
+        destination:
+          name: paperless-secret-key
+          create: true
+        vaultAuthRef: paperless-vault-auth
+  admin:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/paperless/admin
+        destination:
+          name: paperless-admin
+          create: true
+        vaultAuthRef: paperless-vault-auth
+  redis:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/paperless/redis
+        destination:
+          name: paperless-redis
+          create: true
+        vaultAuthRef: paperless-vault-auth

@@ -134,3 +134,15 @@ releases:
   - name: homepage
     inherit:
       - template: argocd-app
+
+  - name: paperless
+    chart: bjw-s/app-template
+    version: 3.3.2
+    dependencies:
+      - chart: oci://registry-1.docker.io/bitnamicharts/redis
+        version: 20.1.3
+    inherit:
+      - template: default
+  - name: paperless
+    inherit:
+      - template: argocd-app

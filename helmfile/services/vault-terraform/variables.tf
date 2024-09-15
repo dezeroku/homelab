@@ -76,3 +76,23 @@ variable "homepage_jellyfin_apikey" {
   # Automate the process
   type = string
 }
+
+variable "paperless_secret_key" {
+  type = string
+}
+
+variable "paperless_admin_username" {
+  type = string
+}
+
+variable "paperless_admin_password" {
+  type = string
+}
+
+variable "paperless_admin_email" {
+  type = string
+}
+
+variable "paperless_redis_password" {
+  type = string
+}
