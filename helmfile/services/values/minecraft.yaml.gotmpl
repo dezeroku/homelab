@@ -1,0 +1,65 @@
+image:
+  tag: 2024.9.0-java21-jdk
+
+resources:
+  requests:
+    memory: 12Gi
+    cpu: 1
+  limits:
+    memory: 15Gi
+    cpu: 10
+
+minecraftServer:
+  # Uncomment this when applying changes to configs
+  # overrideServerProperties: true
+  eula: true
+  version: "1.21"
+  type: SPIGOT
+  # difficulty: normal
+  # whitelist: dezeroku
+  ops: dezeroku
+  maxWorldSize: 100000
+  viewDistance: 32
+  gameMode: survival
+  motd: "Welcome to the League of Minecraft"
+  memory: 12G
+  # jvmOpts: ""
+  # jvmXXOpts: "-Xmx12G -Xms12G"
+
+  rcon:
+    enabled: true
+    existingSecret: minecraft-rcon
+    secretKey: password
+
+persistence:
+  storageClass: longhorn
+  dataDir:
+    enabled: true
+    Size: 10Gi
+
+app-template:
+  serviceAccount:
+    create: true
+  rawResources:
+    vault-auth:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
+      spec:
+        spec:
+          method: kubernetes
+          mount: kubernetes
+          kubernetes:
+            role: minecraft
+            serviceAccount: minecraft
+    rcon:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: services/minecraft/rcon
+          destination:
+            name: minecraft-rcon
+            create: true
+          vaultAuthRef: minecraft-vault-auth

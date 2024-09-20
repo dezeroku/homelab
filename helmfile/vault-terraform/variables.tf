@@ -152,3 +152,7 @@ variable "ses_smtp_password" {
 variable "ses_smtp_host" {
   type = string
 }
+
+variable "minecraft_rcon_password" {
+  type = string
+}

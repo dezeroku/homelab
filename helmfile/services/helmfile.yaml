@@ -7,6 +7,8 @@ repositories:
     url: https://bjw-s.github.io/helm-charts
   - name: minio
     url: https://operator.min.io/
+  - name: itzg
+    url: https://itzg.github.io/minecraft-server-charts/
 
 releases:
   - name: pacoloco
@@ -144,5 +146,17 @@ releases:
     inherit:
       - template: default
   - name: paperless
+    inherit:
+      - template: argocd-app
+
+  - name: minecraft
+    chart: itzg/minecraft
+    version: 4.23.1
+    inherit:
+      - template: default
+    dependencies:
+      - chart: bjw-s/app-template
+        version: 3.3.2
+  - name: minecraft
     inherit:
       - template: argocd-app
