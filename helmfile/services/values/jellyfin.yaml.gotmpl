@@ -52,7 +52,7 @@ ingress:
       #gethomepage.dev/widget.enableNowPlaying: "false"
       # We allow access from 192.168.4.0/24 so traffic to Ingress is accepted from the network cluster lives in
       # This is done so homepage deployment can query the API
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
     ingressClassName: nginx
     integrations:
       traefik:
