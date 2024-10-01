@@ -10,6 +10,44 @@ defaultPodOptions:
     fsGroup: 1000
 
 controllers:
+  gotenberg:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: gotenberg/gotenberg
+          tag: 8.7
+          pullPolicy: IfNotPresent
+        # The gotenberg chromium route is used to convert .eml files. We do not
+        # want to allow external content like tracking pixels or even javascript.
+        command:
+          - "gotenberg"
+          - "--chromium-disable-javascript=true"
+          - "--chromium-allow-list=file:///tmp/.*"
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+          requests:
+            cpu: 10m
+            memory: 256Mi
+  tika:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: apache/tika
+          tag: 2.9.2.1
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+          requests:
+            cpu: 10m
+            memory: 256Mi
   main:
     strategy: Recreate
     replicas: 1
@@ -112,6 +150,9 @@ controllers:
                 ]
               }
             }
+          PAPERLESS_TIKA_ENABLED: 1
+          PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://paperless-gotenberg:3000
+          PAPERLESS_TIKA_ENDPOINT: http://paperless-tika:9998
           PAPERLESS_URL: https://paperless.{{ requiredEnv "DOMAIN" }}
           PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
           PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
@@ -119,7 +160,7 @@ controllers:
           PAPERLESS_TIME_ZONE: Europe/Warsaw
           PAPERLESS_OCR_LANGUAGES: pol
           PAPERLESS_EMPTY_TRASH_DIR: /usr/src/paperless/trash
-          PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{title}"
+          PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{doc_pk}-{title}"
         probes:
           readiness:
             enabled: true
@@ -127,12 +168,86 @@ controllers:
             enabled: true
         resources:
           limits:
-            cpu: 6
+            cpu: 3
             memory: 4Gi
           requests:
             cpu: 500m
             memory: 128Mi
-    # TODO: tika setup
+      ses-local-email-s3-monitor:
+        # Receive emails to S3 bucket and download .eml files using
+        # a small helper
+        image:
+          repository: ghcr.io/dezeroku/ses_local_email_s3_monitor
+          tag: v0.3.1
+          pullPolicy: IfNotPresent
+        env:
+          # TODO: switch to identity based auth with proxy deployed in cluster
+          AWS_ACCESS_KEY_ID:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-ses-incoming
+                key: aws_access_key_id
+          AWS_SECRET_ACCESS_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-ses-incoming
+                key: aws_secret_access_key
+          AWS_REGION: eu-central-1
+          BUCKET_NAME:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-ses-incoming
+                key: bucket_name
+          QUEUE_URL:
+            valueFrom:
+              secretKeyRef:
+                name: paperless-ses-incoming
+                key: queue_url
+          STORAGE_PATH: /consume-mail-staging
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+      ses-local-email-eml-unpack-attachments:
+        # Unpack attachments from email received in the sidecar above
+        image:
+          repository: ghcr.io/dezeroku/ses_local_email_eml_unpack_attachments
+          tag: v0.3.1
+          pullPolicy: IfNotPresent
+        env:
+          INPUT_DIRECTORY: /consume-mail-staging
+          OUTPUT_DIRECTORY: /usr/src/paperless/consume
+          ALLOWED_CONTENT_TYPES_REGEX: "application/pdf"
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+
+    initContainers:
+      wait-for-tika:
+        image:
+          repository: busybox
+          tag: 1.31
+        args:
+          - /bin/sh
+          - -c
+          - echo "Wait for tika to be available"; while ! nc -z paperless-tika 9998; do sleep 1; echo "-"; done; echo "Ready";
+        resources: {}
+      wait-for-gotenberg:
+        image:
+          repository: busybox
+          tag: 1.31
+        args:
+          - /bin/sh
+          - -c
+          - echo "Wait for gotenberg to be available"; while ! nc -z paperless-gotenberg 3000; do sleep 1; echo "-"; done; echo "Ready";
+        resources: {}
 
 serviceAccount:
   create: true
@@ -140,9 +255,20 @@ serviceAccount:
 service:
   main:
     controller: main
+    primary: true
     ports:
       http:
         port: 8000
+  tika:
+    controller: tika
+    ports:
+      http:
+        port: 9998
+  gotenberg:
+    controller: gotenberg
+    ports:
+      http:
+        port: 3000
 
 ingress:
   main:
@@ -176,41 +302,64 @@ persistence:
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 5Gi
-    globalMounts:
-      - path: /usr/src/paperless/data
+    advancedMounts:
+      main:
+        main:
+          - path: /usr/src/paperless/data
   media:
     enabled: true
     type: persistentVolumeClaim
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 5Gi
-    globalMounts:
-      - path: /usr/src/paperless/media
+    advancedMounts:
+      main:
+        main:
+          - path: /usr/src/paperless/media
   export:
     enabled: true
     type: persistentVolumeClaim
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 5Gi
-    globalMounts:
-      - path: /usr/src/paperless/export
+    advancedMounts:
+      main:
+        main:
+          - path: /usr/src/paperless/export
   consume:
     enabled: true
     type: persistentVolumeClaim
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 5Gi
-    globalMounts:
-      - path: /usr/src/paperless/consume
+    advancedMounts:
+      main:
+        main:
+          - path: /usr/src/paperless/consume
+        ses-local-email-eml-unpack-attachments:
+          - path: /usr/src/paperless/consume
+  consume-mail-staging:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 3Gi
+    advancedMounts:
+      main:
+        ses-local-email-s3-monitor:
+          - path: /consume-mail-staging
+        ses-local-email-eml-unpack-attachments:
+          - path: /consume-mail-staging
   trash:
     enabled: true
     type: persistentVolumeClaim
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 5Gi
-    globalMounts:
-      - path: /usr/src/paperless/trash
-
+    advancedMounts:
+      main:
+        main:
+          - path: /usr/src/paperless/trash
 redis:
   architecture: standalone
   auth:
@@ -311,6 +460,18 @@ rawResources:
         path: services/paperless/redis
         destination:
           name: paperless-redis
+          create: true
+        vaultAuthRef: paperless-vault-auth
+  ses-incoming:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/paperless/ses/incoming
+        destination:
+          name: paperless-ses-incoming
           create: true
         vaultAuthRef: paperless-vault-auth
 #  smtp:

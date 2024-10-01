@@ -1,3 +1,9 @@
+module "paperless_ses_incoming" {
+  source = "git@github.com:dezeroku/ses_local_email.git//terraform?depth=1&ref=v0.3.1"
+
+  recipients = var.paperless_ses_incoming_recipients
+}
+
 resource "vault_identity_oidc_assignment" "paperless" {
   name = "paperless"
   group_ids = [
@@ -37,6 +43,9 @@ path "kvv2/data/services/paperless/admin" {
 path "kvv2/data/services/paperless/redis" {
   capabilities = ["read"]
 }
+path "kvv2/data/services/paperless/ses/incoming" {
+  capabilities = ["read"]
+}
 path "kvv2/data/services/paperless/smtp" {
   capabilities = ["read"]
 }
@@ -74,6 +83,19 @@ resource "vault_generic_secret" "paperless-redis" {
   data_json = jsonencode(
     {
       "password" : var.paperless_redis_password,
+    }
+  )
+}
+
+resource "vault_generic_secret" "paperless-ses-incoming" {
+  path = "kvv2/services/paperless/ses/incoming"
+
+  data_json = jsonencode(
+    {
+      "queue_url" : module.paperless_ses_incoming.queue_url,
+      "bucket_name" : module.paperless_ses_incoming.bucket_name,
+      "aws_access_key_id" : module.paperless_ses_incoming.user_access_key,
+      "aws_secret_access_key" : module.paperless_ses_incoming.user_secret_key,
     }
   )
 }

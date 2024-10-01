@@ -141,6 +141,10 @@ variable "paperless_redis_password" {
   type = string
 }
 
+variable "paperless_ses_incoming_recipients" {
+  type = list(string)
+}
+
 variable "ses_smtp_username" {
   type = string
 }
