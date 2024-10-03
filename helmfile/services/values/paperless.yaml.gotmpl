@@ -178,7 +178,7 @@ controllers:
         # a small helper
         image:
           repository: ghcr.io/dezeroku/ses_local_email_s3_monitor
-          tag: v0.3.1
+          tag: v0.4.0
           pullPolicy: IfNotPresent
         env:
           # TODO: switch to identity based auth with proxy deployed in cluster
@@ -215,7 +215,7 @@ controllers:
         # Unpack attachments from email received in the sidecar above
         image:
           repository: ghcr.io/dezeroku/ses_local_email_eml_unpack_attachments
-          tag: v0.3.1
+          tag: v0.4.0
           pullPolicy: IfNotPresent
         env:
           INPUT_DIRECTORY: /consume-mail-staging
