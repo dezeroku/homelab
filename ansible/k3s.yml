@@ -21,11 +21,11 @@
         enabled: false
 
 - name: Set up k3s
-  hosts: k8s_nodes
+  hosts: k8s_homeserver
   become: true
   become_user: root
   vars:
-    k3s_server:
+    k3s_server: &k3s_server_settings
       disable:
         - traefik
       tls-san:
@@ -33,9 +33,22 @@
       node-label:
         - "{{ vars.node_label | mandatory }}"
       write-kubeconfig-mode: "0644"
-    k3s_agent:
-      # an empty list breaks the initialization and flannel
-      node-label:
-        - "{{ vars.node_label | mandatory }}"
+      #  k3s_agent:
+      #    # an empty list breaks the initialization and flannel
+      #    node-label:
+      #      - "{{ vars.node_label | mandatory }}"
+  roles:
+    - role: xanmanning.k3s
+
+- name: Set up k3s (backup cluster)
+  hosts: k8s_homeserver_backup
+  become: true
+  become_user: root
+  vars:
+    k3s_server: *k3s_server_settings
+    # k3s_agent:
+    #   # an empty list breaks the initialization and flannel
+    #   node-label:
+    #     - "{{ vars.node_label | mandatory }}"
   roles:
     - role: xanmanning.k3s
