@@ -159,6 +159,9 @@ controllers:
           PAPERLESS_OCR_LANGUAGE: pol+eng
           PAPERLESS_TIME_ZONE: Europe/Warsaw
           PAPERLESS_OCR_LANGUAGES: pol
+          # Allow importing digitally signed PDFs, see https://github.com/paperless-ngx/paperless-ngx/discussions/4047
+          # Paperless also keeps originals, so it's fine to invalidate the OCR'd version
+          PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
           PAPERLESS_EMPTY_TRASH_DIR: /usr/src/paperless/trash
           PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{doc_pk}-{title}"
         probes:
