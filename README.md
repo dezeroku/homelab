@@ -7,6 +7,12 @@ It currently spans three nodes to get some HA and distributed storage.
 DNS setup (pointing `homeserver` to all the IPs and `homeserver-{one,two...}/printserver` to the specific machine is out of the scope of this repo).
 It is defined in [network_layout](https://github.com/dezeroku/network_layout) repository.
 
+TODO:
+
+- graphical overview of clusters, nodes, etc
+- graphical overview of Vault and auth used
+- description of `homeserver` and `homeserver-backup` clusters and their purpose
+
 # Hardware
 
 I currently use RPis 4B, 8GB of RAM, 4x1.5GHz CPU.

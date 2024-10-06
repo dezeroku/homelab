@@ -2,6 +2,9 @@
 bases:
   - ../lib/base.yaml
 
+helmDefaults:
+  kubeContext: homeserver
+
 repositories:
   - name: victoria-metrics
     url: https://victoriametrics.github.io/helm-charts/
