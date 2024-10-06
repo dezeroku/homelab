@@ -22,7 +22,7 @@ resource "vault_identity_oidc_client" "paperless" {
 }
 
 resource "vault_kubernetes_auth_backend_role" "paperless" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "paperless"
   bound_service_account_namespaces = ["paperless"]
   token_ttl                        = 3600

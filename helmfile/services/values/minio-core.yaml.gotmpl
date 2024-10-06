@@ -72,7 +72,7 @@ app-template:
       spec:
         spec:
           method: kubernetes
-          mount: kubernetes
+          mount: k8s/homeserver
           kubernetes:
             role: minio
             # TODO: operator will only create the sa after the secret is already in place

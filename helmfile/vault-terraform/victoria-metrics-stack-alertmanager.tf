@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "victoria-metrics-stack-alertmanager" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "victoria-metrics-stack-alertmanager"
   bound_service_account_namespaces = ["victoria-metrics-stack"]
   token_ttl                        = 3600

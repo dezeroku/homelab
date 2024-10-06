@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "minio" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "minio"
   bound_service_account_namespaces = ["minio-core"]
   token_ttl                        = 3600

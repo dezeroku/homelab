@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "homepage" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "homepage"
   bound_service_account_namespaces = ["homepage"]
   token_ttl                        = 3600

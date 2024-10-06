@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "cert-manager" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "cert-manager"
   bound_service_account_namespaces = ["cert-manager"]
   token_ttl                        = 3600

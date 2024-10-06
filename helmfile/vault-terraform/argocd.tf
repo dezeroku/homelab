@@ -41,7 +41,7 @@ resource "vault_identity_oidc_client" "argocd-cli" {
 }
 
 resource "vault_kubernetes_auth_backend_role" "argocd" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "argocd"
   bound_service_account_namespaces = ["argocd"]
   token_ttl                        = 3600

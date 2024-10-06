@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "home-assistant" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "home-assistant"
   bound_service_account_namespaces = ["home-assistant"]
   token_ttl                        = 3600

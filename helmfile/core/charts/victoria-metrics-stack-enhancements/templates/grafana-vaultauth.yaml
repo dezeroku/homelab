@@ -5,7 +5,7 @@ metadata:
   name: grafana
 spec:
   method: kubernetes
-  mount: kubernetes
+  mount: k8s/homeserver
   kubernetes:
     role: victoria-metrics-stack-grafana
     serviceAccount: vm-grafana

@@ -1,5 +1,5 @@
 resource "vault_kubernetes_auth_backend_role" "longhorn" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "longhorn"
   bound_service_account_namespaces = ["longhorn"]
   token_ttl                        = 3600

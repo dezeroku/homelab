@@ -5,7 +5,7 @@ metadata:
   name: alertmanager
 spec:
   method: kubernetes
-  mount: kubernetes
+  mount: k8s/homeserver
   kubernetes:
     role: victoria-metrics-stack-alertmanager
     serviceAccount: vmalertmanager-vm-victoria-metrics-k8s-stack

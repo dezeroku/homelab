@@ -5,7 +5,7 @@ metadata:
   name: longhorn
 spec:
   method: kubernetes
-  mount: kubernetes
+  mount: k8s/homeserver
   kubernetes:
     role: longhorn
     serviceAccount: longhorn-service-account

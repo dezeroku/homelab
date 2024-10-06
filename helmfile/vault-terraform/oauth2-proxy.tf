@@ -14,7 +14,7 @@ resource "vault_identity_oidc_client" "oauth2-proxy" {
 }
 
 resource "vault_kubernetes_auth_backend_role" "oauth2-proxy" {
-  backend                          = vault_auth_backend.kubernetes.path
+  backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "oauth2-proxy"
   bound_service_account_namespaces = ["oauth2-proxy"]
   token_ttl                        = 3600
