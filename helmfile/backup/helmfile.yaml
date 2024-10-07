@@ -81,3 +81,12 @@ releases:
   - name: homepage
     inherit:
       - template: argocd-app
+
+  - name: minio-longhorn
+    chart: minio/tenant
+    version: 5.0.11
+    inherit:
+      - template: default
+    dependencies:
+      - chart: bjw-s/app-template
+        version: 3.3.2

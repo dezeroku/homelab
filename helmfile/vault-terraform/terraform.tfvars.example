@@ -1,10 +1,6 @@
 victoria_metrics_alertmanager_pagerduty_token = "example_token"
 homeserver_backup_victoria_metrics_alertmanager_pagerduty_token = "example_token"
 victoria_metrics_alertmanager_deadmanssnitch_url = "https://nosnch.in/some_id"
-# longhorn is just our internal alias, the real username may be different
-minio_longhorn_backup_username = "longhorn"
-minio_longhorn_backup_password = "password"
-minio_longhorn_backup_endpoint = "http://some-external-minio"
 # This is the same value as set in Vault ingress
 domain = "your-domain-exposed-via-ingress"
 # generate e.g. with `dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d -- '\n' | tr -- '+/' '-_' ; echo`
@@ -30,6 +26,11 @@ minio_private_root_password = "password"
 # dezeroku is just our internal alias, the real username may be different
 minio_private_dezeroku_username = "dezeroku"
 minio_private_dezeroku_password = "password"
+minio_longhorn_root_username = "admin"
+minio_longhorn_root_password = "password"
+minio_longhorn_longhorn_username = "longhorn"
+minio_longhorn_longhorn_password = "password"
+minio_longhorn_endpoint = "https://api.longhorn.minio.your.domain.com"
 tgtg_username = "example_tgtg_username"
 tgtg_ses_from = "homeserver-tgtg@example.com"
 tgtg_ses_to = "receiver@example.com"

@@ -1,0 +1,119 @@
+secrets:
+  existingSecret: minio-longhorn-root-credentials
+
+tenant:
+  name: longhorn
+  configuration:
+    name: minio-longhorn-root-credentials
+  pools:
+    - servers: 1
+      volumesPerServer: 1
+      size: 300Gi
+      storageClassName: longhorn
+  metrics:
+    enabled: true
+  #prometheusOperator: true
+  features:
+    bucketDNS: true
+  buckets:
+    - name: longhorn
+  users:
+    - name: minio-longhorn-longhorn-user-secret
+ingress:
+  api:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      # Allow access from the cluster VLAN
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+      # TODO: make it prettier
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        chunked_transfer_encoding off;
+    tls:
+      - secretName: minio-api-general-tls
+        hosts:
+          - api.longhorn.minio.backup.{{ requiredEnv "DOMAIN" }}
+    host: api.longhorn.minio.backup.{{ requiredEnv "DOMAIN" }}
+  console:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: S3-compatible storage for Longhorn backups
+      gethomepage.dev/group: Storage
+      gethomepage.dev/icon: minio.png
+      gethomepage.dev/name: Minio (Private)
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      # TODO: make it prettier
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        chunked_transfer_encoding off;
+    tls:
+      - secretName: minio-console-general-tls
+        hosts:
+          - longhorn.minio.backup.{{ requiredEnv "DOMAIN" }}
+    host: longhorn.minio.backup.{{ requiredEnv "DOMAIN" }}
+
+app-template:
+  rawResources:
+    vault-auth:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
+      spec:
+        spec:
+          method: kubernetes
+          mount: k8s/homeserver-backup
+          kubernetes:
+            role: minio-longhorn
+            # TODO: operator will only create the sa after the secret is already in place
+            # so let's use default for now
+            serviceAccount: default
+    root-credentials:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: services/minio/longhorn/root-credentials
+          destination:
+            name: minio-longhorn-root-credentials
+            create: true
+            transformation:
+              excludes:
+                - .*
+              templates:
+                config.env:
+                  text: |
+                    export MINIO_ROOT_USER={{ "{{`{{" }}.Secrets.rootUser{{ "}}`}}" }}
+                    export MINIO_ROOT_PASSWORD={{ "{{`{{" }}.Secrets.rootPassword{{ "}}`}}" }}
+          vaultAuthRef: minio-longhorn-vault-auth
+    longhorn-user-secret:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: services/minio/longhorn/longhorn-credentials
+          destination:
+            name: minio-longhorn-longhorn-user-secret
+            create: true
+            transformation:
+              excludes:
+                - .*
+              templates:
+                CONSOLE_ACCESS_KEY:
+                  text: |
+                    {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                CONSOLE_SECRET_KEY:
+                  text: |
+                    {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+          vaultAuthRef: minio-longhorn-vault-auth

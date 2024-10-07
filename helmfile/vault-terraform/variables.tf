@@ -10,19 +10,6 @@ variable "victoria_metrics_alertmanager_deadmanssnitch_url" {
   type = string
 }
 
-variable "minio_longhorn_backup_username" {
-  type = string
-}
-
-variable "minio_longhorn_backup_password" {
-  type = string
-}
-
-variable "minio_longhorn_backup_endpoint" {
-  type    = string
-  default = "minio.longhorn.svc.cluster.local:443"
-}
-
 variable "users" {
   type = map(object({
     email    = string
@@ -80,6 +67,26 @@ variable "minio_private_dezeroku_username" {
 }
 
 variable "minio_private_dezeroku_password" {
+  type = string
+}
+
+variable "minio_longhorn_root_username" {
+  type = string
+}
+
+variable "minio_longhorn_root_password" {
+  type = string
+}
+
+variable "minio_longhorn_longhorn_username" {
+  type = string
+}
+
+variable "minio_longhorn_longhorn_password" {
+  type = string
+}
+
+variable "minio_longhorn_endpoint" {
   type = string
 }
 
