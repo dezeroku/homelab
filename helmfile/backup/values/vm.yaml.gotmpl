@@ -1,0 +1,241 @@
+# K3S specific stuff,
+# taken from https://github.com/k3s-io/k3s/issues/3619
+# Unfortunately hardcoded IPs, so just disable these for now
+# Disabling these disables a lot of the monitoring...
+# But it's on a best-effort basis
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+victoria-metrics-operator:
+  operator:
+    # Allow us to still use the ServiceMonitors CRDs
+    # TODO: this chart doesn't install CRDs for prometheus stuff
+    # We should do it as part of helmfile.yaml
+    disable_prometheus_converter: false
+    # Make ArgoCD stop complaining about the converted resources
+    prometheus_converter_add_argocd_ignore_annotations: true
+
+alertmanager:
+  config:
+    route:
+      # Basically do not group at all
+      # we don't get that many alerts
+      group_by: ['...']
+      receiver: default
+      routes:
+      - receiver: pagerduty
+        matchers:
+          - alertname !~ "InfoInhibitor|Watchdog"
+      # TODO: Free tier of dead man's snitch allows only one snitch to be set :(
+      # We probably want to set up a custom solution relying on the homeserver cluster
+      #- receiver: deadman
+      #  group_wait: 0s
+      #  group_interval: 1m
+      #  repeat_interval: 50s
+      #  matchers:
+      #    - alertname = Watchdog
+    receivers:
+    - name: default
+    - name: pagerduty
+      pagerduty_configs:
+      - routing_key_file: /etc/vm/secrets/alertmanager-pagerduty-token/token
+        send_resolved: true
+    #- name: deadman
+    #  webhook_configs:
+    #  - url_file: /etc/vm/secrets/alertmanager-deadmanssnitch-url/url
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Alerts routing
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: alertmanager.png
+      gethomepage.dev/name: AlertManager
+      gethomepage.dev/app: vmalertmanager
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      # TODO: redirects don't work correctly on the initial request if they have a path after the slash
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - alertmanager.backup.{{ requiredEnv "DOMAIN" }}
+    paths:
+      - /
+    pathType: ImplementationSpecific
+    tls:
+      - secretName: alertmanager-general-tls
+        hosts:
+          - alertmanager.backup.{{ requiredEnv "DOMAIN" }}
+  spec:
+    image:
+      # TODO: we manually bump to this version to have support for url_file webhook config
+      # get rid of this when a new enough version is vendored in the chart itself
+      tag: v0.27.0
+    externalURL: https://alertmanager.backup.{{ requiredEnv "DOMAIN" }}
+    secrets:
+    - alertmanager-pagerduty-token
+    #- alertmanager-deadmanssnitch-url
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: longhorn
+          resources:
+            requests:
+              storage: 5Gi
+
+grafana:
+  # We disable the admin account creation via grafana.ini
+  # This value is added here just to avoid unnecessary secret changes
+  adminPassword: admin
+
+  envValueFrom:
+    GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
+      secretKeyRef:
+        name: vm-grafana-oidc-secret
+        key: client_id
+    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
+      secretKeyRef:
+        name: vm-grafana-oidc-secret
+        key: client_secret
+  defaultDashboardsTimezone: Europe/Warsaw
+  plugins:
+    - grafana-piechart-panel
+  dashboards:
+    default:
+      node-exporter-full:
+        gnetId: 1860
+        revision: 31
+        datasource: VictoriaMetrics
+      longhorn:
+        gnetId: 16888
+        rev: 8
+
+  grafana.ini:
+    # log:
+    #  level: debug
+    server:
+      root_url: https://grafana.backup.{{ requiredEnv "DOMAIN" }}
+    security:
+      disable_initial_admin_creation: true
+    auth.generic_oauth:
+      enabled: true
+      name: Vault
+      allow_sign_up: true
+      auto_login: true
+      scopes: "openid profile email groups"
+      auth_url: https://vault.{{ requiredEnv "DOMAIN" }}/ui/vault/identity/oidc/provider/main/authorize
+      token_url: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/token
+      api_url: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/userinfo
+      # These are set directly through env variables
+      # client_id: ""
+      # client_secret: ""
+      role_attribute_path: contains(groups[*], 'monitoring-admins') && 'GrafanaAdmin' || contains(groups[*], 'monitoring-editors') && 'Editor' || 'Viewer'
+      allow_assign_grafana_admin: true
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Dashboards
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: grafana.png
+      gethomepage.dev/name: Grafana
+      gethomepage.dev/app: grafana
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.backup.{{ requiredEnv "DOMAIN" }}
+    paths:
+      - /
+    pathType: ImplementationSpecific
+    tls:
+      - secretName: grafana-general-tls
+        hosts:
+          - grafana.backup.{{ requiredEnv "DOMAIN" }}
+
+vmsingle:
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Metrics provider
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: si-victoriametrics
+      gethomepage.dev/name: VictoriaMetrics
+      gethomepage.dev/app: vmsingle
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - prometheus.backup.{{ requiredEnv "DOMAIN" }}
+    paths:
+      - /
+    pathType: ImplementationSpecific
+    tls:
+      - secretName: prometheus-general-tls
+        hosts:
+          - prometheus.backup.{{ requiredEnv "DOMAIN" }}
+
+  spec:
+    resources:
+      requests:
+        memory: 1000Mi
+      limits:
+        memory: 2250Mi
+    retentionPeriod: "30d"
+    storage:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: longhorn-single-replica
+      resources:
+        requests:
+          storage: 50Gi
+
+vmagent:
+  # Give it some room to breathe, defaults cause it to throttle
+  # Maybe let's get rid of these completely?
+  spec:
+    resources:
+      requests:
+        cpu: 250m
+      limits:
+        cpu: 1
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Metrics scraper
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: si-victoriametrics
+      gethomepage.dev/name: VMAgent
+      gethomepage.dev/app: vmagent
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      # TODO: redirects don't work correctly on the initial request if they have a path after the slash
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - vmagent.backup.{{ requiredEnv "DOMAIN" }}
+    paths:
+      - /
+    pathType: ImplementationSpecific
+    tls:
+      - secretName: vmagent-general-tls
+        hosts:
+          - vmagent.backup.{{ requiredEnv "DOMAIN" }}
+
+vmalert:
+  spec:
+    extraArgs:
+      # TODO: this feels a little bit hacky, but seems this option can't be defined in a different way?
+      external.url: https://prometheus.backup.{{ requiredEnv "DOMAIN" }}

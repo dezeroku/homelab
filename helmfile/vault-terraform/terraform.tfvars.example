@@ -1,4 +1,5 @@
 victoria_metrics_alertmanager_pagerduty_token = "example_token"
+homeserver_backup_victoria_metrics_alertmanager_pagerduty_token = "example_token"
 victoria_metrics_alertmanager_deadmanssnitch_url = "https://nosnch.in/some_id"
 # longhorn is just our internal alias, the real username may be different
 minio_longhorn_backup_username = "longhorn"
@@ -48,3 +49,8 @@ paperless_admin_email = "admin@example.com"
 paperless_redis_password = "example_password"
 minecraft_rcon_password = "example_password"
 paperless_ses_incoming_recipients = ["some-email@your-domain.com"]
+backup_cluster_kubernetes_host = "https://homeserver-backup:6443"
+# Both these values can be found in secret 'vault-auth-secret' in 'default' namespace
+# after the 'vault-auth' chart is deployed
+backup_cluster_kubernetes_ca_cert = "ca cert"
+backup_cluster_token_reviewer_jwt = "token_reviewer_jwt"

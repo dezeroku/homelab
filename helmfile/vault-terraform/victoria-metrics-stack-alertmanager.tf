@@ -1,3 +1,12 @@
+resource "vault_kubernetes_auth_backend_role" "victoria-metrics-stack-alertmanager_backup" {
+  backend                          = vault_auth_backend.kubernetes_homeserver_backup.path
+  role_name                        = "victoria-metrics-stack-alertmanager"
+  bound_service_account_namespaces = ["victoria-metrics-stack"]
+  token_ttl                        = 3600
+  bound_service_account_names      = ["vmalertmanager-vm-victoria-metrics-k8s-stack"]
+  token_policies                   = ["victoria-metrics-stack-alertmanager"]
+}
+
 resource "vault_kubernetes_auth_backend_role" "victoria-metrics-stack-alertmanager" {
   backend                          = vault_auth_backend.kubernetes_homeserver.path
   role_name                        = "victoria-metrics-stack-alertmanager"
@@ -14,6 +23,9 @@ resource "vault_policy" "victoria-metrics-stack-alertmanager" {
 path "kvv2/data/victoria-metrics-stack/alertmanager-pagerduty-token" {
   capabilities = ["read"]
 }
+path "kvv2/data/victoria-metrics-stack/alertmanager-pagerduty-token-backup" {
+  capabilities = ["read"]
+}
 path "kvv2/data/victoria-metrics-stack/alertmanager-deadmanssnitch-url" {
   capabilities = ["read"]
 }
@@ -26,6 +38,16 @@ resource "vault_generic_secret" "victoria-metrics-stack-alertmanager-pagerduty-t
   data_json = jsonencode(
     {
       "token" : var.victoria_metrics_alertmanager_pagerduty_token
+    }
+  )
+}
+
+resource "vault_generic_secret" "victoria-metrics-stack-alertmanager-pagerduty-token-backup" {
+  path = "kvv2/victoria-metrics-stack/alertmanager-pagerduty-token-backup"
+
+  data_json = jsonencode(
+    {
+      "token" : var.homeserver_backup_victoria_metrics_alertmanager_pagerduty_token
     }
   )
 }

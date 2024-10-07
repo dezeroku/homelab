@@ -1,0 +1,13 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: alertmanager-pagerduty-token
+spec:
+  type: kv-v2
+  mount: kvv2
+  path: victoria-metrics-stack/alertmanager-pagerduty-token-backup
+  destination:
+    name: alertmanager-pagerduty-token
+    create: true
+  vaultAuthRef: alertmanager

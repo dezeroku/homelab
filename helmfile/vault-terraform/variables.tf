@@ -2,6 +2,10 @@ variable "victoria_metrics_alertmanager_pagerduty_token" {
   type = string
 }
 
+variable "homeserver_backup_victoria_metrics_alertmanager_pagerduty_token" {
+  type = string
+}
+
 variable "victoria_metrics_alertmanager_deadmanssnitch_url" {
   type = string
 }
@@ -158,5 +162,17 @@ variable "ses_smtp_host" {
 }
 
 variable "minecraft_rcon_password" {
+  type = string
+}
+
+variable "backup_cluster_kubernetes_host" {
+  type = string
+}
+
+variable "backup_cluster_kubernetes_ca_cert" {
+  type = string
+}
+
+variable "backup_cluster_token_reviewer_jwt" {
   type = string
 }

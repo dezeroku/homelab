@@ -1,0 +1,11 @@
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: alertmanager
+spec:
+  method: kubernetes
+  mount: k8s/homeserver-backup
+  kubernetes:
+    role: victoria-metrics-stack-alertmanager
+    serviceAccount: vmalertmanager-vm-victoria-metrics-k8s-stack

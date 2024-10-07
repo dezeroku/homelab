@@ -1,0 +1,28 @@
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: Distributed storage for Kubernetes
+    gethomepage.dev/group: Cluster
+    gethomepage.dev/icon: longhorn.png
+    gethomepage.dev/name: Longhorn
+    gethomepage.dev/app: longhorn
+    nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+    nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=storage-admins"
+    nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+  host: longhorn.backup.{{ requiredEnv "DOMAIN" }}
+  tls: true
+  tlsSecret: longhorn-tls
+
+longhornUI:
+  replicas: 1
+
+persistence:
+  defaultDataLocality: best-effort
+
+defaultSettings:
+  defaultDataLocality: best-effort
+  createDefaultDiskLabeledNodes: true
+  concurrentAutomaticEngineUpgradePerNodeLimit: 1

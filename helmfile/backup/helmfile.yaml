@@ -1,0 +1,83 @@
+---
+bases:
+  - ../lib/base.yaml
+
+helmDefaults:
+  kubeContext: homeserver-backup
+
+repositories:
+  - name: victoria-metrics
+    url: https://victoriametrics.github.io/helm-charts/
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+  - name: jetstack
+    url: https://charts.jetstack.io
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+  - name: longhorn
+    url: https://charts.longhorn.io
+  - name: minio
+    url: https://operator.min.io/
+  - name: bjw-s
+    url: https://bjw-s.github.io/helm-charts
+releases:
+  - name: vault-secrets-operator
+    chart: hashicorp/vault-secrets-operator
+    version: 0.5.1
+    inherit:
+      - template: default
+
+  - name: longhorn
+    chart: longhorn/longhorn
+    version: 1.6.2
+    inherit:
+      - template: default
+    dependencies:
+      - chart: ./charts/longhorn-enhancements
+        version: 0.1.0
+
+  - name: ingress-nginx
+    chart: ingress-nginx/ingress-nginx
+    version: 4.11.1
+    inherit:
+      - template: default
+
+  - name: cert-manager
+    chart: jetstack/cert-manager
+    version: 1.14.4
+    inherit:
+      - template: default
+    dependencies:
+      - chart: bjw-s/app-template
+        version: 3.3.2
+
+  # Using vm instead of victoria-metrics-stack, because the latter causes
+  # issues with with names extending 63 characters
+  - name: vm
+    namespace: victoria-metrics-stack
+    chart: victoria-metrics/victoria-metrics-k8s-stack
+    version: 0.24.5
+    inherit:
+      - template: default
+    dependencies:
+      - chart: ./charts/victoria-metrics-stack-enhancements
+        version: 0.1.0
+
+  - name: minio-operator
+    chart: minio/operator
+    version: 5.0.11
+    inherit:
+      - template: default
+
+  - name: vault-auth
+    chart: ./charts/vault-auth
+    namespace: default
+
+  - name: homepage
+    chart: bjw-s/app-template
+    version: 3.3.2
+    inherit:
+      - template: default
+  - name: homepage
+    inherit:
+      - template: argocd-app

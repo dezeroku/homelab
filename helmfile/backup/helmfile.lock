@@ -1,0 +1,25 @@
+version: 0.0.0-dev
+dependencies:
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 3.3.2
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.14.4
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.11.1
+- name: longhorn
+  repository: https://charts.longhorn.io
+  version: 1.6.2
+- name: operator
+  repository: https://operator.min.io/
+  version: 5.0.11
+- name: vault-secrets-operator
+  repository: https://helm.releases.hashicorp.com
+  version: 0.5.1
+- name: victoria-metrics-k8s-stack
+  repository: https://victoriametrics.github.io/helm-charts/
+  version: 0.24.5
+digest: sha256:1f3fbb352370b6bcbe6dfe864419c8be252670c2d1bdc0a4f5549576f17a8994
+generated: "2024-10-07T23:17:36.482177294+02:00"
