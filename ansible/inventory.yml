@@ -56,10 +56,9 @@ misc:
 
 rack_rpis:
   hosts:
-    homeserver-one:
-    homeserver-two:
-    homeserver-three:
-    homeserver-four:
+    homeserver-backup-one:
+    homeserver-backup-two:
+    homeserver-backup-three:
   vars:
     poe_plus_hat: true
     raspi_os: true
