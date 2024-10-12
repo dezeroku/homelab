@@ -1,0 +1,129 @@
+
+tenant:
+  name: k8s-backups
+  configuration:
+    name: minio-k8s-backups-root-credentials
+  configSecret:
+    name: minio-k8s-backups-root-credentials
+    accessKey: ""
+    secretKey: ""
+    existingSecret: true
+  pools:
+    - servers: 1
+      volumesPerServer: 1
+      storageLabels:
+        recurring-job-group.longhorn.io/k8s-backups: enabled
+        recurring-job.longhorn.io/source: enabled
+      size: 50Gi
+      storageClassName: longhorn
+  metrics:
+    enabled: true
+  #prometheusOperator: true
+  features:
+    bucketDNS: false
+  buckets:
+    - name: invidious
+    - name: paperless
+  users:
+    - name: minio-k8s-backups-backuper-user-secret
+ingress:
+  api:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+      # TODO: make it prettier
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/server-snippet: |
+        client_max_body_size 0;
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        chunked_transfer_encoding off;
+    tls:
+      - secretName: minio-api-general-tls
+        hosts:
+          - api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+    host: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+  console:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: S3-compatible storage for K8S backups
+      gethomepage.dev/group: Storage
+      gethomepage.dev/icon: minio.png
+      gethomepage.dev/name: Minio (K8S Backups)
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      # TODO: make it prettier
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/server-snippet: |
+        client_max_body_size 0;
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        chunked_transfer_encoding off;
+    tls:
+      - secretName: minio-console-general-tls
+        hosts:
+          - k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+    host: k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+
+app-template:
+  rawResources:
+    vault-auth:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
+      spec:
+        spec:
+          method: kubernetes
+          mount: k8s/homeserver
+          kubernetes:
+            role: minio-k8s-backups
+            # TODO: operator will only create the sa after the secret is already in place
+            # so let's use default for now
+            serviceAccount: default
+    root-credentials:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: core/minio/k8s-backups/root-credentials
+          destination:
+            name: minio-k8s-backups-root-credentials
+            create: true
+            transformation:
+              excludes:
+                - .*
+              templates:
+                config.env:
+                  text: |
+                    export MINIO_ROOT_USER={{ "{{`{{" }}.Secrets.rootUser{{ "}}`}}" }}
+                    export MINIO_ROOT_PASSWORD={{ "{{`{{" }}.Secrets.rootPassword{{ "}}`}}" }}
+          vaultAuthRef: minio-k8s-backups-vault-auth
+    backuper-user-secret:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: core/minio/k8s-backups/backuper-credentials
+          destination:
+            name: minio-k8s-backups-backuper-user-secret
+            create: true
+            transformation:
+              excludes:
+                - .*
+              templates:
+                CONSOLE_ACCESS_KEY:
+                  text: |
+                    {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                CONSOLE_SECRET_KEY:
+                  text: |
+                    {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+          vaultAuthRef: minio-k8s-backups-vault-auth

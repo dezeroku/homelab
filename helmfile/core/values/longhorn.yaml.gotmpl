@@ -29,3 +29,17 @@ defaultSettings:
   backupTarget: s3://longhorn@us-east-1/
   backupTargetCredentialSecret: longhorn-credentials-s3
   concurrentAutomaticEngineUpgradePerNodeLimit: 1
+
+app-template:
+  rawResources:
+    k8s-backups:
+      apiVersion: longhorn.io/v1beta1
+      kind: RecurringJob
+      spec:
+        spec:
+          cron: "0 1 * * *"
+          task: "backup"
+          groups:
+          - k8s-backups
+          retain: 2
+          concurrency: 1

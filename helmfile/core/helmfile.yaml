@@ -52,6 +52,8 @@ releases:
     dependencies:
       - chart: ./charts/longhorn-enhancements
         version: 0.1.0
+      - chart: bjw-s/app-template
+        version: 3.3.2
   - name: longhorn
     inherit:
       - template: argocd-app
@@ -225,5 +227,21 @@ releases:
   - name: intel-gpu-device-plugin
     values:
       - targetNamespace: intel
+    inherit:
+      - template: argocd-app
+
+  - name: minio-k8s-backups
+    # TODO: Switch back tenant repository after
+    # https://github.com/minio/operator/commit/b8c9bf4a1ce7a1c9b91ed3b0e0d11e1e2d050920
+    # is released (> 6.0.4)
+    # Currently this tar points to manually built chart with the above commit included on top
+    chart: ./tenant-6.0.4.tgz
+    version: 6.0.4
+    inherit:
+      - template: default
+    dependencies:
+      - chart: bjw-s/app-template
+        version: 3.3.2
+  - name: minio-k8s-backups
     inherit:
       - template: argocd-app

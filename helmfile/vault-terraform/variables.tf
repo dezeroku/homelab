@@ -70,6 +70,22 @@ variable "minio_private_dezeroku_password" {
   type = string
 }
 
+variable "minio_k8s_backups_root_username" {
+  type = string
+}
+
+variable "minio_k8s_backups_root_password" {
+  type = string
+}
+
+variable "minio_k8s_backups_backuper_username" {
+  type = string
+}
+
+variable "minio_k8s_backups_backuper_password" {
+  type = string
+}
+
 variable "minio_longhorn_root_username" {
   type = string
 }
