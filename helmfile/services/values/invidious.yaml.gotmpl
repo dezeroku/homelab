@@ -305,15 +305,18 @@ rawResources:
                   storage: 20Gi
         backups:
           pgbackrest:
+            configuration:
+              - secret:
+                  name: invidious-pgo-backup-s3-secret
+            global:
+              repo1-s3-uri-style: path
+              repo1-retention-full: "2"
             repos:
               - name: repo1
-                volume:
-                  volumeClaimSpec:
-                    accessModes:
-                      - "ReadWriteOnce"
-                    resources:
-                      requests:
-                        storage: 20Gi
+                s3:
+                  bucket: invidious
+                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                  region: default
   vault-auth:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultAuth
@@ -335,6 +338,27 @@ rawResources:
         destination:
           name: invidious-hmac-secret
           create: true
+        vaultAuthRef: invidious-vault-auth
+  pgo-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: invidious-pgo-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              s3.conf:
+                text: |
+                  [global]
+                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
         vaultAuthRef: invidious-vault-auth
   deployment-restart-role:
     apiVersion: rbac.authorization.k8s.io/v1
@@ -371,7 +395,6 @@ rawResources:
             - patch
             - list
             - watch
-
   deployment-restart-role-binding:
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding

@@ -14,6 +14,9 @@ resource "vault_policy" "invidious" {
 path "kvv2/data/services/invidious/hmac" {
   capabilities = ["read"]
 }
+path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
+  capabilities = ["read"]
+}
 EOT
 }
 
