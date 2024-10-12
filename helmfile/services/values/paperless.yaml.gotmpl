@@ -399,15 +399,18 @@ rawResources:
                   storage: 5Gi
         backups:
           pgbackrest:
+            configuration:
+              - secret:
+                  name: paperless-pgo-backup-s3-secret
+            global:
+              repo1-s3-uri-style: path
+              repo1-retention-full: "2"
             repos:
               - name: repo1
-                volume:
-                  volumeClaimSpec:
-                    accessModes:
-                      - "ReadWriteOnce"
-                    resources:
-                      requests:
-                        storage: 5Gi
+                s3:
+                  bucket: paperless
+                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                  region: default
   vault-auth:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultAuth
@@ -418,6 +421,27 @@ rawResources:
         kubernetes:
           role: paperless
           serviceAccount: paperless
+  pgo-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: paperless-pgo-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              s3.conf:
+                text: |
+                  [global]
+                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: paperless-vault-auth
   secret-key:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

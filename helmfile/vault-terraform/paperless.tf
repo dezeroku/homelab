@@ -52,6 +52,9 @@ path "kvv2/data/services/paperless/smtp" {
 path "identity/oidc/client/paperless" {
   capabilities = ["read"]
 }
+path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
+  capabilities = ["read"]
+}
 EOT
 }
 
