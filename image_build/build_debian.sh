@@ -9,6 +9,9 @@ set -euo pipefail
 pubkey_file="/home/dezeroku/.ssh/id_smartcard_dezeroku.pub"
 pubkey="$(cat "$pubkey_file")"
 
+# Get password from password manager
+luks_password="$(rbw get homeserver_luks)"
+
 debian_version=12.7.0
 debian_arch=amd64
 # This is a directory suffix in the unpacked ISO, depends on the architecture
@@ -25,6 +28,7 @@ bsdtar -C "$staging_dir/" -xf "$debian_iso"
 cp preseed.cfg "$staging_dir"
 pushd "$staging_dir"
 sed -i "s#PUB_KEY_SED_ME#$pubkey#" preseed.cfg
+sed -i "s#LUKS_PASSWORD_SED_ME#$luks_password#" preseed.cfg
 cat preseed.cfg
 
 chmod +w -R "install.$debian_arch_dir/"
