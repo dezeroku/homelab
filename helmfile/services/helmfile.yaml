@@ -16,7 +16,7 @@ repositories:
 releases:
   - name: pacoloco
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: pacoloco
@@ -25,7 +25,7 @@ releases:
 
   - name: invidious
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: invidious
@@ -34,7 +34,7 @@ releases:
 
   - name: redbot
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: redbot
@@ -43,7 +43,7 @@ releases:
 
   - name: netbootxyz
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: netbootxyz
@@ -52,7 +52,7 @@ releases:
 
   - name: home-assistant
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: home-assistant
@@ -62,7 +62,7 @@ releases:
   - name: media-storage
     namespace: media
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: media-storage
@@ -74,7 +74,7 @@ releases:
   - name: filebrowser
     namespace: media
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: filebrowser
@@ -86,7 +86,7 @@ releases:
   - name: metube
     namespace: media
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: metube
@@ -114,7 +114,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: minio-core
     inherit:
       - template: argocd-app
@@ -126,14 +126,14 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: minio-private
     inherit:
       - template: argocd-app
 
   - name: homepage
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: homepage
@@ -142,7 +142,7 @@ releases:
 
   - name: paperless
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     dependencies:
       - chart: oci://registry-1.docker.io/bitnamicharts/redis
         version: 20.1.3
@@ -159,7 +159,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: minecraft
     inherit:
       - template: argocd-app

@@ -2,12 +2,12 @@ version: 0.0.0-dev
 dependencies:
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.3.2
+  version: 3.5.1
 - name: minecraft
   repository: https://itzg.github.io/minecraft-server-charts/
   version: 4.23.1
 - name: tenant
   repository: https://operator.min.io/
   version: 5.0.11
-digest: sha256:a14b1a00bff8d1025c451329224d5a65556dc805277fc86c8f6f88ec68df2b04
-generated: "2024-09-21T01:16:01.984888025+02:00"
+digest: sha256:d142e598c649484ad64a466be972fda50715d7a4ee3d02b8470f3259b92da3b0
+generated: "2024-10-16T03:43:27.093070215+02:00"

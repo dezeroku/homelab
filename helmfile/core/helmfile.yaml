@@ -53,7 +53,7 @@ releases:
       - chart: ./charts/longhorn-enhancements
         version: 0.1.0
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: longhorn
     inherit:
       - template: argocd-app
@@ -83,7 +83,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: cert-manager
     inherit:
       - template: argocd-app
@@ -116,7 +116,7 @@ releases:
   - name: vm-hass
     namespace: victoria-metrics-stack
     chart: bjw-s/app-template
-    version: 3.3.2
+    version: 3.5.1
     inherit:
       - template: default
   - name: vm-hass
@@ -174,7 +174,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: oauth2-proxy
     inherit:
       - template: argocd-app
@@ -186,7 +186,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: argocd-app
     values:
       - targetNamespace: argocd
@@ -241,7 +241,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.3.2
+        version: 3.5.1
   - name: minio-k8s-backups
     inherit:
       - template: argocd-app
