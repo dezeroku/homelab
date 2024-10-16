@@ -129,6 +129,8 @@ controllers:
 
   deployment-restart:
     type: cronjob
+    serviceAccount:
+      identifier: deployment-restart
     cronjob:
       concurrencyPolicy: Forbid
       schedule: '5 */6 * * *'
@@ -154,6 +156,8 @@ controllers:
   # TODO: do we want to trigger it from initContainer if secret is not present?
   yt-tokens:
     type: cronjob
+    serviceAccount:
+      identifier: yt-tokens
     cronjob:
       concurrencyPolicy: Forbid
       schedule: '1 */6 * * *'
@@ -275,9 +279,67 @@ persistence:
           - path: /yt-tokens
 
 serviceAccount:
-  # TODO: create separate SAs for different functions
   name: invidious
   create: true
+
+  extraServiceAccounts:
+    deployment-restart:
+      create: true
+
+    yt-tokens:
+      create: true
+
+rbac:
+  roles:
+    deployment-restart-role:
+      type: Role
+      rules:
+        - apiGroups:
+            - apps
+          resources:
+            - deployments
+          resourceNames:
+            - invidious-main
+          verbs:
+            - get
+            - patch
+            - list
+            - watch
+    yt-tokens-role:
+      type: Role
+      rules:
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          # no resourceNames because of https://github.com/kubernetes/kubernetes/issues/80295#issuecomment-512874100
+          verbs:
+            - create
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          resourceNames:
+            - invidious-yt-tokens
+          verbs:
+            - get
+            - delete
+            - patch
+            - list
+            - watch
+  bindings:
+    deployment-restart-role-binding:
+      type: RoleBinding
+      roleRef:
+        identifier: deployment-restart-role
+      subjects:
+        - identifier: deployment-restart
+    yt-tokens-role-binding:
+      type: RoleBinding
+      roleRef:
+        identifier: yt-tokens-role
+      subjects:
+        - identifier: yt-tokens
 
 rawResources:
   db:
@@ -360,49 +422,3 @@ rawResources:
                   repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
                   repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
         vaultAuthRef: invidious-vault-auth
-  deployment-restart-role:
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    spec:
-      rules:
-        - apiGroups:
-            - apps
-          resources:
-            - deployments
-          resourceNames:
-            - invidious-main
-          verbs:
-            - get
-            - patch
-            - list
-            - watch
-        - apiGroups:
-            - ""
-          resources:
-            - secrets
-          # no resourceNames because of https://github.com/kubernetes/kubernetes/issues/80295#issuecomment-512874100
-          verbs:
-            - create
-        - apiGroups:
-            - ""
-          resources:
-            - secrets
-          resourceNames:
-            - invidious-yt-tokens
-          verbs:
-            - get
-            - delete
-            - patch
-            - list
-            - watch
-  deployment-restart-role-binding:
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: RoleBinding
-    spec:
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: Role
-        name: invidious-deployment-restart-role
-      subjects:
-        - kind: ServiceAccount
-          name: invidious
