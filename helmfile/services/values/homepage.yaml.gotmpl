@@ -114,11 +114,11 @@ persistence:
     type: emptyDir
     globalMounts:
       - path: /app/config/logs
-rawResources:
-  cluster-role:
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRole
-    spec:
+
+rbac:
+  roles:
+    cluster-role:
+      type: ClusterRole
       rules:
         - apiGroups:
             - ""
@@ -159,18 +159,15 @@ rawResources:
             - customresourcedefinitions/status
           verbs:
             - get
-  cluster-role-binding:
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRoleBinding
-    spec:
+  bindings:
+    cluster-role-binding:
+      type: ClusterRoleBinding
       roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: ClusterRole
-        name: homepage-cluster-role
+        identifier: cluster-role
       subjects:
-        - kind: ServiceAccount
-          name: homepage
-          namespace: homepage
+        - identifier: default
+
+rawResources:
   vault-auth:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultAuth
