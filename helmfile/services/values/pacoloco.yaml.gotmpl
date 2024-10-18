@@ -52,7 +52,7 @@ ingress:
     className: nginx
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24"
     tls:
       - secretName: pacoloco-general-tls
         hosts:
@@ -72,18 +72,19 @@ configMaps:
       config.yaml: |
         download_timeout: 3600  ## downloads will timeout if not completed after 3600 sec, 0 to disable timeout
         purge_files_after: 2592000  ## purge files after 30 days
-        # archlinux:
-        #   urls: ## add or change official mirror urls as desired, see https://archlinux.org/mirrors/status/
-        #     - http://mirror.lty.me/archlinux
-        #     - http://mirrors.kernel.org/archlinux
         repos:
           archlinux-reflector:
             mirrorlist: /reflector-output/mirrorlist
-        # prefetch: ## optional section, add it if you want to enable prefetching
-        #  cron: 0 0 3 * * * * ## standard cron expression (https://en.wikipedia.org/wiki/Cron#CRON_expression) to define how frequently prefetch, see https://github.com/gorhill/cronexpr#implementation for documentation.
-        # ttl_unaccessed_in_days: 14
-        ## It deletes and stops prefetching packages (and db links) when not downloaded after "ttl_unaccessed_in_days" days that it has been updated.
-        #  ttl_unupdated_in_days: 300 ## defaults to 300, it deletes and stops prefetching packages which haven't been either updated upstream or requested for "ttl_unupdated_in_days".
+
+          # TODO: this approach should be considered unstable until further tests are concluded
+          # We have to separate debian and debian-updates,
+          # because pacoloco seems to flatten the structure and InRelease file gets "shared" between the two
+          debian:
+            url: https://mirrors.edge.kernel.org/debian
+          debian-updates:
+            url: https://mirrors.edge.kernel.org/debian
+          debian-security:
+            url: https://security.debian.org/debian-security
 
 persistence:
   storage:
