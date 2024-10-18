@@ -6,11 +6,14 @@ set -euo pipefail
 # * syslinux
 # * cdrtools
 
-pubkey_file="/home/dezeroku/.ssh/id_smartcard_dezeroku.pub"
+pubkey_file="${HOST_SSH_PUB_KEYS_FILE:-$HOME/.ssh/id_smartcard_dezeroku.pub}"
 pubkey="$(cat "$pubkey_file")"
 
-# Get password from password manager
-luks_password="$(rbw get homeserver_luks)"
+luks_password="${LUKS_PASSWORD:-}"
+if [ -z "$luks_password" ]; then
+    # Get password from password manager
+    luks_password="$(rbw get homeserver_luks)"
+fi
 
 debian_version=12.7.0
 debian_arch=amd64

@@ -1,67 +1,117 @@
 # Home Server
 
-This repository is a collection of tooling, docs and configuration that defines my small homelab
-(the stable one, not a development machine).
-It currently spans three nodes to get some HA and distributed storage.
+This repository is a collection of tooling, docs and configuration that defines my homelab and specific purpose nodes.
+Currently this boils down to:
 
-DNS setup (pointing `homeserver` to all the IPs and `homeserver-{one,two...}/printserver` to the specific machine is out of the scope of this repo).
-It is defined in [network_layout](https://github.com/dezeroku/network_layout) repository.
+- `homeserver` cluster, serving general-purpose applications
+- `homeserver-backup` cluster, keeping backups from the above
+- `printserver`, which enables wireless access to a USB-only printer
 
-TODO:
+# Overview
 
-- graphical overview of clusters, nodes, etc
-- graphical overview of Vault and auth used
-- description of `homeserver` and `homeserver-backup` clusters and their purpose
+![Overview](docs/diagrams/created/overview.png?raw=true "Overview")
+
+Key takeaways:
+
+- `ingress-nginx` on entry, with `cert-manager` + `Let's Encrypt` (DNS based challenges in Route53) backed
+  SSL, `oauth2-proxy` for non-OIDC-native services
+- `vault` for centralized identity and secrets management
+- `longhorn` used for storage with daily backups of "important" volumes in a separate cluster
+
+# Networking
+
+Clusters live in a separate `cluster` VLAN defined in a [network_layout repository](https://github.com/dezeroku/network_layout/blob/master/build/config/mainrouter/template-variables.yaml).
+Mentioned repo also defines the VPN setup and IPs assignment.
+
+All traffic to `*.<DOMAIN>` and `*.backup.<DOMAIN>` is redirected to specific cluster LBs on a router/VPN level.
 
 # Hardware
 
-I currently use RPis 4B, 8GB of RAM, 4x1.5GHz CPU.
-Because of that, probably some tooling will be chosen with ARM in mind, but it shouldn't matter too much.
-RPis are mounted in rack using the [3d printed frames](https://www.thingiverse.com/thing:4078710),
-M.2 SSD to USB adapters are used for storage.
+## homeserver
+
+Three Dell Optiplex nodes, totaling 18 cores, 192G of RAM and 6T of storage (1x2T NVMe on each node).
+
+Nodes mounted in a 10″ rack using the [3d printed frames](https://dimitrije.website/posts/2024-01-02-homelab-hardware.html)
+with minor modifications (TODO: upstream model changes).
+
+## homeserver backup
+
+Three RPis 4B, totaling 12 cores, 24G of RAM and 3T of storage (1x1T M.2 SATA attached over USB on each node).
+
+Pis are mounted in a 10″ rack using the [3d printed frames](https://www.thingiverse.com/thing:4078710).
 Power is provided via official PoE+ hats.
 
-It's connected via Ethernet to a separate IoT subnetwork, as defined in [network_layout](https://github.com/dezeroku/network_layout).
-This comes mostly from the `home-assistant` deployment, as I didn't have time to spend resolving mDNS connectivity between networks yet.
+## printserver
 
-# Initial steps
+RPi Zero 2 W, with OTG splitter for a USB-A type port.
 
-In other words, what needs to be done when you lay your hands on the machine.
+# Bootstrapping
+
+## Initial steps
+
+In other words, what needs to be done when you lay your hands on a new machine.
+As a rule of thumb this only has to be done once.
+
+### RPi nodes
 
 1. Update the bootloader and make it boot from the USB first. `RPi Imager` > `Bootloader` > `USB Boot`
-2. (optional) Flash the Raspberry Pi OS (64-bit) and make sure that it works fine. You can use this step to run `raspi-config` and set WLAN country
-3. Pure Debian "Bookworm" OS was chosen for this exercise.
-   Install it on the Pi and make sure that you can SSH into it as `ansible_bootstrap` user and have root privileges.
-   For Debian this can be done by setting up a non-root user and giving it e.g. sudo access
+2. Flash the official Raspberry Pi OS (64-bit) image and make sure that it works fine. You can use this step to run `raspi-config` and set WLAN country
 
-# Flashing Debian
+### Dell Optiplex
 
-To make the whole process a bit easier, a custom Debian/Raspbian image (that fulfills the requirements listed above)
-can be built using the scripts in `image_build` directory.
-It requires `vagrant` and `ssh` to be available on the build host
+1. Run extended diagnostic suite
+2. Update BIOS
+3. Run extended diagnostic suite again
 
-Running the `build_raspbian.sh/build_debian.sh` script will create an image that:
+## Installing OS
 
-1. is based on the newest `bookworm` release packages available to date
-2. contains `ansible_bootstrap` user with passwordless sudo, which can be logged in via SSH using any of the keys defined in file under `HOST_SSH_PUB_KEYS_FILE` variable
-3. sets up the minimal hardening of ssh server (denies password authentication, denies root login, allows public key based auth)
+We want to use a bootstrap image that is ready to be provisioned with `ansible` without requiring any user interaction first.
+To achieve it, we need to:
 
-The built image can be found in `image_build/output` directory.
+1. create bootstrap user `ansible_bootstrap` with passwordless `sudo` privileges
+2. provide public SSH key to be added to `authorized_keys`
+3. setup minimal required SSH hardening (deny password authentication, deny root login, only allow public key based logins)
 
-The `build.sh` script optionally takes a number as a parameter (defaults to `4`), below redacted excerpt from the build repo describes its meaning:
+Scripts are provided to prepare such image
 
+### Building OS image
+
+Currently `Raspbian` is used for RPi nodes (because of the OOTB support for PoE+ hat fans), while Dell nodes use `Debian`.
+
+Take a look at corresponding `build_` scripts in `image_build` directory for more details.
+Few useful variables:
+
+1. `HOST_SSH_PUB_KEYS_FILE` points to a pubkey that should be added to `authorized_keys` on the target
+2. `LUKS_PASSWORD` (`build_debian` specific) if provided, will be used for full disk encryption.
+   Defaults to obtaining the password from password manager
+
+Required packages on host for the build to succeed:
+
+- `vagrant` (builds are performed in VMs for better interoperability)
+- `ssh`
+
+Built images can be found in `image_build/output` directory.
+
+<!---
+#The `build.sh` script optionally takes a number as a parameter (defaults to `4`), below redacted excerpt from the build repo describes its meaning:
+#
 - Model `1` should be used for the Raspberry Pi 0, 0w and 1, models A and B
 - Model `2` for the Raspberry Pi 2 models A and B
 - Model `3` for all models of the Raspberry Pi 3
 - Model `4` for all models of the Raspberry Pi 4.
-
 You can also optionally pass the `WIFI_SETUP`, `WIFI_SSID` and `WIFI_PASSWORD` environment variables if you want to perform a WiFi based setup.
+TODO: restore this section after script supports them again
+-->
 
-If you were to use an official image you'll have to do the user and SSH setup manually.
+If you were to use an official image you would have to perform the user, SSH and (optionally) LUKS setup manually.
 
-In later steps, the Ansible will make sure that SSH config is properly hardened and `ansible_bootstrap` user is removed.
+In later steps Ansible will make sure that SSH config is properly hardened and `ansible_bootstrap` user is removed.
 
-When you have the image on hand you can flash it on the SSD using the tool of your choice, e.g. with `dd`
+### Creating boot media
+
+#### RPi
+
+When you have the image on hand you can flash it to the drive using the tool of your choice, e.g. with `dd`
 
 ```
 # dd if=<path to the image> of=<path to your SSD> bs=64k oflag=dsync status=progress
@@ -69,119 +119,93 @@ When you have the image on hand you can flash it on the SSD using the tool of yo
 
 or using a tool like `rufus` or `etcher`.
 
-In case of "normal" machines a preseed file is burned into the image and is responsible for the initial setup.
+#### Dell
+
+Create a bootable USB drive or upload the file to a TFTP server to perform netboot.
+Afterwards, install the system as usual.
 Beware, you have to use the _Install_ (not graphical) option for the preseed file to be taken into account.
 
-# Software
+The preseed file responsible for the initial setup is burned into the image itself.
 
-The end-goal here is to be able to run few relatively low-resource applications, such as
-`Home Assistant` or a file server.
+## Ansible
 
-There are many ways this could be done, just running container, using `docker-compose`, etc.
+This part is responsible for most of the software provisioning.
 
-I've chosen to set-up a Kubernetes (k3s flavour) cluster, as in my opinion
-it greatly simplifies the setup once you get through the initial learning curve and additionally
-gives you access to a lot of battle-tested tools and helpers, such as `cert-manager` or `ingress-nginx`.
-Lastly, it has some HA properties and allows for distributed storage.
-
-This may seem like an overkill (and in fact is), but why not do it.
-
-## Initial provisioning
-
-There are few "layers" of automation that are going to be used to minimise the effort needed to set this up from scratch.
-
-Starting with `Ansible` the idea is to ensure that core blocks such as:
+The idea is to ensure that core blocks are in place, for example:
 
 1. users
 2. firewall
 3. access restriction, e.g. via SSH
-4. required dependencies installed
-5. container runtime setup
+4. required dependencies
+5. container runtime
 
-are properly configured and versioned.
+This step also removes the `ansible_bootstrap` user and initializes Kubernetes clusters.
 
-What you need to do (this step assumes that your homeserver is available as `homeserver.lan`. Modify the inventories if it's not true):
-
-1. Enter the `ansible` directory
-2. Set up the workspace with `poetry install`
-3. Get dependencies via `poetry run ansible-galaxy install -r requirements.yml`
-4. Run the `poetry run ansible-playbook site.yml -l k8s_nodes`
-   You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` and `--extra-vars user_password=<password you want to set>` if the default values don't suit you.
-   This will also remove the `ansible_bootstrap` user by default.
-   The user_password is obtained from Bitwarden by default
-
-5. Obtain kubeconfig via `scp server@homeserver-one:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
-   You'll have to modify the `127.0.0.1` so it points to your homeserver
-
-Note: later on you can use the above command again, but this time also make it run system updates:
-
-```
-poetry run ansible-playbook site.yml -l k8s_nodes --extra-vars upgrade_packages=true
-```
-
-This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
-
-## Core cluster setup
-
-This chapter assumes that the `kubeconfig.yaml` obtained in previous step is the one in use.
-Prefix commands with `KUBECONFIG=<path_to_kubeconfig_yaml>` if needed.
-It also requires the `helm` (with [diff-plugin](https://github.com/databus23/helm-diff)) and `helmfile` tools to be present.
-
-A bunch of charts to be installed, that will cover:
-
-1. cert-manager for certificates generation (Route53 DNS solver under the hood)
-2. ingress-nginx for reverse proxying
-3. kube-prometheus-stack for monitoring, configured with PagerDuty and Dead Man's Snitch
-4. vault for secrets management. It's not really "properly" deployed but should be more than enough for the use-case, basically we just want a central storage for credentials
-5. longhorn for distributed storage
-
-How to deploy:
-
-1. Go to `helmfile/core/charts/cert-manager-cluster-issuer/aws-cert-user/` and follow the README to obtain AWS access data that will be used later on for obtaining certificates
-2. Copy the `helmfile/core/charts/cert-manager-cluster-issuer/values.yaml` as `helmfile/core/values/cert-manager-cluster-issuer.yaml` and adjust accordingly to your needs
-3. Go to `helmfile/core`
-4. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls, but deploying prometheus requires CRDs, so `sync` is needed on the initial deploy)
-
-While the steps above cover the deployment, there's some special treatment needed to initialize vault.
-Please follow the [helmfile/core/vault-setup.md](helmfile/core/vault-setup.md).
-Make sure that you have entered the required values for `helmfile/vault-terraform/terraform.tfvars`.
-
-## End applications
-
-This sets up:
-
-1. [Home Assistant](https://github.com/home-assistant) for managing smart devices
-2. [Pacoloco](https://github.com/anatol/pacoloco) for caching the archlinux packages (I have few Arch hosts running on LAN)
-3. `minio` for object storage
-
-How to deploy:
-
-1. Go to `helmfile/services`
-2. Run `DOMAIN=<your domain> helmfile sync` (it's fine to use `DOMAIN=<your domain> helmfile apply` on subsequent calls)
-
-## Tips
-
-### Printserver
-
-This repository allows you to set up a Raspberry Pi as a CUPS printserver.
-For this to happen, you've got to follow the instructions from "Initial Steps" and "Flashing Debian" chapters, following it up
-with applying ansible playbook `printserver.yml`:
+To provision the nodes:
 
 1. Enter the `ansible` directory
 2. Set up the workspace with `poetry install`
 3. Get dependencies via `poetry run ansible-galaxy install -r requirements.yml`
-4. Run the `poetry run ansible-playbook site.yml -l printserver`
-   You can also use the `--extra-vars ssh_pub_key_file=<path_to_a_pub_key_file>` and `--extra-vars user_password=<password you want to set>` if the default values don't suit you.
-   This will also remove the `ansible_bootstrap` user by default.
-   The user_password is obtained from Bitwarden by default
+4. Run the `poetry run ansible-playbook site.yml`
 
-Note: later on you can use the above command again, but this time also make it run system updates:
+Take a look at `inventory.yml` and `site.yml` for supported options.
+Most notably passwords that will be set for the newly created users are obtained from the password manager by default.
 
-```
-poetry run ansible-playbook site.yml -l printserver -extra-vars upgrade_packages=true
-```
+## Core cluster setup (homeserver/homeserver_backup)
 
-This will ensure that your setup didn't drift away and also reboot when required after applying the upgrades.
+At the very beginning obtain kubeconfig via `scp server@<node>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+You will have to modify the `server` field in the kubeconfig so it points to a remote node and not `127.0.0.1` (which is the default).
+
+It's assumed that `homeserver` and `homeserver_backup` have corresponding contexts created under
+the names `homeserver` and `homeserver-backup` respectively
+
+Required tools:
+
+- `kubectl`
+- `helm`
+- `helmfile`
+- `terragrunt`
+- `terraform`
+
+Few important charts that will be deployed in this step:
+
+1. `cert-manager` for certificates generation (Route53 DNS solver under the hood)
+2. `ingress-nginx` for reverse proxying
+3. `victoria-metrics-k8s-stack` for monitoring, configured with PagerDuty and Dead Man's Snitch
+4. `vault` for secrets and identity management
+5. `oauth2-proxy` for OIDC support for applications that do not support it natively
+6. `longhorn` for distributed storage
+
+### Cluster deployment
+
+All the cluster related configuration is stored under `helmfile` directory.
+Different directories are to be used depending on the cluster.
+Below instructions define how to perform a full (from scratch) deployment
+
+#### homeserver
+
+1. cd to `helmfile/core`
+2. run `DOMAIN=<your domain> helmfile sync`
+3. cd to `helmfile/vault-terraform`
+4. run `terragrunt apply`
+5. cd to `helmfile/services`
+6. run `DOMAIN=<your domain> helmfile sync`
+
+While the steps above cover the deployment, there's some special treatment needed to initialize vault from scratch.
+Please follow the [helmfile/vault-terraform/vault-setup.md](helmfile/vault-terraform/vault-setup.md).
+Make sure that you have provided the required values for `helmfile/vault-terraform/terraform.tfvars`.
+
+#### homeserver_backup
+
+This cluster largely depends on the `homeserver` setup, e.g. for auth.
+Make sure that the above cluster is deployed and ready first
+
+1. cd to `helmfile/backup`
+2. run `DOMAIN=<your domain> helmfile sync`
+
+## Notes
+
+### printserver
 
 Currently the ansible playbook takes care of:
 
@@ -189,16 +213,3 @@ Currently the ansible playbook takes care of:
 2. installing (properiatary) drivers for HP LaserJet Pro P1102 printer
 
 It requires the printer to be connected to the device when the playbook is being applied.
-
-### PRs for helmfile
-
-[Renovate Bot](https://github.com/renovatebot/github-action) is set up to run daily in the repo.
-It's meant to notify about new charts releases (and general dependencies).
-The workflow for these changes should be roughly:
-
-1. Checkout the PR locally (it's recommended to read the Release Notes first)
-2. Run `DOMAIN=<domain of your choice> helmfile deps` in the appropriate directory (depending on the change)
-3. Run `DOMAIN=<domain of your choice> helmfile diff` and make sure that the changes look good
-4. Run `DOMAIN=<domain of your choice> helmfile apply`
-5. Amend the changed `helmfile.lock` if needed and merge to master
-6. Push to upstream

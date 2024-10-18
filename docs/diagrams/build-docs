@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RUNDIR="$(readlink -f "$(dirname "$0")")"
+cd "${RUNDIR}"
+
+if [[ "${GHA_DOCKER_CACHING:-false}" == "true" ]]; then
+	EXTRA_ARGS="--cache-to type=gha,mode=max --cache-from type=gha"
+fi
+
+# Handle proper IDs during a build, so permissions are OK on host
+# shellcheck disable=SC2086 # Intended globbing
+docker buildx build . --target output --output "type=local,dest=created" ${EXTRA_ARGS:-}
