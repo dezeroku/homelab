@@ -160,7 +160,7 @@ releases:
 
   - name: minio-operator
     chart: minio/operator
-    version: 5.0.11
+    version: 6.0.4
     inherit:
       - template: default
   - name: minio-operator
