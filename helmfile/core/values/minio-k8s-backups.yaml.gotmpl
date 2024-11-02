@@ -1,4 +1,3 @@
-
 tenant:
   name: k8s-backups
   configuration:
@@ -10,6 +9,7 @@ tenant:
     existingSecret: true
   pools:
     - servers: 1
+      name: ss-0
       volumesPerServer: 1
       storageLabels:
         recurring-job-group.longhorn.io/k8s-backups: enabled
@@ -20,8 +20,10 @@ tenant:
     enabled: true
   #prometheusOperator: true
   features:
-    bucketDNS: false
+    bucketDNS: true
   buckets:
+    # TODO: handle this list dynamically, maybe configure minio via terraform?
+    # we'd probably want to have separate credentials for each service in the end
     - name: invidious
     - name: paperless
   users:
@@ -32,7 +34,9 @@ ingress:
     ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+      # TODO: Adding a k8s IP range so oauth2-proxy can talk with Vault via the ingress
+      # It can probably be done prettier
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24,10.42.0.0/16"
       # TODO: make it prettier
       nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
@@ -45,6 +49,9 @@ ingress:
       - secretName: minio-api-general-tls
         hosts:
           - api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+      - secretName: minio-star-api-general-tls
+        hosts:
+          - "*.api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}"
     host: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
   console:
     enabled: true
