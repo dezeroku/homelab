@@ -37,6 +37,7 @@ resource "vault_identity_oidc_provider" "main" {
     vault_identity_oidc_client.grafana.client_id,
     vault_identity_oidc_client.grafana_backup.client_id,
     vault_identity_oidc_client.paperless.client_id,
+    vault_identity_oidc_client.ryot.client_id,
   ]
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,

@@ -1,0 +1,164 @@
+---
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/ignisda/ryot
+          tag: v7.8.0
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          DISABLE_TELEMETRY: true
+          USERS_DISABLE_LOCAL_AUTH: true
+          DATABASE_URL:
+            valueFrom:
+              secretKeyRef:
+                name: ryot-db-pguser-ryot
+                key: uri
+          FRONTEND_URL: https://ryot.{{ requiredEnv "DOMAIN" }}
+          SERVER_OIDC_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: ryot-oidc-secret
+                key: client_id
+          SERVER_OIDC_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: ryot-oidc-secret
+                key: client_secret
+          SERVER_OIDC_ISSUER_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
+          # For debugging OIDC (and other) issues
+          # RUST_LOG: ryot=debug
+
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 128Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8000
+
+serviceAccount:
+  create: true
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Track consumed media
+      gethomepage.dev/group: Media
+      gethomepage.dev/icon: ryot.png
+      gethomepage.dev/name: Ryot
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    tls:
+      - secretName: ryot-tls
+        hosts:
+          - ryot.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: ryot.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+rawResources:
+  db:
+    apiVersion: postgres-operator.crunchydata.com/v1beta1
+    kind: PostgresCluster
+    spec:
+      spec:
+        postgresVersion: 16
+        users:
+          - name: ryot
+            databases:
+              - ryot
+            # TODO: These permissions can be probably much more fine-grained
+            # We want to keep them quite lax, as the program itself is responsible
+            # for creating the initial table layout.
+            # This takes the burden off of our shoulders.
+            options: "SUPERUSER"
+        instances:
+          - name: ryot-db
+            dataVolumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 5Gi
+        backups:
+          pgbackrest:
+            configuration:
+              - secret:
+                  name: ryot-pgo-backup-s3-secret
+            global:
+              repo1-s3-uri-style: path
+              repo1-retention-full: "2"
+            repos:
+              - name: repo1
+                s3:
+                  bucket: ryot
+                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                  region: default
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: ryot
+          serviceAccount: ryot
+  pgo-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: ryot-pgo-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              s3.conf:
+                text: |
+                  [global]
+                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: ryot-vault-auth
+  oidc-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v1
+        mount: /identity
+        path: oidc/client/ryot
+        destination:
+          name: ryot-oidc-secret
+          create: true
+          transformation:
+            includes:
+              - client_id
+              - client_secret
+        vaultAuthRef: ryot-vault-auth
