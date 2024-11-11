@@ -181,3 +181,12 @@ releases:
   - name: speedtest
     inherit:
       - template: argocd-app
+
+  - name: it-tools
+    chart: bjw-s/app-template
+    version: 3.5.1
+    inherit:
+      - template: default
+  - name: it-tools
+    inherit:
+      - template: argocd-app

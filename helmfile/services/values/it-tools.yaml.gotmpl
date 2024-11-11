@@ -1,0 +1,62 @@
+---
+# TODO: attach emptyDirs in required places and run as non-root
+#defaultPodOptions:
+#  securityContext:
+#    runAsUser: 19972
+#    runAsGroup: 19972
+#    fsGroup: 19972
+
+controllers:
+  main:
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/corentinth/it-tools
+          tag: 2024.10.22-7ca5933
+          pullPolicy: IfNotPresent
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 1
+          requests:
+            memory: 128Mi
+            cpu: 5m
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 80
+
+serviceAccount:
+  create: true
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Collection of useful tools and converters
+      gethomepage.dev/group: Tools
+      gethomepage.dev/icon: si-planet
+      gethomepage.dev/name: IT Tools
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    tls:
+      - secretName: it-tools-tls
+        hosts:
+          - it-tools.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: it-tools.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
