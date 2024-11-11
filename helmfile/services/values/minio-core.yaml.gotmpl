@@ -7,6 +7,7 @@ tenant:
     name: minio-core-root-credentials
   pools:
     - servers: 1
+      name: ss-0
       volumesPerServer: 1
       size: 10Gi
       storageClassName: longhorn
