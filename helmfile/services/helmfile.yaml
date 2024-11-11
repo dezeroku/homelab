@@ -172,3 +172,12 @@ releases:
   - name: ryot
     inherit:
       - template: argocd-app
+
+  - name: speedtest
+    chart: bjw-s/app-template
+    version: 3.5.1
+    inherit:
+      - template: default
+  - name: speedtest
+    inherit:
+      - template: argocd-app
