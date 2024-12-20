@@ -1,0 +1,265 @@
+defaultPodOptions:
+  securityContext:
+#    runAsUser: 1000
+#    runAsGroup: 1000
+    fsGroup: 1000
+  nodeSelector:
+    kubernetes.io/arch: amd64
+
+controllers:
+  main:
+    strategy: Recreate
+    containers:
+      main:
+        image:
+          repository: ghcr.io/lavalink-devs/lavalink
+          # Update when redbot updates
+          tag: 3.7.13
+          #tag: 4.0.8
+          pullPolicy: IfNotPresent
+        env:
+          _JAVA_OPTIONS: "-Xmx6G"
+          PLUGINS_YOUTUBE_POT_TOKEN:
+            valueFrom:
+              secretKeyRef:
+                name: lavalink-yt-tokens
+                key: po_token
+          PLUGINS_YOUTUBE_POT_VISITORDATA:
+            valueFrom:
+              secretKeyRef:
+                name: lavalink-yt-tokens
+                key: visitor_data
+
+        resources:
+          limits:
+            memory: 6Gi
+          requests:
+            memory: 256Mi
+
+  # TODO: this is just copied over (with minor changes) from the invidious setup, it would be nice
+  # to share this setup somehow
+  #
+  # This job needs to be triggered manually once, when the deployment is initially done
+  # Or you can wait 6 hours, so it triggers on its own
+  # TODO: do we want to trigger it from initContainer if secret is not present?
+  yt-tokens:
+    type: cronjob
+    serviceAccount:
+      identifier: yt-tokens
+    cronjob:
+      concurrencyPolicy: Forbid
+      schedule: '1 */6 * * *'
+      backoffLimit: 2
+      # TODO: wait for this field to be supported
+      # activeDeadlineSeconds: 600
+      #restartPolicy: Never
+    containers:
+      create-secret:
+        image:
+          repository: bitnami/kubectl
+          tag: 1.29
+          pullPolicy: IfNotPresent
+        command:
+          - bash
+          - -c
+          - >-
+            kubectl get secret lavalink-yt-tokens && kubectl delete secret lavalink-yt-tokens;
+            kubectl create secret generic lavalink-yt-tokens --from-file=po_token=/yt-tokens/po_token --from-file=visitor_data=/yt-tokens/visitor_data
+    initContainers:
+      obtain-tokens:
+        securityContext:
+          # TODO: this container seems to require root at the moment, change it when fixed upstream
+          # https://github.com/iv-org/youtube-trusted-session-generator/issues/4
+          runAsUser: 0
+        image:
+          repository: quay.io/invidious/youtube-trusted-session-generator
+          tag: latest
+          pullPolicy: Always
+        args:
+          - /bin/sh
+          - -c
+          - ./startup.sh > /yt-tokens/raw_output; grep "visitor_data" /yt-tokens/raw_output | cut -d ":" -f2 | tr -d '[:blank:]' | tr -d '\n' > /yt-tokens/visitor_data ; grep "po_token" /yt-tokens/raw_output | cut -d ":" -f2 | tr -d '[:blank:]' | tr -d '\n' > /yt-tokens/po_token
+        resources: {}
+
+
+service:
+  main:
+    controller: main
+    primary: true
+    ports:
+      http:
+        port: 2333
+
+serviceAccount:
+  create: true
+
+  extraServiceAccounts:
+    yt-tokens:
+      create: true
+
+configMaps:
+  config:
+    enabled: true
+    data:
+      # Taken from https://lavalink.dev/configuration/ and modified
+      application.yml: |
+        server:
+          port: 2333
+          address: 0.0.0.0
+          http2:
+            enabled: true # Whether to enable HTTP/2 support
+        plugins:
+          youtube:
+            #pot:
+              # token: <via env var>
+              # visitorData: <via env var>
+            clients:
+              #- MUSIC
+              - WEB
+              #- WEBEMBEDDED
+              #- ANDROID_TESTSUITE
+              #- TVHTML5EMBEDDED
+              #- TV
+              #- MEDIA_CONNECT
+              #- IOS
+            enabled: true
+            #TVHTML5EMBEDDED:
+            #  playlistLoading: false
+            #  searching: false
+            #  videoLoading: false
+            WEB:
+              playback: true
+              allowDirectPlaylistIds: true
+              allowDirectVideoIds: true
+              allowSearch: true
+        lavalink:
+          plugins:
+            - dependency: dev.lavalink.youtube:youtube-plugin:1.11.1
+              repository: https://maven.lavalink.dev/releases
+          server:
+            password: "youshallnotpass"
+            sources:
+              # The default Youtube source is now deprecated and won't receive further updates. Please use https://github.com/lavalink-devs/youtube-source#plugin instead.
+              youtube: false
+              bandcamp: true
+              soundcloud: true
+              twitch: true
+              vimeo: true
+              nico: true
+              http: true # warning: keeping HTTP enabled without a proxy configured could expose your server's IP address.
+              local: false
+            filters: # All filters are enabled by default
+              volume: true
+              equalizer: true
+              karaoke: true
+              timescale: true
+              tremolo: true
+              vibrato: true
+              distortion: true
+              rotation: true
+              channelMix: true
+              lowPass: true
+            nonAllocatingFrameBuffer: false # Setting to true reduces the number of allocations made by each player at the expense of frame rebuilding (e.g. non-instantaneous volume changes)
+            bufferDurationMs: 400 # The duration of the NAS buffer. Higher values fare better against longer GC pauses. Duration <= 0 to disable JDA-NAS. Minimum of 40ms, lower values may introduce pauses.
+            frameBufferDurationMs: 5000 # How many milliseconds of audio to keep buffered
+            opusEncodingQuality: 10 # Opus encoder quality. Valid values range from 0 to 10, where 10 is best quality but is the most expensive on the CPU.
+            resamplingQuality: LOW # Quality of resampling operations. Valid values are LOW, MEDIUM and HIGH, where HIGH uses the most CPU.
+            trackStuckThresholdMs: 10000 # The threshold for how long a track can be stuck. A track is stuck if does not return any audio data.
+            useSeekGhosting: true # Seek ghosting is the effect where whilst a seek is in progress, the audio buffer is read from until empty, or until seek is ready.
+            youtubePlaylistLoadLimit: 6 # Number of pages at 100 each
+            playerUpdateInterval: 5 # How frequently to send player updates to clients, in seconds
+            youtubeSearchEnabled: true
+            soundcloudSearchEnabled: true
+            gc-warnings: true
+        metrics:
+          prometheus:
+            enabled: false
+            endpoint: /metrics
+
+        sentry:
+          dsn: ""
+          environment: ""
+
+        logging:
+          file:
+            path: ./logs/
+
+          level:
+            root: INFO
+            lavalink: INFO
+
+          request:
+            enabled: true
+            includeClientInfo: true
+            includeHeaders: false
+            includeQueryString: true
+            includePayload: true
+            maxPayloadLength: 10000
+
+          logback:
+            rollingpolicy:
+              max-file-size: 1GB
+              max-history: 30
+
+persistence:
+  storage:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      main:
+        main:
+          - path: /opt/Lavalink/plugins
+
+  config:
+    enabled: true
+    type: configMap
+    name: lavalink-config
+    advancedMounts:
+      main:
+        main:
+          - path: /opt/Lavalink/application.yml
+            subPath: application.yml
+
+  yt-tokens:
+    enabled: true
+    type: emptyDir
+    advancedMounts:
+      yt-tokens:
+        create-secret:
+          - path: /yt-tokens
+        obtain-tokens:
+          - path: /yt-tokens
+
+rbac:
+  roles:
+    yt-tokens-role:
+      type: Role
+      rules:
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          # no resourceNames because of https://github.com/kubernetes/kubernetes/issues/80295#issuecomment-512874100
+          verbs:
+            - create
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          resourceNames:
+            - lavalink-yt-tokens
+          verbs:
+            - get
+            - delete
+            - patch
+            - list
+            - watch
+  bindings:
+    yt-tokens-role-binding:
+      type: RoleBinding
+      roleRef:
+        identifier: yt-tokens-role
+      subjects:
+        - identifier: yt-tokens

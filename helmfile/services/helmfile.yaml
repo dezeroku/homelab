@@ -41,6 +41,15 @@ releases:
     inherit:
       - template: argocd-app
 
+  - name: lavalink
+    chart: bjw-s/app-template
+    version: 3.5.1
+    inherit:
+      - template: default
+  - name: lavalink
+    inherit:
+      - template: argocd-app
+
   - name: netbootxyz
     chart: bjw-s/app-template
     version: 3.5.1
