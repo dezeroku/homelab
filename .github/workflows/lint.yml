@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       python_version: "3.11"
+      terraform_version: "~1.0"
       tflint_version: "v0.47.0"
       terragrunt_version: "0.50.4"
 
@@ -20,6 +21,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.python_version }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.terraform_version }}
       - uses: autero1/action-terragrunt@v3.0.2
         with:
           terragrunt-version: ${{ env.terragrunt_version }}
