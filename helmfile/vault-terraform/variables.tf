@@ -172,6 +172,10 @@ variable "paperless_ses_incoming_recipients" {
   type = list(string)
 }
 
+variable "paperless_ses_senders_regex" {
+  type = string
+}
+
 variable "ses_smtp_username" {
   type = string
 }

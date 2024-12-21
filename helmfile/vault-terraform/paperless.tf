@@ -1,7 +1,8 @@
 module "paperless_ses_incoming" {
-  source = "git@github.com:dezeroku/ses_local_email.git//terraform?depth=1&ref=v0.3.1"
+  source = "git@github.com:dezeroku/ses_local_email.git//terraform?depth=1&ref=v0.5.2"
 
-  recipients = var.paperless_ses_incoming_recipients
+  recipients    = var.paperless_ses_incoming_recipients
+  senders_regex = var.paperless_ses_senders_regex
 }
 
 resource "vault_identity_oidc_assignment" "paperless" {

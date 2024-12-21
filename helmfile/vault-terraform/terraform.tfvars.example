@@ -54,6 +54,7 @@ paperless_admin_email = "admin@example.com"
 paperless_redis_password = "example_password"
 minecraft_rcon_password = "example_password"
 paperless_ses_incoming_recipients = ["some-email@your-domain.com"]
+paperless_ses_senders_regex = ".*@your-domain.com"
 backup_cluster_kubernetes_host = "https://homeserver-backup:6443"
 # Both these values can be found in secret 'vault-auth-secret' in 'default' namespace
 # after the 'vault-auth' chart is deployed
