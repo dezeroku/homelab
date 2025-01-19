@@ -88,6 +88,18 @@ releases:
     inherit:
       - template: argocd-app
 
+  - name: vm-operator
+    namespace: victoria-metrics-operator
+    chart: victoria-metrics/victoria-metrics-operator
+    version: 0.40.4
+    inherit:
+      - template: default
+  - name: vm-operator
+    values:
+      - targetNamespace: victoria-metrics-operator
+    inherit:
+      - template: argocd-app
+
   # Using vm instead of victoria-metrics-stack, because the latter causes
   # issues with with names extending 63 characters
   - name: vm

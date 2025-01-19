@@ -11,13 +11,7 @@ kubeProxy:
   enabled: false
 
 victoria-metrics-operator:
-  operator:
-    # Allow us to still use the ServiceMonitors CRDs
-    # TODO: this chart doesn't install CRDs for prometheus stuff
-    # We should do it as part of helmfile.yaml
-    disable_prometheus_converter: false
-    # Make ArgoCD stop complaining about the converted resources
-    prometheus_converter_add_argocd_ignore_annotations: true
+  enabled: false
 
 alertmanager:
   config:
