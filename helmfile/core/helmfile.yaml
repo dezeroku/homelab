@@ -37,7 +37,7 @@ repositories:
 releases:
   - name: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
-    version: 0.5.1
+    version: 0.9.1
     inherit:
       - template: default
   - name: vault-secrets-operator
