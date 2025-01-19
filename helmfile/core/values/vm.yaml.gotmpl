@@ -196,9 +196,9 @@ vmsingle:
   spec:
     resources:
       requests:
-        memory: 1000Mi
+        memory: 1Gi
       limits:
-        memory: 2250Mi
+        memory: 5Gi
     retentionPeriod: "30d"
     storage:
       accessModes:
@@ -206,7 +206,9 @@ vmsingle:
       storageClassName: longhorn-single-replica
       resources:
         requests:
-          storage: 50Gi
+          storage: 75Gi
+    extraArgs:
+      maxLabelsPerTimeseries: "100"
 
 vmagent:
   # Give it some room to breathe, defaults cause it to throttle
