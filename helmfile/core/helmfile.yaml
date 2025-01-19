@@ -93,7 +93,7 @@ releases:
   - name: vm
     namespace: victoria-metrics-stack
     chart: victoria-metrics/victoria-metrics-k8s-stack
-    version: 0.24.5
+    version: 0.33.5
     values:
       - values/grafana-dashboards.yaml.gotmpl
     inherit:

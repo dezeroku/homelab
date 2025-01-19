@@ -111,19 +111,21 @@ grafana:
   defaultDashboardsTimezone: Europe/Warsaw
   plugins:
     - grafana-piechart-panel
-  dashboards:
-    default:
-      vault:
-        gnetId: 12904
-        revision: 2
-        datasource: VictoriaMetrics
-      node-exporter-full:
-        gnetId: 1860
-        revision: 31
-        datasource: VictoriaMetrics
-      longhorn:
-        gnetId: 16888
-        rev: 8
+  # TODO: new VM release doesn't like having both sidecar and configmaps provided dashboards
+  # migrate these listed below to be compatible
+  #dashboards:
+  #  default:
+  #    vault:
+  #      gnetId: 12904
+  #      revision: 2
+  #      datasource: VictoriaMetrics
+  #    node-exporter-full:
+  #      gnetId: 1860
+  #      revision: 31
+  #      datasource: VictoriaMetrics
+  #    longhorn:
+  #      gnetId: 16888
+  #      rev: 8
 
   grafana.ini:
     # log:
