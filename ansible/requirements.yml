@@ -5,3 +5,5 @@ collections:
 roles:
   - name: xanmanning.k3s
     version: "v3.4.4"
+  - name: lablabs.rke2
+    version: "1.38.7"

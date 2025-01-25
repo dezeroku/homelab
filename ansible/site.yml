@@ -44,7 +44,12 @@
   roles:
     - {role: docker_runtime}
 
-- name: Set up k3s server
+- name: Set up rke2
+  import_playbook: rke2.yml
+  tags:
+    - rke2
+
+- name: Set up k3s
   import_playbook: k3s.yml
   tags:
     - k3s

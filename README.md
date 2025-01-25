@@ -153,7 +153,7 @@ Most notably passwords that will be set for the newly created users are obtained
 
 ## Core cluster setup (homeserver/homeserver_backup)
 
-At the very beginning obtain kubeconfig via `scp server@<node>:/etc/rancher/k3s/k3s.yaml kubeconfig.yaml`.
+At the very beginning obtain kubeconfig via `scp server@<node>:/etc/rancher/{rke2/k3s}/{rke2/k3s}.yaml kubeconfig.yaml`.
 You will have to modify the `server` field in the kubeconfig so it points to a remote node and not `127.0.0.1` (which is the default).
 
 It's assumed that `homeserver` and `homeserver_backup` have corresponding contexts created under

@@ -1,0 +1,51 @@
+---
+- name: Install rke2 services dependencies
+  hosts: k8s_homeserver
+  become: true
+  become_user: root
+  roles:
+    - {role: longhorn}
+
+- name: Obtain rke2_token from Bitwarden, if it's not explicitly provided
+  hosts: k8s_homeserver
+  tags:
+    - always
+  gather_facts: false
+  pre_tasks:
+    - name: Obtain rke2_token from Bitwarden
+      # Throttle to one, so the rbw can keep the password in memory
+      throttle: 1
+      ansible.builtin.command:
+        cmd: rbw get homeserver/rke2/token
+      check_mode: false
+      changed_when: false
+      delegate_to: 127.0.0.1
+      register: rke2_token_bitwarden
+      when: rke2_token | default("") | length < 1
+
+    - name: Set rke2_token from Bitwarden
+      when: rke2_token | default("") | length < 1
+      ansible.builtin.set_fact:
+        rke2_token: "{{ rke2_token_bitwarden.stdout }}"
+
+- name: Set up rke2
+  hosts: k8s_homeserver
+  become: true
+  become_user: root
+  vars:
+    rke2_ha_mode: true
+    # TODO: complaining about ipv4_default_address variable, let's try to make it work
+    rke2_ha_mode_keepalived: false
+    rke2_version: v1.32.0+rke2r1
+    rke2_disable:
+      # TODO: maybe it's worth sticking with it?
+      - rke2-ingress-nginx
+    rke2_servers_group_name: k8s_controlplanes
+    rke2_agents_group_name: k8s_workers
+    # Copy of the defaults, for the sake of completeness
+    rke2_cluster_cidr:
+      - 10.42.0.0/16
+    rke2_service_cidr:
+      - 10.43.0.0/16
+  roles:
+    - role: lablabs.rke2
