@@ -17,15 +17,18 @@ k8s_workers:
   # TODO: an empty node_label list breaks the initialization and flannel
   # for now let's just add a label for each node, falling back to dummylabel
   hosts:
+    homeserver-eight:
   vars:
     node_label:
-      - dezeroku.com/dummy-label=true
+      # - dezeroku.com/dummy-label=true
+      - node.longhorn.io/create-default-disk=true
 
 k8s_homeserver:
   hosts:
     homeserver-five:
     homeserver-six:
     homeserver-seven:
+    homeserver-eight:
   vars:
     k3s_become: true
     k3s_etcd_datastore: true
@@ -68,6 +71,7 @@ rack_dells:
     homeserver-five:
     homeserver-six:
     homeserver-seven:
+    homeserver-eight:
 
 all:
   children:
