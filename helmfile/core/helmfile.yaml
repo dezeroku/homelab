@@ -124,6 +124,18 @@ releases:
     inherit:
       - template: argocd-app
 
+  - name: vm-logs
+    namespace: victoria-logs
+    chart: victoria-metrics/victoria-logs-single
+    version: 0.8.14
+    inherit:
+      - template: default
+  - name: vm-logs
+    values:
+      - targetNamespace: victoria-logs
+    inherit:
+      - template: argocd-app
+
   # A separate stack with longer retention period
   # for IoT related data
   # We only care about vmsingle here

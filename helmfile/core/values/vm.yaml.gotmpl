@@ -105,6 +105,11 @@ grafana:
         name: vm-grafana-oidc-secret
         key: client_secret
   defaultDashboardsTimezone: Europe/Warsaw
+  sidecar:
+    # datasources:
+    #   searchNamespace: victoria-metrics-stack,victoria-logs
+    dashboards:
+      searchNamespace: victoria-metrics-stack,victoria-logs
   plugins:
     - grafana-piechart-panel
   # TODO: new VM release doesn't like having both sidecar and configmaps provided dashboards

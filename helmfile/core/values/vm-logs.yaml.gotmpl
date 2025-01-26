@@ -1,0 +1,41 @@
+server:
+  retentionPeriod: 14d
+  # Use with 30G pvc
+  # retentionDiskSpaceUsage: 25
+
+  persistentVolume:
+    enabled: true
+    storageClassName: longhorn-single-replica
+    size: 30Gi
+
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Logs
+      gethomepage.dev/group: Monitoring
+      gethomepage.dev/icon: si-victoriametrics
+      gethomepage.dev/name: VictoriaLogs
+      gethomepage.dev/app: victorialogs
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+    ingressClassName: nginx
+    hosts:
+      - name: vm-logs.{{ requiredEnv "DOMAIN" }}
+        path:
+          - /
+    tls:
+      - secretName: vm-logs-general-tls
+        hosts:
+          - vm-logs.{{ requiredEnv "DOMAIN" }}
+
+  serviceMonitor:
+    enabled: true
+
+vector:
+  enabled: true
+
+dashboards:
+  enabled: true
+  labels:
+    grafana_dashboard: "1"
