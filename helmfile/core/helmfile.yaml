@@ -34,6 +34,8 @@ repositories:
     url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
   - name: intel
     url: https://intel.github.io/helm-charts
+  - name: goldpinger
+    url: https://bloomberg.github.io/goldpinger
 releases:
   - name: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
@@ -255,5 +257,14 @@ releases:
       - chart: bjw-s/app-template
         version: 3.5.1
   - name: minio-k8s-backups
+    inherit:
+      - template: argocd-app
+
+  - name: goldpinger
+    chart: goldpinger/goldpinger
+    version: 1.0.1
+    inherit:
+      - template: default
+  - name: goldpinger
     inherit:
       - template: argocd-app
