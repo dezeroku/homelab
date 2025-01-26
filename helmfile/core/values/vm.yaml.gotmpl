@@ -82,6 +82,14 @@ alertmanager:
             requests:
               storage: 5Gi
 
+defaultDatasources:
+  extra:
+    # TODO: expose both VM clusters under a common proxy
+    # and split based on the label name
+    - name: VictoriaMetricsHASS
+      url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/
+      type: prometheus
+
 grafana:
   # We disable the admin account creation via grafana.ini
   # This value is added here just to avoid unnecessary secret changes
@@ -96,30 +104,31 @@ grafana:
       secretKeyRef:
         name: vm-grafana-oidc-secret
         key: client_secret
-  additionalDataSources:
-    # TODO: expose both VM clusters under a common proxy
-    # and split based on the label name
-    - name: VictoriaMetricsHASS
-      url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/
-      type: prometheus
   defaultDashboardsTimezone: Europe/Warsaw
   plugins:
     - grafana-piechart-panel
   # TODO: new VM release doesn't like having both sidecar and configmaps provided dashboards
   # migrate these listed below to be compatible
-  #dashboards:
-  #  default:
-  #    vault:
-  #      gnetId: 12904
-  #      revision: 2
-  #      datasource: VictoriaMetrics
-  #    node-exporter-full:
-  #      gnetId: 1860
-  #      revision: 31
-  #      datasource: VictoriaMetrics
-  #    longhorn:
-  #      gnetId: 16888
-  #      rev: 8
+  # dashboards:
+  #   default:
+  #     # Note: you can't have both sidecar and initContainer provisioning enabled,
+  #     # this means that with this setup finding configMaps with dashboards won't be possible
+  #     # built-in dashboards, not provisioned if initContainer provisioning is enabled
+  #     victoria-metrics-cluster:
+  #       gnetId: 11176
+  #       revision: 39
+  #       datasource: VictoriaMetrics
+  #     vault:
+  #       gnetId: 12904
+  #       revision: 2
+  #       datasource: VictoriaMetrics
+  #     node-exporter-full:
+  #       gnetId: 1860
+  #       revision: 31
+  #       datasource: VictoriaMetrics
+  #     longhorn:
+  #       gnetId: 16888
+  #       rev: 8
 
   grafana.ini:
     # log:
