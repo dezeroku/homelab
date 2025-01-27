@@ -373,8 +373,13 @@ rawResources:
             global:
               repo1-s3-uri-style: path
               repo1-retention-full: "2"
+              repo1-retention-full: "14"
+              repo1-retention-full-type: count
             repos:
               - name: repo1
+                schedules:
+                  full: "0 1 * * 0"
+                  differential: "0 1 * * 1-6"
                 s3:
                   bucket: invidious
                   endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
