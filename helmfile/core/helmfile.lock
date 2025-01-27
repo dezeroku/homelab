@@ -9,6 +9,9 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.14.4
+- name: cloudnative-pg
+  repository: https://cloudnative-pg.github.io/charts
+  version: 0.23.0
 - name: descheduler
   repository: https://kubernetes-sigs.github.io/descheduler/
   version: 0.29.0
@@ -54,5 +57,5 @@ dependencies:
 - name: victoria-metrics-operator
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.40.4
-digest: sha256:91eda48998cb91a1ba80efbd9899769f513bcf24cb47579235d9d609e33ea8fc
-generated: "2025-01-26T23:50:17.076872267+01:00"
+digest: sha256:804dd3cf366b3bfcc5c6e72732fc46cd5ae6a49bd2fddb373ec14a619c857f8a
+generated: "2025-01-27T02:39:48.09193002+01:00"

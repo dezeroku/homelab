@@ -36,6 +36,8 @@ repositories:
     url: https://intel.github.io/helm-charts
   - name: goldpinger
     url: https://bloomberg.github.io/goldpinger
+  - name: cnpg
+    url: https://cloudnative-pg.github.io/charts
 releases:
   - name: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
@@ -278,5 +280,14 @@ releases:
     inherit:
       - template: default
   - name: goldpinger
+    inherit:
+      - template: argocd-app
+
+  - name: cnpg
+    chart: cnpg/cloudnative-pg
+    version: 0.23.0
+    inherit:
+      - template: default
+  - name: cnpg
     inherit:
       - template: argocd-app
