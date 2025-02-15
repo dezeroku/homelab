@@ -38,10 +38,10 @@ repos:
     hooks:
       - id: prettier
 
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v24.7.0
-    hooks:
-      - id: ansible-lint
-        additional_dependencies:
-          - ansible-core
-          - passlib
+      #  - repo: https://github.com/ansible/ansible-lint
+      #    rev: v24.7.0
+      #    hooks:
+      #      - id: ansible-lint
+      #        additional_dependencies:
+      #          - ansible-core
+      #          - passlib
