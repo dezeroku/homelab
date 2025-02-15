@@ -17,7 +17,7 @@ repositories:
 releases:
   - name: pacoloco
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: pacoloco
@@ -26,7 +26,7 @@ releases:
 
   - name: invidious
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: invidious
@@ -35,7 +35,7 @@ releases:
 
   - name: redbot
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: redbot
@@ -44,7 +44,7 @@ releases:
 
   - name: lavalink
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: lavalink
@@ -53,7 +53,7 @@ releases:
 
   - name: netbootxyz
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: netbootxyz
@@ -62,7 +62,7 @@ releases:
 
   - name: home-assistant
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: home-assistant
@@ -72,7 +72,7 @@ releases:
   - name: media-storage
     namespace: media
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: media-storage
@@ -84,7 +84,7 @@ releases:
   - name: filebrowser
     namespace: media
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: filebrowser
@@ -96,7 +96,7 @@ releases:
   - name: metube
     namespace: media
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     # Using labels as "release values", in anticipation of
     # https://github.com/roboll/helmfile/issues/1329 result
     # This pattern will be shared by all metube deployments for the time being
@@ -118,7 +118,7 @@ releases:
   - name: jellyfin
     namespace: media
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: jellyfin
@@ -134,7 +134,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.5.1
+        version: 3.7.0
   - name: minio-core
     inherit:
       - template: argocd-app
@@ -146,14 +146,14 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.5.1
+        version: 3.7.0
   - name: minio-private
     inherit:
       - template: argocd-app
 
   - name: homepage
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: homepage
@@ -162,7 +162,7 @@ releases:
 
   - name: paperless
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     dependencies:
       - chart: oci://registry-1.docker.io/bitnamicharts/redis
         version: 20.1.3
@@ -179,14 +179,14 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s/app-template
-        version: 3.5.1
+        version: 3.7.0
   - name: minecraft
     inherit:
       - template: argocd-app
 
   - name: ryot
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: ryot
@@ -195,7 +195,7 @@ releases:
 
   - name: speedtest
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: speedtest
@@ -204,7 +204,7 @@ releases:
 
   - name: it-tools
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: it-tools
@@ -227,7 +227,7 @@ releases:
   - name: immich-enhancements
     namespace: immich
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: immich-enhancements
@@ -239,7 +239,7 @@ releases:
   - name: navidrome
     namespace: media
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     inherit:
       - template: default
   - name: navidrome
@@ -251,7 +251,7 @@ releases:
   - name: metube-navidrome
     namespace: media
     chart: bjw-s/app-template
-    version: 3.5.1
+    version: 3.7.0
     labels:
       mountSubPath: music
       homepageName: MeTube (Navidrome)

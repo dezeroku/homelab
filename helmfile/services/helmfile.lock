@@ -2,49 +2,58 @@ version: 0.0.0-dev
 dependencies:
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.5.1
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s.github.io/helm-charts
+  version: 3.7.0
 - name: immich
   repository: https://immich-app.github.io/immich-charts
   version: 0.9.0
@@ -57,5 +66,5 @@ dependencies:
 - name: tenant
   repository: https://operator.min.io/
   version: 5.0.11
-digest: sha256:cda14ed20ce4526e2e56d5a357fb8244ba523d63099ee039dcb9a61c40306d66
-generated: "2025-01-27T01:12:26.788637119+01:00"
+digest: sha256:5d77fe80a5d246d6a18b70c8a8c860be5837aa3daa2ee34e0a14927f7fcde61d
+generated: "2025-02-16T00:14:01.570412074+01:00"

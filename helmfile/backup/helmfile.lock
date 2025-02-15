@@ -2,7 +2,7 @@ version: 0.0.0-dev
 dependencies:
 - name: app-template
   repository: https://bjw-s.github.io/helm-charts
-  version: 3.3.2
+  version: 3.7.0
 - name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.14.4
@@ -24,5 +24,5 @@ dependencies:
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.24.5
-digest: sha256:6e6b711ae1a8000d8975d7b5a6beedd90d12df4b68b7fd52736a76c82a1fdb04
-generated: "2024-10-08T00:22:38.978376631+02:00"
+digest: sha256:716fc01c1b9e5defdcdde69474b8a89f2631294f37e0f8f0edc78ce6f3916223
+generated: "2025-02-16T00:19:08.943803314+01:00"
