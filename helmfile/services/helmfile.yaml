@@ -247,3 +247,22 @@ releases:
       - targetNamespace: media
     inherit:
       - template: argocd-app
+
+  - name: metube-navidrome
+    namespace: media
+    chart: bjw-s/app-template
+    version: 3.5.1
+    labels:
+      mountSubPath: music
+      homepageName: MeTube (Navidrome)
+      homepageGroup: Media Management
+      hostPrefix: metube.navidrome
+    inherit:
+      - template: default
+    values:
+      - values/metube-common.yaml.gotmpl
+  - name: metube-navidrome
+    values:
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app
