@@ -225,3 +225,15 @@ releases:
       - targetNamespace: immich
     inherit:
       - template: argocd-app
+
+  - name: navidrome
+    namespace: media
+    chart: bjw-s/app-template
+    version: 3.5.1
+    inherit:
+      - template: default
+  - name: navidrome
+    values:
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app

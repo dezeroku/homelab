@@ -1,0 +1,78 @@
+---
+defaultPodOptions:
+  securityContext:
+    # Stay consistent with jellyfin deployment
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: deluan/navidrome
+          tag: 0.54.4
+          pullPolicy: IfNotPresent
+        env:
+          ND_ENABLEINSIGHTSCOLLECTOR: false
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 128Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 4533
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Music Server
+      gethomepage.dev/group: Media
+      gethomepage.dev/icon: navidrome.png
+      gethomepage.dev/name: Navidrome
+    tls:
+      - secretName: navidrome-tls
+        hosts:
+          - navidrome.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: navidrome.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+persistence:
+  music:
+    enabled: true
+    type: persistentVolumeClaim
+    existingClaim: media-storage-main
+    globalMounts:
+      - path: /music
+        subPath: music
+        readOnly: true
+
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /data
