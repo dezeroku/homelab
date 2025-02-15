@@ -1,43 +1,62 @@
-global:
-  fallbackDefaults:
-    storageClass: longhorn
-
-securityContext:
-  pod:
+---
+defaultPodOptions:
+  securityContext:
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
+    runAsNonRoot: true
     # ID of the "video" and "render" groups in Debian
     # For proper hardware acceleration support
-    # TODO: shouldn't this be handled by the plugin somehow?
+    # TODO: shouldn't this be handled by the GPU plugin somehow?
     supplementalGroups:
       - 44
       - 105
-
-resources:
-  limits:
-    memory: 8Gi
-    gpu.intel.com/i915: "1"
-
-podOptions:
+#    allowPrivilegeEscalation: false
+#    privileged: false
+#    capabilities:
+#      add: []
+#      drop:
+#        - ALL
   nodeSelector:
     dezeroku.com/role: media-server
+    kubernetes.io/arch: amd64
+  terminationGracePeriodSeconds: 60
 
-persistence:
-  config:
-    size: 5Gi
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/jellyfin/jellyfin
+          tag: 10.10.5
+          pullPolicy: IfNotPresent
+        env:
+          JELLYFIN_PublishedServerUrl: https://jellyfin.{{ requiredEnv "DOMAIN" }}
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 8Gi
+            gpu.intel.com/i915: "1"
 
-  media-storage-main:
-    enabled: true
-    type: pvc
-    mountPath: /media-storage-main
-    targetSelectAll: true
-    existingClaim: media-storage-main
-
-portal:
-  open:
-    enabled: false
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8096
 
 ingress:
   main:
     enabled: true
+    className: nginx
     annotations:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
@@ -53,15 +72,44 @@ ingress:
       # We allow access from 192.168.4.0/24 so traffic to Ingress is accepted from the network cluster lives in
       # This is done so homepage deployment can query the API
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    ingressClassName: nginx
-    integrations:
-      traefik:
-        enabled: false
     hosts:
       - host: jellyfin.{{ requiredEnv "DOMAIN" }}
         paths:
           - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: main
+
     tls:
       - secretName: jellyfin-tls
         hosts:
           - jellyfin.{{ requiredEnv "DOMAIN" }}
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    globalMounts:
+      - path: /config
+
+  media-storage-main:
+    enabled: true
+    type: persistentVolumeClaim
+    existingClaim: media-storage-main
+    globalMounts:
+      - path: /media-storage-main
+
+  cache:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /cache
+
+  transcodes:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /cache/transcodes

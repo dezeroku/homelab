@@ -117,8 +117,8 @@ releases:
 
   - name: jellyfin
     namespace: media
-    chart: oci://tccr.io/truecharts/jellyfin
-    version: 20.1.6
+    chart: bjw-s/app-template
+    version: 3.5.1
     inherit:
       - template: default
   - name: jellyfin
