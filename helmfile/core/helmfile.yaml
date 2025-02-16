@@ -259,12 +259,8 @@ releases:
       - template: argocd-app
 
   - name: minio-k8s-backups
-    # TODO: Switch back tenant repository after
-    # https://github.com/minio/operator/commit/b8c9bf4a1ce7a1c9b91ed3b0e0d11e1e2d050920
-    # is released (> 6.0.4)
-    # Currently this tar points to manually built chart with the above commit included on top
-    chart: ./tenant-6.0.4.tgz
-    version: 6.0.4
+    chart: minio/tenant
+    version: 7.0.0
     inherit:
       - template: default
     dependencies:
