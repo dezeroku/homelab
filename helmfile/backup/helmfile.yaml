@@ -65,7 +65,7 @@ releases:
 
   - name: minio-operator
     chart: minio/operator
-    version: 5.0.11
+    version: 7.0.0
     inherit:
       - template: default
 
@@ -84,7 +84,7 @@ releases:
 
   - name: minio-longhorn
     chart: minio/tenant
-    version: 5.0.11
+    version: 7.0.0
     inherit:
       - template: default
     dependencies:

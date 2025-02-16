@@ -1,12 +1,17 @@
-secrets:
-  existingSecret: minio-longhorn-root-credentials
-
 tenant:
+  certificate:
+    requestAutoCert: false
   name: longhorn
   configuration:
     name: minio-longhorn-root-credentials
+  configSecret:
+    name: minio-core-root-credentials
+    accessKey: ""
+    secretKey: ""
+    existingSecret: true
   pools:
     - servers: 1
+      name: ss-0
       volumesPerServer: 1
       size: 300Gi
       storageClassName: longhorn
@@ -27,12 +32,7 @@ ingress:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       # Allow access from the cluster VLAN
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
-      # TODO: make it prettier
-      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        chunked_transfer_encoding off;
     tls:
       - secretName: minio-api-general-tls
         hosts:
@@ -47,14 +47,9 @@ ingress:
       gethomepage.dev/description: S3-compatible storage for Longhorn backups
       gethomepage.dev/group: Storage
       gethomepage.dev/icon: minio.png
-      gethomepage.dev/name: Minio (Private)
+      gethomepage.dev/name: Minio (Longhorn)
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      # TODO: make it prettier
-      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        chunked_transfer_encoding off;
     tls:
       - secretName: minio-console-general-tls
         hosts:

@@ -14,15 +14,15 @@ dependencies:
   version: 1.6.2
 - name: operator
   repository: https://operator.min.io/
-  version: 5.0.11
+  version: 7.0.0
 - name: tenant
   repository: https://operator.min.io/
-  version: 5.0.11
+  version: 7.0.0
 - name: vault-secrets-operator
   repository: https://helm.releases.hashicorp.com
   version: 0.5.1
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.24.5
-digest: sha256:716fc01c1b9e5defdcdde69474b8a89f2631294f37e0f8f0edc78ce6f3916223
-generated: "2025-02-16T00:19:08.943803314+01:00"
+digest: sha256:077a58867bfd395d202f62a52f556e218b3b806b7f164d13431a95fb73f3986b
+generated: "2025-02-16T03:55:09.39875003+01:00"
