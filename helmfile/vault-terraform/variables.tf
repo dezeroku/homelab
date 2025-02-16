@@ -176,6 +176,10 @@ variable "paperless_ses_senders_regex" {
   type = string
 }
 
+variable "wikijs_oidc_auth_id" {
+  type = string
+}
+
 variable "ses_smtp_username" {
   type = string
 }

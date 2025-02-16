@@ -1,0 +1,190 @@
+---
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/requarks/wiki
+          tag: 2.5.306
+          pullPolicy: IfNotPresent
+        env:
+          DB_TYPE: postgres
+          DB_HOST:
+            valueFrom:
+              secretKeyRef:
+                name: wikijs-db-pguser-wikijs
+                key: host
+          DB_PORT:
+            valueFrom:
+              secretKeyRef:
+                name: wikijs-db-pguser-wikijs
+                key: port
+          DB_USER:
+            valueFrom:
+              secretKeyRef:
+                name: wikijs-db-pguser-wikijs
+                key: user
+          DB_PASS:
+            valueFrom:
+              secretKeyRef:
+                name: wikijs-db-pguser-wikijs
+                key: password
+          DB_NAME:
+            valueFrom:
+              secretKeyRef:
+                name: wikijs-db-pguser-wikijs
+                key: dbname
+          # Configured from within the UI, keeping env variables for future reference
+#          SERVER_OIDC_CLIENT_ID:
+#            valueFrom:
+#              secretKeyRef:
+#                name: wikijs-oidc-secret
+#                key: client_id
+#          SERVER_OIDC_CLIENT_SECRET:
+#            valueFrom:
+#              secretKeyRef:
+#                name: wikijs-oidc-secret
+#                key: client_secret
+#          SERVER_OIDC_ISSUER_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            memory: 128Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 3000
+
+serviceAccount:
+  create: true
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Knowledge database
+      gethomepage.dev/group: Server
+      gethomepage.dev/icon: wikijs.png
+      gethomepage.dev/name: WikiJS
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    tls:
+      - secretName: wikijs-tls
+        hosts:
+          - wikijs.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: wikijs.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+rawResources:
+  db:
+    apiVersion: postgres-operator.crunchydata.com/v1beta1
+    kind: PostgresCluster
+    spec:
+      spec:
+        # Dirty WA for allowing non-TLS DB connections (TODO: insert cert files into the pod)
+        patroni:
+          dynamicConfiguration:
+            postgresql:
+              pg_hba:
+                - "hostnossl all all all md5"
+        postgresVersion: 16
+        users:
+          - name: wikijs
+            databases:
+              - wikijs
+            # TODO: These permissions can be probably much more fine-grained
+            # We want to keep them quite lax, as the program itself is responsible
+            # for creating the initial table layout.
+            # This takes the burden off of our shoulders.
+            options: "SUPERUSER"
+        instances:
+          - name: wikijs-db
+            dataVolumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 5Gi
+        backups:
+          pgbackrest:
+            configuration:
+              - secret:
+                  name: wikijs-pgo-backup-s3-secret
+            global:
+              repo1-s3-uri-style: path
+              repo1-retention-full: "2"
+              repo1-retention-full-type: count
+            repos:
+              - name: repo1
+                schedules:
+                  full: "0 1 * * 0"
+                  differential: "0 1 * * 1-6"
+                s3:
+                  bucket: wikijs
+                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                  region: default
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: wikijs
+          serviceAccount: wikijs
+  pgo-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: wikijs-pgo-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              s3.conf:
+                text: |
+                  [global]
+                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: wikijs-vault-auth
+  oidc-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v1
+        mount: /identity
+        path: oidc/client/wikijs
+        destination:
+          name: wikijs-oidc-secret
+          create: true
+          transformation:
+            includes:
+              - client_id
+              - client_secret
+        vaultAuthRef: wikijs-vault-auth
