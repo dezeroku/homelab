@@ -41,7 +41,7 @@ dependencies:
   version: 7.6.0
 - name: operator
   repository: https://operator.min.io/
-  version: 6.0.4
+  version: 7.0.0
 - name: tenant
   repository: https://operator.min.io/
   version: 7.0.0
@@ -60,5 +60,5 @@ dependencies:
 - name: victoria-metrics-operator
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.40.4
-digest: sha256:7c9ffab48f942135c0d336db6cd8f5f47b2c36dc91443c8ab39afaf795c430e9
-generated: "2025-02-16T03:12:51.309166507+01:00"
+digest: sha256:cb10e32248d11c8370874276f603ad766eb2c2715fbb9f5473f813908c471e6f
+generated: "2025-02-16T03:35:21.079047571+01:00"

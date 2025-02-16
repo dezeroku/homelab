@@ -188,7 +188,7 @@ releases:
 
   - name: minio-operator
     chart: minio/operator
-    version: 6.0.4
+    version: 7.0.0
     inherit:
       - template: default
   - name: minio-operator
