@@ -5,7 +5,7 @@ dependencies:
   version: 3.7.0
 - name: argo-cd
   repository: https://argoproj.github.io/argo-helm
-  version: 7.3.11
+  version: 7.8.2
 - name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.14.4
@@ -57,5 +57,5 @@ dependencies:
 - name: victoria-metrics-operator
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.40.4
-digest: sha256:aadd77e9c3a3e89d2a999e86d9cf8a8cd7ff3135e9536db573b37e4f73430f3e
-generated: "2025-02-16T00:16:51.712760364+01:00"
+digest: sha256:ed5ff581d6cdc2023d4077644dc43d9c80376342fcaeabec4013a90f1b0bc56c
+generated: "2025-02-16T02:53:00.718766629+01:00"

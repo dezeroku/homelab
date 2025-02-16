@@ -209,7 +209,7 @@ releases:
 
   - name: argocd
     chart: argo-helm/argo-cd
-    version: 7.3.11
+    version: 7.8.2
     inherit:
       - template: default
     dependencies:
