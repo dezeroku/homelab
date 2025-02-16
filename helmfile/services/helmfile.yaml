@@ -129,7 +129,7 @@ releases:
 
   - name: minio-core
     chart: minio/tenant
-    version: 5.0.11
+    version: 7.0.0
     inherit:
       - template: default
     dependencies:
@@ -141,7 +141,7 @@ releases:
 
   - name: minio-private
     chart: minio/tenant
-    version: 5.0.11
+    version: 7.0.0
     inherit:
       - template: default
     dependencies:
