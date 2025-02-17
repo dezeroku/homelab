@@ -11,7 +11,7 @@ dependencies:
   version: 4.11.1
 - name: longhorn
   repository: https://charts.longhorn.io
-  version: 1.6.2
+  version: 1.8.0
 - name: operator
   repository: https://operator.min.io/
   version: 7.0.0
@@ -24,5 +24,5 @@ dependencies:
 - name: victoria-metrics-k8s-stack
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.24.5
-digest: sha256:077a58867bfd395d202f62a52f556e218b3b806b7f164d13431a95fb73f3986b
-generated: "2025-02-16T03:55:09.39875003+01:00"
+digest: sha256:3652ba1b804444e944bb41ab3fd24560ed24517c9473b5b485fed070d989106d
+generated: "2025-02-17T17:38:09.98725039+01:00"
