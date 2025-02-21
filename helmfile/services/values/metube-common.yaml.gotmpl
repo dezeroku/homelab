@@ -23,7 +23,8 @@ controllers:
             enabled: true
         resources:
           limits:
-            memory: 512Mi
+            # Allow for big decodes
+            memory: 8Gi
           requests:
             memory: 128Mi
 
