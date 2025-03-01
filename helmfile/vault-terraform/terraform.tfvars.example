@@ -62,3 +62,18 @@ backup_cluster_kubernetes_ca_cert = "ca cert"
 backup_cluster_token_reviewer_jwt = "token_reviewer_jwt"
 # This auth ID needs to be obtained via the UI
 wikijs_oidc_auth_id = "example_auth"
+kopia_control_user_username = "control"
+kopia_control_user_password = "example_password"
+kopia_server_user_username = "server"
+kopia_server_user_password = "example_password"
+kopia_repository_password = "example_password"
+kopia_target_users = [
+  {
+    username = "user1",
+    password = "password1"
+  },
+  {
+    username = "user2",
+    password = "password2"
+  }
+]

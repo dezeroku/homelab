@@ -1,0 +1,290 @@
+---
+# TODO: check if maintenance job is run automatically every 24h or we need a sidecar for that
+# Similarly it could be nice to run a full verification of backups once a week or once a month: https://kopia.io/docs/advanced/consistency/
+# TODO: enable zstd-better-compression globally
+controllers:
+  main:
+    type: statefulset
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: kopia/kopia
+          tag: 0.19.0
+          pullPolicy: IfNotPresent
+        env: &env
+          TZ: Europe/Warsaw
+          KOPIA_CONFIG_PATH: /kopia-config/repository.config
+          KOPIA_CACHE_DIRECTORY: /kopia-cache
+          KOPIA_CHECK_FOR_UPDATES: false
+          KOPIA_SERVER_CONTROL_USER:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-control-secret
+                key: username
+          KOPIA_SERVER_CONTROL_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-control-secret
+                key: password
+          # It's kinda funny that it's USER for control but USERNAME for server :shrug:
+          KOPIA_SERVER_USERNAME:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-server-secret
+                key: username
+          KOPIA_SERVER_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-server-secret
+                key: password
+          KOPIA_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-repository-secret
+                key: password
+          # To make running admin commands inside the container easier
+          KOPIA_SERVER_ADDRESS: https://kopia.{{ requiredEnv "DOMAIN" }}:443
+          SERVER_CONTROL_AUTH_FLAGS: --server-control-username=$(KOPIA_SERVER_CONTROL_USER) --server-control-password=$(KOPIA_SERVER_CONTROL_PASSWORD)
+        args:
+          - server
+          - start
+          - --tls-cert-file=/kopia-cert/tls.crt
+          - --tls-key-file=/kopia-cert/tls.key
+          - --address
+          - 0.0.0.0:51515
+        probes:
+          liveness: &probe
+            enabled: false
+            # Running HTTPS check results in 403s
+            # Running AUTO results in a lot of failed handshakes in the log and I don't want it
+            # Keeping probes turned off for now
+            type: AUTO
+#            custom: true
+#            # This is messed up, as flags have conflicting env names for server and server-control users, depending on the command...
+#            # See https://github.com/kopia/kopia/issues/3783 for details
+#            # TODO: Running a check as defined below requires the service to be ready, so it's present on ingress.
+#            # It's a chicken and egg problem
+#            spec:
+#              exec:
+#                command:
+#                - sh
+#                - -c
+#                - kopia server status --server-control-username=$KOPIA_SERVER_CONTROL_USER --server-control-password=$KOPIA_SERVER_CONTROL_PASSWORD
+          readiness: *probe
+          startup: *probe
+        resources:
+          limits:
+            # TODO: it's way more than needed
+            memory: 8Gi
+          requests:
+            memory: 50Mi
+    initContainers:
+      initialize-repository:
+        image:
+          repository: kopia/kopia
+          tag: 0.19.0
+          pullPolicy: IfNotPresent
+        env: *env
+        command:
+          - bash
+          - -c
+          - >-
+            kopia repository connect filesystem --path=/kopia-storage ||
+            kopia repository create filesystem --path=/kopia-storage
+        resources: {}
+      initialize-users:
+        image:
+          repository: kopia/kopia
+          tag: 0.19.0
+          pullPolicy: IfNotPresent
+        env:
+          << : *env
+          # String in format "user1:password1 user2:password2 user3:password3..."
+          # that will be used to initialize users and update passwords as needed
+          # With current implementation the colon (:) character can't be used in username and password
+          TARGET_USERS_MAPPING:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-target-users
+                key: mapping
+        command:
+          - bash
+          - -c
+          - >-
+            declare -A target_users;
+
+            for user_config in $(echo $TARGET_USERS_MAPPING | tr " " "\n"); do
+              user=$(echo $user_config | cut -d ":" -f1);
+              password=$(echo $user_config | cut -d ":" -f2);
+              target_users[$user]="$password";
+            done;
+
+            existing_users=( $(kopia server users list | sort) );
+
+            for user in "${!target_users[@]}"; do
+              echo $user;
+
+              if [[ ! " ${existing_users[*]} " =~ [[:space:]]${user}[[:space:]] ]]; then
+                # User doesn't exist yet, create
+                kopia server users add $user --user-password ${target_users[$user]};
+              else
+                # User already exists, ensure proper password
+                kopia server users set $user --user-password ${target_users[$user]};
+              fi;
+            done;
+
+            # TODO: do we care about removing users? It seems dangerous to do it automatically
+        resources: {}
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 51515
+
+serviceAccount:
+  create: true
+
+ingress:
+  grpc:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      #nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      # To allow running GRPC on the backend, it requires TLS cert to be present in the server
+      # https://github.com/kopia/kopia/issues/1982#issuecomment-2449454069
+      # In practice, this means double TLS termination, once on Ingress and once on the backend.
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
+      # Potentially big uploads
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      # Add 192.168.4.0 to allow traffic from inside the pod to hit ingress
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+    tls:
+      - secretName: grpc-kopia-general-tls
+        hosts:
+          - kopia.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: kopia.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: main
+  ui:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Backup server
+      gethomepage.dev/group: Server
+      gethomepage.dev/icon: kopia.png
+      gethomepage.dev/name: Kopia
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+    tls:
+      - secretName: ui-kopia-general-tls
+        hosts:
+          - ui.kopia.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: ui.kopia.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: main
+
+persistence:
+  storage:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    globalMounts:
+      - path: /kopia-storage
+
+  cert:
+    enabled: true
+    type: secret
+    name: grpc-kopia-general-tls
+    globalMounts:
+      - path: /kopia-cert
+
+  config:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /kopia-config
+
+  cache:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /kopia-cache
+
+rawResources:
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: kopia
+          serviceAccount: kopia
+  control-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/kopia/users/control
+        destination:
+          name: kopia-control-secret
+          create: true
+        vaultAuthRef: kopia-vault-auth
+  server-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/kopia/users/server
+        destination:
+          name: kopia-server-secret
+          create: true
+        vaultAuthRef: kopia-vault-auth
+  repository-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/kopia/repository
+        destination:
+          name: kopia-repository-secret
+          create: true
+        vaultAuthRef: kopia-vault-auth
+  target-users:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/kopia/users/target
+        destination:
+          name: kopia-target-users
+          create: true
+        vaultAuthRef: kopia-vault-auth
+        rolloutRestartTargets:
+          - kind: StatefulSet
+            name: kopia

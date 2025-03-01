@@ -275,3 +275,12 @@ releases:
   - name: wikijs
     inherit:
       - template: argocd-app
+
+  - name: kopia
+    chart: bjw-s/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+  - name: kopia
+    inherit:
+      - template: argocd-app

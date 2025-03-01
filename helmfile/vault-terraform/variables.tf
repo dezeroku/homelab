@@ -207,3 +207,31 @@ variable "backup_cluster_kubernetes_ca_cert" {
 variable "backup_cluster_token_reviewer_jwt" {
   type = string
 }
+
+variable "kopia_control_user_username" {
+  type = string
+}
+
+variable "kopia_control_user_password" {
+  type = string
+}
+
+variable "kopia_server_user_username" {
+  type = string
+}
+
+variable "kopia_server_user_password" {
+  type = string
+}
+
+variable "kopia_repository_password" {
+  type = string
+}
+
+variable "kopia_target_users" {
+  # Use a list, as usernames can contain @ character
+  type = list(object({
+    username = string
+    password = string
+  }))
+}
