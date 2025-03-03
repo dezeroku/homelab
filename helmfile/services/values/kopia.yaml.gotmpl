@@ -196,7 +196,7 @@ ingress:
       # Potentially big uploads
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       # Add 192.168.4.0 to allow traffic from inside the pod to hit ingress
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24"
     tls:
       - secretName: grpc-kopia-general-tls
         hosts:
