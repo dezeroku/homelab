@@ -10,7 +10,7 @@ controllers:
       main:
         image:
           repository: kopia/kopia
-          tag: 0.19.0
+          tag: &image_version 0.19.0
           pullPolicy: IfNotPresent
         env: &env
           TZ: Europe/Warsaw
@@ -80,10 +80,11 @@ controllers:
           requests:
             memory: 50Mi
     initContainers:
-      initialize-repository:
+      # This init container also sets up the config under /kopia-config and must be run first
+      0-initialize-repository:
         image:
           repository: kopia/kopia
-          tag: 0.19.0
+          tag: *image_version
           pullPolicy: IfNotPresent
         env: *env
         command:
@@ -93,10 +94,10 @@ controllers:
             kopia repository connect filesystem --path=/kopia-storage ||
             kopia repository create filesystem --path=/kopia-storage
         resources: {}
-      initialize-users:
+      1-initialize-users:
         image:
           repository: kopia/kopia
-          tag: 0.19.0
+          tag: *image_version
           pullPolicy: IfNotPresent
         env:
           << : *env
@@ -135,7 +136,41 @@ controllers:
             done;
 
             # TODO: do we care about removing users? It seems dangerous to do it automatically
-        resources: {}
+
+      2-initialize-notifications:
+        image:
+          repository: kopia/kopia
+          tag: *image_version
+          pullPolicy: IfNotPresent
+        env:
+          << : *env
+          PUSHOVER_APP_TOKEN:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-pushover
+                key: app_token
+          PUSHOVER_USER_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: kopia-pushover
+                key: user_key
+          # Allowed report/error, potentially also warning?
+          MINIMUM_SEVERITY: error
+          # TODO: 'report' sound spammy (and currently doesn't seem to work with 0.19.0,
+          # same issue as https://github.com/kopia/kopia/issues/1958#issuecomment-2611998569
+          # For devices (at least devserver), likely something like a healthcheck/deadman'ssnitch approach
+          # with webhook would be preferable
+        command:
+          - bash
+          - -c
+          - >-
+            if kopia notification profile show --profile-name=pushover; then
+              # Make sure credentials and severity is ok
+              kopia notification profile configure pushover --profile-name=pushover --app-token=$PUSHOVER_APP_TOKEN --user-key=$PUSHOVER_USER_KEY --min-severity=$MINIMUM_SEVERITY
+            else
+              # Set up the profile and send a test notification
+              kopia notification profile configure pushover --profile-name=pushover --app-token=$PUSHOVER_APP_TOKEN --user-key=$PUSHOVER_USER_KEY --min-severity=$MINIMUM_SEVERITY --send-test-notification
+            fi
 
 service:
   main:
@@ -288,3 +323,15 @@ rawResources:
         rolloutRestartTargets:
           - kind: StatefulSet
             name: kopia
+  pushover:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/kopia/pushover
+        destination:
+          name: kopia-pushover
+          create: true
+        vaultAuthRef: kopia-vault-auth

@@ -235,3 +235,11 @@ variable "kopia_target_users" {
     password = string
   }))
 }
+
+variable "kopia_pushover_app_token" {
+  type = string
+}
+
+variable "kopia_pushover_user_key" {
+  type = string
+}

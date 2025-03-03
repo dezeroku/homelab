@@ -77,3 +77,5 @@ kopia_target_users = [
     password = "password2"
   }
 ]
+kopia_pushover_app_token = "app_token"
+kopia_pushover_user_key = "user_key"

@@ -23,6 +23,9 @@ path "kvv2/data/services/kopia/users/target" {
 path "kvv2/data/services/kopia/repository" {
   capabilities = ["read"]
 }
+path "kvv2/data/services/kopia/pushover" {
+  capabilities = ["read"]
+}
 EOT
 }
 
@@ -67,6 +70,17 @@ resource "vault_generic_secret" "kopia-repository" {
   data_json = jsonencode(
     {
       "password" : var.kopia_repository_password
+    }
+  )
+}
+
+resource "vault_generic_secret" "kopia-pushover" {
+  path = "kvv2/services/kopia/pushover"
+
+  data_json = jsonencode(
+    {
+      "app_token" : var.kopia_pushover_app_token
+      "user_key" : var.kopia_pushover_user_key
     }
   )
 }
