@@ -86,3 +86,6 @@ all:
     cleanup_bootstrap_user: true
     upgrade_packages: false
     timezone: Europe/Warsaw
+    # Comment out the below variable if it's the initial homeserver deploy
+    # as the mirror deployment won't be in place at this point
+    apt_mirror_pacoloco_url: https://pacoloco.home.dezeroku.com

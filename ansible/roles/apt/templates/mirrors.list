@@ -1,0 +1,7 @@
+# Corresponding pacoloco setup can be found in homelab repo helmfile/services/values/pacoloco.yaml.gotmpl
+deb {{ apt_mirror_pacoloco_url }}/repo/debian bookworm main non-free-firmware
+deb-src {{ apt_mirror_pacoloco_url }}/repo/debian bookworm main non-free-firmware
+deb {{ apt_mirror_pacoloco_url }}/repo/debian-security bookworm-security main non-free-firmware
+deb-src {{ apt_mirror_pacoloco_url }}/repo/debian-security bookworm-security main non-free-firmware
+deb {{ apt_mirror_pacoloco_url }}/repo/debian-updates bookworm-updates main non-free-firmware
+deb-src {{ apt_mirror_pacoloco_url }}/repo/debian-updates bookworm-updates main non-free-firmware

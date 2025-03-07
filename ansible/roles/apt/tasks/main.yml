@@ -1,0 +1,21 @@
+---
+- name: Replace apt sources with pacoloco mirrors
+  when: apt_mirror_pacoloco_url
+  block:
+    - name: Comment out original sources
+      become: true
+      become_user: root
+      ansible.builtin.replace:
+        path: /etc/apt/sources.list
+        regexp: '^([^#].*)$'
+        replace: '#\1'
+
+    - name: Template mirrorlist
+      ansible.builtin.template:
+        src: mirrors.list
+        dest: /etc/apt/sources.list.d/00-homelab-ansible-mirrors.list
+        mode: '0644'
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
