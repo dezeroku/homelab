@@ -3,9 +3,28 @@
   hosts: all
   become: true
   become_user: root
+  tags:
+    - base-setup
   roles:
     - {role: general}
     - {role: hardening}
     - {role: tooling}
+
+- name: Base setup (rpis)
+  hosts: rack_rpis
+  become: true
+  become_user: root
+  tags:
+    - base-setup
+  roles:
     - {role: poe_plus_hat}
     - {role: raspi_cgroups}
+
+- name: Base setup (dells)
+  hosts: rack_dells
+  become: true
+  become_user: root
+  tags:
+    - base-setup
+  roles:
+    - {role: monitoring}

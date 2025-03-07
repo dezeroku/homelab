@@ -1,0 +1,8 @@
+---
+- name: Install S.M.A.R.T tooling
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    name:
+      - smartmontools
+    state: present
