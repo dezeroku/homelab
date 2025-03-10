@@ -29,7 +29,7 @@ All traffic to `*.<DOMAIN>` and `*.backup.<DOMAIN>` is redirected to specific cl
 
 ## homeserver
 
-Three Dell Optiplex nodes, totaling 18 cores, 192G of RAM and 6T of storage (1x2T NVMe on each node).
+Four Dell Optiplex nodes, totaling 24 cores, 256G of RAM and 12T of storage (1x2T NVMe on each node + 1x4T SATA SSD on homeserver-eight).
 
 Nodes mounted in a 10″ rack using the [3d printed frames](https://dimitrije.website/posts/2024-01-02-homelab-hardware.html)
 with minor modifications (TODO: upstream model changes).
@@ -147,9 +147,10 @@ To provision the nodes:
 2. Set up the workspace with `poetry install`
 3. Get dependencies via `poetry run ansible-galaxy install -r requirements.yml`
 4. Run the `poetry run ansible-playbook site.yml`
+5. (Dell specific) To provision secondary SATA SSD drives (if present), run `poetry run ansible-playbook site.yml -l <host> -t storage-setup`
 
 Take a look at `inventory.yml` and `site.yml` for supported options.
-Most notably passwords that will be set for the newly created users are obtained from the password manager by default.
+Most notably passwords that will be set for the newly created users and secondary drive encryption are obtained from the password manager by default.
 
 ## Core cluster setup (homeserver/homeserver_backup)
 

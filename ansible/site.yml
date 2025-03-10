@@ -30,6 +30,9 @@
 - name: Base setup
   import_playbook: base-setup.yml
 
+- name: Storage setup
+  import_playbook: storage-setup.yml
+
 - name: Upgrade packages
   import_playbook: upgrade-packages.yml
   when: vars.upgrade_packages

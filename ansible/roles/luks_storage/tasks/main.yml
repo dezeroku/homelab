@@ -1,0 +1,97 @@
+---
+# Partition an empty (as in not partitioned) drive and initialize single partition LUKS device on it,
+# mounting it under a specified path in filesystem at the end
+#
+# This role relies on {{ luks_storage_device }} being the actual SSD that we want to encrypt
+# Default value of sda should be fine for nodes with 1 NVMe (used for system) and 1 SSD (used for storage)
+# and may cause issues on other machines
+# TL;DR this role is pretty fragile and can cause data-loss, don't use it if you don't know what you are doing
+
+- name: Partition and encrypt device
+  # TODO: the 4TB storage check is a sanity check, but is it really needed?
+  when: >
+    luks_storage_device in ansible_facts.devices and
+    (ansible_facts.devices[luks_storage_device].partitions == {} or not luks_storage_skip_already_partitioned) and
+    ansible_facts.devices[luks_storage_device].model != "VIRTUAL-DISK" and
+    ansible_facts.devices[luks_storage_device].size == "3.64 TB"
+  block:
+    - name: Install parted
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        name:
+          - parted
+        state: present
+
+    - name: Create keyfile
+      become: true
+      become_user: root
+      no_log: true
+      ansible.builtin.copy:
+        content: "{{ luks_storage_passphrase }}"
+        dest: "{{ luks_storage_passphrase_path }}"
+        mode: 0400
+
+    # This operation is potentially destructive, especially the label part
+    - name: Create partition
+      community.general.parted:
+        device: "/dev/{{ luks_storage_device }}"
+        number: 1
+        state: present
+        label: gpt
+      register: partition_creation
+
+    # You can monitor the progress on remote machine with cat /proc/<dd PID>/fd/2
+    - name: Initialize partition with dummy data (this will take a looong time)
+      # via https://wiki.archlinux.org/title/Securely_wipe_disk/Tips_and_tricks#dd_-_advanced_example
+      # takes about 3 hours on a 4TB SATA drive, with stable 405MB/s
+      ansible.builtin.shell: |
+        set -o pipefail
+        PASS=$(tr -cd '[:alnum:]' < /dev/urandom | head -c128)
+        openssl enc -aes-256-ctr -pass pass:"$PASS" -nosalt </dev/zero | dd obs=64K ibs=4K of=/dev/{{ luks_storage_device }}{{ luks_storage_partition_suffix }} oflag=direct status=progress
+      changed_when: true
+      args:
+        executable: /usr/bin/bash
+      # This command runs till it encounters "No space left on device"
+      # which causes non-zero exit code
+      # TODO: can we get a false negative here?
+      failed_when: false
+      when: partition_creation.changed and not ansible_check_mode
+      # Wait up to a day (yeah...) for the task to finish
+      # 60 * 60 * 24
+      async: 86400
+      poll: 5
+
+    - name: Refresh devices facts
+      ansible.builtin.setup:
+        gather_subset:
+          - devices
+
+    - name: Create and open LUKS container
+      community.crypto.luks_device:
+        device: "/dev/{{ luks_storage_device }}{{ luks_storage_partition_suffix }}"
+        name: "{{ luks_storage_mapper_name }}"
+        state: "opened"
+        keyfile: "{{ luks_storage_passphrase_path }}"
+
+    - name: Format filesystem
+      community.general.filesystem:
+        fstype: "{{ luks_storage_fstype }}"
+        dev: /dev/mapper/{{ luks_storage_mapper_name }}
+
+    - name: Add crypttab entry
+      no_log: true
+      community.general.crypttab:
+        name: "{{ luks_storage_mapper_name }}"
+        backing_device: "UUID={{ ansible_facts.devices[luks_storage_device].partitions[luks_storage_device + luks_storage_partition_suffix].uuid }}"
+        state: present
+        opts: "{{ luks_storage_crypttab_opts }}"
+        password: "{{ luks_storage_passphrase_path }}"
+
+    - name: Add fstab entry and mount
+      ansible.posix.mount:
+        backup: true
+        path: "{{ luks_storage_mount_path }}"
+        src: /dev/mapper/{{ luks_storage_mapper_name }}
+        fstype: "{{ luks_storage_fstype }}"
+        state: mounted

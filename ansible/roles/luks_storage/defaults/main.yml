@@ -1,0 +1,11 @@
+---
+# Whether to touch drives that are already partitioned
+luks_storage_skip_already_partitioned: true
+
+luks_storage_device: sda
+luks_storage_partition_suffix: "1"
+luks_storage_mapper_name: sda1_crypt
+luks_storage_mount_path: /longhorn-ssd
+luks_storage_passphrase_path: /longhorn-ssd-passphrase
+luks_storage_crypttab_opts: luks,discard
+luks_storage_fstype: ext4

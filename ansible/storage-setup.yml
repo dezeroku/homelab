@@ -1,0 +1,40 @@
+---
+- name: Obtain luks_storage_passphrase from Bitwarden, if it's not explicitly provided
+  hosts: rack_dells
+  tags: &tags
+    # I consider this role dangerous
+    # It should only be run on demand
+    - never
+    - storage-setup
+  gather_facts: false
+  pre_tasks:
+    - name: Obtain luks_storage_passphrase from Bitwarden
+      # Throttle to one, so the rbw can keep the password in memory
+      throttle: 1
+      ansible.builtin.command:
+        cmd: rbw get homeserver/luks/storage
+      check_mode: false
+      changed_when: false
+      delegate_to: 127.0.0.1
+      register: luks_storage_passphrase_bitwarden
+      when: luks_storage_passphrase | default("") | length < 1
+
+    - name: Set luks_storage_passphrase from Bitwarden
+      when: rke2_token | default("") | length < 1
+      ansible.builtin.set_fact:
+        luks_storage_passphrase: "{{ luks_storage_passphrase_bitwarden.stdout }}"
+
+- name: Storage setup for secondary SATA SSD (dells)
+  hosts: rack_dells
+  become: true
+  become_user: root
+  tags: *tags
+  vars:
+    # If this value is not set, if drive is already partitioned it will be skipped
+    # It's important to uncomment this part e.g. when you want to change the passphrase location
+    # Make sure you know what you are doing before changing this value,
+    # if the role is run incorrectly it will result in data loss
+    # luks_storage_skip_already_partitioned: false
+    luks_storage_skip_already_partitioned: true
+  roles:
+    - {role: luks_storage}
