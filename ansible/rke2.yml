@@ -61,6 +61,11 @@
       - rke2-ingress-nginx
     rke2_servers_group_name: k8s_controlplanes
     rke2_agents_group_name: k8s_workers
+    rke2_server_options:
+      - "embedded-registry: true"
+      - "supervisor-metrics: true"
+    rke2_custom_registry_mirrors:
+      - name: "*"
     # Copy of the defaults, for the sake of completeness
     rke2_cluster_cidr:
       - 10.42.0.0/16
