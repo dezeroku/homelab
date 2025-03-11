@@ -20,44 +20,62 @@ k8s_workers:
     #      - node.longhorn.io/create-default-disk=true
 
 k8s_homeserver:
+  vars:
+    k8s_context: homeserver
+    k8s_node_additional_annotation: {}
+    k8s_node_additional_label: &homeserver-additional-label
+      node.longhorn.io/create-default-disk: config
+    rke2_cluster_group_name: k8s_homeserver
+    rke2_additional_sans:
+      - homeserver
   hosts:
     homeserver-five:
-      k8s_node_additional_label:
-        node-role.kubernetes.io/loadbalancer: "true"
-    homeserver-six:
-      k8s_node_additional_label:
-        node-role.kubernetes.io/loadbalancer: "true"
-    homeserver-seven:
-      k8s_node_additional_label:
-        node-role.kubernetes.io/loadbalancer: "true"
-    homeserver-eight:
-      k8s_node_label:
-        - node.longhorn.io/create-default-disk=config
       k8s_node_additional_annotation:
-        node.longhorn.io/default-disks-config: >-
+        # Reserve 400GB on the primary NVMe
+        node.longhorn.io/default-disks-config: &longhorn-homeserver-single >-
           [
             {
               "path":"/var/lib/longhorn",
-              "allowScheduling":true
+              "allowScheduling":true,
+              "storageReserved":429496729600,
+              "tags":[ "nvme" ]
+            }
+          ]
+      k8s_node_additional_label:
+        <<: *homeserver-additional-label
+        node-role.kubernetes.io/loadbalancer: "true"
+    homeserver-six:
+      k8s_node_additional_annotation:
+        node.longhorn.io/default-disks-config: *longhorn-homeserver-single
+      k8s_node_additional_label:
+        <<: *homeserver-additional-label
+        node-role.kubernetes.io/loadbalancer: "true"
+    homeserver-seven:
+      k8s_node_additional_annotation:
+        node.longhorn.io/default-disks-config: *longhorn-homeserver-single
+      k8s_node_additional_label:
+        <<: *homeserver-additional-label
+        node-role.kubernetes.io/loadbalancer: "true"
+    homeserver-eight:
+      k8s_node_additional_annotation:
+        # Reserve 400GB on the primary NVMe and
+        # 10GB on the secondary SSD
+        node.longhorn.io/default-disks-config: &longhorn-homeserver-double >-
+          [
+            {
+              "path":"/var/lib/longhorn",
+              "allowScheduling":true,
+              "storageReserved":429496729600,
+              "tags":[ "nvme" ]
             },
             {
                 "name":"longhorn-ssd",
                 "path":"/longhorn-ssd",
                 "allowScheduling":true,
+                "storageReserved":10737418240,
                 "tags":[ "ssd" ]
             }
           ]
-
-  vars:
-    k8s_context: homeserver
-    k8s_node_label:
-      - node.longhorn.io/create-default-disk=true
-      # - node-role.kubernetes.io/loadbalancer=true
-    k8s_node_additional_annotation: {}
-    k8s_node_additional_label: {}
-    rke2_cluster_group_name: k8s_homeserver
-    rke2_additional_sans:
-      - homeserver
 
 k8s_homeserver_backup:
   hosts:
