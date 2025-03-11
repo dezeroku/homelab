@@ -3,8 +3,25 @@
   hosts: k8s_homeserver
   become: true
   become_user: root
+  tags:
+    - rke2
   roles:
     - {role: longhorn}
+
+# TODO: No idea why I get temporary name resolution failure otherwise
+- name: Hardcode rke2 domains in /etc/hosts
+  hosts: k8s_homeserver
+  become: true
+  become_user: root
+  tags:
+    - rke2
+  tasks:
+    - lineinfile:
+        state: present
+        dest: /etc/hosts
+        line: "{{ item }}"
+      loop:
+        - "188.114.96.11 get.rke2.io"
 
 - name: Obtain rke2_token from Bitwarden, if it's not explicitly provided
   hosts: k8s_homeserver
@@ -30,6 +47,8 @@
 
 - name: Set up rke2
   hosts: k8s_homeserver
+  tags:
+    - rke2
   become: true
   become_user: root
   vars:

@@ -2,8 +2,10 @@
 collections:
   - name: ansible.posix
     version: ">=1.5.4"
+  - name: kubernetes.core
+    version: ">=5.1.0"
 roles:
   - name: xanmanning.k3s
     version: "v3.4.4"
   - name: lablabs.rke2
-    version: "1.38.7"
+    version: "1.40.3"

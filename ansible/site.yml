@@ -57,5 +57,10 @@
   tags:
     - k3s
 
+- name: Set up k8s common parts
+  import_playbook: k8s.yml
+  tags:
+    - k8s
+
 - name: Set up printserver
   import_playbook: printserver.yml

@@ -149,6 +149,9 @@ To provision the nodes:
 4. Run the `poetry run ansible-playbook site.yml`
 5. (Dell specific) To provision secondary SATA SSD drives (if present), run `poetry run ansible-playbook site.yml -l <host> -t storage-setup`
 
+`k8s.yml` playbook relies on the proper kubeconfig with `homeserver` and `homeserver-backup` contexts being present on the host.
+During the initial provisioning you may want to skip the `k8s` tag or just let it fail, set up the config and rerun the playbook.
+
 Take a look at `inventory.yml` and `site.yml` for supported options.
 Most notably passwords that will be set for the newly created users and secondary drive encryption are obtained from the password manager by default.
 

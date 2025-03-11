@@ -6,8 +6,9 @@ authors = ["dezeroku <contact@dezeroku.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-ansible = "^10.3.0"
+ansible = "^11.3.0"
 passlib = "^1.7.4"
+kubernetes = "^32.0.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,0 +1,30 @@
+---
+# This task requires you to have a locally set up kubeconfig
+- name: Additional configuration for cluster
+  hosts:
+    - k8s_homeserver
+    - k8s_homeserver_backup
+  tags:
+    - k8s
+  tasks:
+    # e.g. rke2 doesn't work nicely with specifying node roles directly in the config
+    - name: Set labels on nodes
+      kubernetes.core.k8s:
+        context: "{{ k8s_context }}"
+        definition:
+          apiVersion: v1
+          kind: Node
+          metadata:
+            name: "{{ inventory_hostname }}"
+            labels: "{{ k8s_node_additional_label }}"
+      delegate_to: 127.0.0.1
+    - name: Set annotations on nodes
+      kubernetes.core.k8s:
+        context: "{{ k8s_context }}"
+        definition:
+          apiVersion: v1
+          kind: Node
+          metadata:
+            name: "{{ inventory_hostname }}"
+            annotations: "{{ k8s_node_additional_annotation }}"
+      delegate_to: 127.0.0.1

@@ -22,13 +22,39 @@ k8s_workers:
 k8s_homeserver:
   hosts:
     homeserver-five:
+      k8s_node_additional_label:
+        node-role.kubernetes.io/loadbalancer: "true"
     homeserver-six:
+      k8s_node_additional_label:
+        node-role.kubernetes.io/loadbalancer: "true"
     homeserver-seven:
+      k8s_node_additional_label:
+        node-role.kubernetes.io/loadbalancer: "true"
     homeserver-eight:
+      k8s_node_label:
+        - node.longhorn.io/create-default-disk=config
+      k8s_node_additional_annotation:
+        node.longhorn.io/default-disks-config: >-
+          [
+            {
+              "path":"/var/lib/longhorn",
+              "allowScheduling":true
+            },
+            {
+                "name":"longhorn-ssd",
+                "path":"/longhorn-ssd",
+                "allowScheduling":true,
+                "tags":[ "ssd" ]
+            }
+          ]
+
   vars:
+    k8s_context: homeserver
     k8s_node_label:
       - node.longhorn.io/create-default-disk=true
       # - node-role.kubernetes.io/loadbalancer=true
+    k8s_node_additional_annotation: {}
+    k8s_node_additional_label: {}
     rke2_cluster_group_name: k8s_homeserver
     rke2_additional_sans:
       - homeserver
@@ -39,6 +65,10 @@ k8s_homeserver_backup:
     homeserver-backup-two:
     homeserver-backup-three:
   vars:
+    k8s_context: homeserver-backup
+    k8s_node_additional_annotation: {}
+    k8s_node_additional_label:
+      node-role.kubernetes.io/loadbalancer: "true"
     k3s_control_node: true
     node_label:
       - node.longhorn.io/create-default-disk=true
