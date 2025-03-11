@@ -29,6 +29,8 @@ persistence:
 defaultSettings:
   defaultDataLocality: best-effort
   createDefaultDiskLabeledNodes: true
+  # Try to have roughly same number of replicas between nodes
+  replicaAutoBalance: best-effort
   # Region doesn't matter, but we have to set something for Longhorn to be happy
   backupTarget: s3://longhorn@us-east-1/
   backupTargetCredentialSecret: longhorn-credentials-s3
