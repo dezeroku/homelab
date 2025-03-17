@@ -42,6 +42,9 @@ dependencies:
 - name: operator
   repository: https://operator.min.io/
   version: 7.0.0
+- name: prometheus-operator-crds
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 19.0.0
 - name: tenant
   repository: https://operator.min.io/
   version: 7.0.0
@@ -60,5 +63,5 @@ dependencies:
 - name: victoria-metrics-operator
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.40.4
-digest: sha256:b53f7adfd6ca685328e7fe5335abc7368f3caaefcf16be5fbaa972e24fb8be63
-generated: "2025-02-17T17:54:04.501140028+01:00"
+digest: sha256:0767b27e7c6221ccd27f8cae9164af840de5577294854b4390de8e2d19285f37
+generated: "2025-03-17T01:44:05.162368953+01:00"
