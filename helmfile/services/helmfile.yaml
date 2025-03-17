@@ -284,3 +284,12 @@ releases:
   - name: kopia
     inherit:
       - template: argocd-app
+
+  - name: flatnotes
+    chart: bjw-s/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+  - name: flatnotes
+    inherit:
+      - template: argocd-app

@@ -1,0 +1,75 @@
+---
+defaultPodOptions:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+controllers:
+  main:
+    type: deployment
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: dullage/flatnotes
+          tag: v5.4.1
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          # Controlled on ingress level, single user scenario
+          FLATNOTES_AUTH_TYPE: none
+        probes:
+          liveness: &probe
+            enabled: true
+          readiness: *probe
+          startup: *probe
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 50Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8080
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Notes
+      gethomepage.dev/group: Tools
+      gethomepage.dev/icon: flatnotes.png
+      gethomepage.dev/name: flatnotes
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_emails=contact@dezeroku.com"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+      # Arbitrary size of attachments
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    tls:
+      - secretName: flatnotes-general-tls
+        hosts:
+          - flatnotes.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: flatnotes.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: main
+
+persistence:
+  storage:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
