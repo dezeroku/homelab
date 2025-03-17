@@ -9,7 +9,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/gethomepage/homepage
-          tag: v0.9.9
+          tag: v1.0.4
           pullPolicy: IfNotPresent
         env:
           TZ: Europe/Warsaw
@@ -20,6 +20,7 @@ controllers:
               secretKeyRef:
                 name: jellyfin
                 key: apikey
+          HOMEPAGE_ALLOWED_HOSTS: {{ requiredEnv "DOMAIN" }}
         probes:
           readiness:
             enabled: true
