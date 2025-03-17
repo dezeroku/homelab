@@ -9,10 +9,11 @@ controllers:
       main:
         image:
           repository: ghcr.io/gethomepage/homepage
-          tag: v0.9.9
+          tag: v1.0.4
           pullPolicy: IfNotPresent
         env:
           TZ: Europe/Warsaw
+          HOMEPAGE_ALLOWED_HOSTS: backup.{{ requiredEnv "DOMAIN" }}
         probes:
           readiness:
             enabled: true
