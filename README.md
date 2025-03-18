@@ -29,7 +29,7 @@ All traffic to `*.<DOMAIN>` and `*.backup.<DOMAIN>` is redirected to specific cl
 
 ## homeserver
 
-Four Dell Optiplex nodes, totaling 24 cores, 256G of RAM and 12T of storage (1x2T NVMe on each node + 1x4T SATA SSD on homeserver-eight).
+Four Dell Optiplex nodes, totaling 24 cores, 256G of RAM and 24T of storage (1x2T NVMe + 1x4T SATA SSD on each node).
 
 Nodes mounted in a 10″ rack using the [3d printed frames](https://dimitrije.website/posts/2024-01-02-homelab-hardware.html)
 with minor modifications (TODO: upstream model changes).
