@@ -293,3 +293,12 @@ releases:
   - name: flatnotes
     inherit:
       - template: argocd-app
+
+  - name: yopass
+    chart: bjw-s/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+  - name: yopass
+    inherit:
+      - template: argocd-app

@@ -1,0 +1,79 @@
+---
+controllers:
+  main:
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: jhaals/yopass
+          tag: 11.19.0
+          pullPolicy: IfNotPresent
+        env:
+          YOPASS_DATABASE: redis
+          YOPASS_REDIS: redis://yopass-dragonfly-db:6379/0
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 128Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 1337
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Securely share secrets
+      gethomepage.dev/group: Tools
+      gethomepage.dev/icon: si-planet
+      gethomepage.dev/name: yopass
+      # For uploading small files
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    tls:
+      - secretName: yopass-tls
+        hosts:
+          - yopass.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: yopass.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+rawResources:
+  dragonfly-db:
+    apiVersion: dragonflydb.io/v1alpha1
+    kind: Dragonfly
+    spec:
+      spec:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        snapshot:
+          cron: "*/5 * * * *"
+          persistentVolumeClaimSpec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 2Gi
+            storageClassName: longhorn
