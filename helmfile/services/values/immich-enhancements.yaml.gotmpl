@@ -2,9 +2,9 @@ persistence:
   library:
     enabled: true
     type: persistentVolumeClaim
-    storageClass: longhorn
+    storageClass: longhorn-ssd
     accessMode: ReadWriteOnce
-    size: 60Gi
+    size: 100Gi
 
 serviceAccount:
   name: immich
