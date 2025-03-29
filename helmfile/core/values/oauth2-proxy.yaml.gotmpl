@@ -56,6 +56,18 @@ extraEnv:
         name: oauth2-proxy-cookie-secret
         key: cookie-secret
 
+extraInitContainers:
+  - name: wait-for-vault
+    image: hashicorp/vault:1.19.0
+    env:
+      - name: VAULT_ADDR
+        value: http://vault.vault.svc.cluster.local:8200
+    command:
+      - /bin/sh
+      - -c
+      - echo "Wait for vault to be ready"; while ! vault status > /dev/null; do sleep 1; echo "-"; done; echo "Ready";
+
+
 app-template:
   rawResources:
     vault-auth:
