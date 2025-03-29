@@ -18,6 +18,7 @@ server:
       gethomepage.dev/icon: si-victoriametrics
       gethomepage.dev/name: VictoriaLogs
       gethomepage.dev/app: victorialogs
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=victoria-logs-single"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
     ingressClassName: nginx
     hosts:
