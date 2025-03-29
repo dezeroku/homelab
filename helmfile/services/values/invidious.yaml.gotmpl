@@ -148,6 +148,8 @@ controllers:
           - bash
           - -c
           - >-
+            kubectl rollout restart deployment/invidious-sig-helper &&
+            kubectl rollout status deployment/invidious-sig-helper &&
             kubectl rollout restart deployment/invidious-main &&
             kubectl rollout status deployment/invidious-main
 
@@ -300,6 +302,7 @@ rbac:
             - deployments
           resourceNames:
             - invidious-main
+            - invidious-sig-helper
           verbs:
             - get
             - patch
