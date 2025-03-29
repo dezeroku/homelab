@@ -70,12 +70,42 @@ configMaps:
   config:
     enabled: true
     data:
+      custom.js: |
+        # Redirect to the default tab if no tab is chosen
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.location.pathname === "/" && !window.location.hash) {
+                window.location.replace("/#for-users");
+            }
+        });
       bookmarks.yaml: ""
       docker.yaml: ""
       kubernetes.yaml: |
         mode: cluster
       services.yaml: ""
-      settings.yaml: ""
+      settings.yaml: |
+        layout:
+          Tools:
+            tab: For Users
+          Services:
+            tab: For Users
+          Media:
+            tab: For Users
+          YT:
+            tab: For Users
+          Utils:
+            tab: Personal
+          Storage:
+            tab: For Admins
+          Monitoring:
+            tab: For Admins
+          Media Management:
+            tab: For Admins
+          Cluster:
+            tab: For Admins
+          Server:
+            tab: For Admins
+          IoT:
+            tab: For Admins
       widgets.yaml: |
         - kubernetes:
             cluster:
@@ -113,6 +143,8 @@ persistence:
             subPath: settings.yaml
           - path: /app/config/widgets.yaml
             subPath: widgets.yaml
+          - path: /app/config/custom.js
+            subPath: custom.js
   logs:
     enabled: true
     type: emptyDir

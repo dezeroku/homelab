@@ -103,7 +103,7 @@ releases:
     labels:
       mountSubPath: metube
       homepageName: MeTube
-      homepageGroup: Media Management
+      homepageGroup: YT
       hostPrefix: metube
     inherit:
       - template: default
