@@ -1,0 +1,100 @@
+---
+defaultPodOptions:
+  securityContext:
+    # Designed to run with this user id
+    runAsUser: 999
+    runAsGroup: 999
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/yoryan/mailrise
+          tag: 1.4.0
+          pullPolicy: IfNotPresent
+        env:
+          PUSHOVER_GENERAL_URL:
+            valueFrom:
+              secretKeyRef:
+                name: mailrise-pushover-general
+                key: url
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            memory: 100Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      smtp:
+        port: 8025
+
+serviceAccount:
+  create: true
+
+# No ingress for now
+# It's only meant to be used from within the cluster for the time being
+
+configMaps:
+  config:
+    enabled: true
+    data:
+      config.yaml: |
+        configs:
+          # Send to pushover_general@mailrise.xyz
+          # to access this handler.
+          # Remember to set k8s service as SMTP host
+          pushover_general:
+            urls:
+              - !env_var PUSHOVER_GENERAL_URL
+
+persistence:
+  config:
+    enabled: true
+    type: configMap
+    name: mailrise-config
+    advancedMounts:
+      main:
+        main:
+          - path: /etc/mailrise.conf
+            subPath: config.yaml
+
+rawResources:
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: mailrise
+          serviceAccount: mailrise
+  pushover-general:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/mailrise/pushover/general
+        destination:
+          name: mailrise-pushover-general
+          create: true
+          transformation:
+            templates:
+              url:
+                text: pover://{{ "{{`{{" }}.Secrets.user_key{{ "}}`}}" }}@{{ "{{`{{" }}.Secrets.api_key{{ "}}`}}" }}
+        vaultAuthRef: mailrise-vault-auth

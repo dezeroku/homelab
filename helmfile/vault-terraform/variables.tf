@@ -243,3 +243,11 @@ variable "kopia_pushover_app_token" {
 variable "kopia_pushover_user_key" {
   type = string
 }
+
+variable "mailrise_pushover_general_user_key" {
+  type = string
+}
+
+variable "mailrise_pushover_general_api_key" {
+  type = string
+}

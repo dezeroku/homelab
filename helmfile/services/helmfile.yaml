@@ -311,3 +311,12 @@ releases:
   - name: silverbullet
     inherit:
       - template: argocd-app
+
+  - name: mailrise
+    chart: bjw-s/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+  - name: mailrise
+    inherit:
+      - template: argocd-app
