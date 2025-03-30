@@ -329,3 +329,12 @@ releases:
   - name: convertx
     inherit:
       - template: argocd-app
+
+  - name: cyberchef
+    chart: bjw-s/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+  - name: cyberchef
+    inherit:
+      - template: argocd-app

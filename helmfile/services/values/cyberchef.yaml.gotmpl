@@ -1,0 +1,60 @@
+---
+#defaultPodOptions:
+#  securityContext:
+#    runAsUser: 101
+#    runAsGroup: 101
+#    fsGroup: 101
+
+controllers:
+  main:
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/gchq/cyberchef
+          tag: 10.19.4
+          pullPolicy: IfNotPresent
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 128Mi
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 80
+
+serviceAccount:
+  create: true
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Another collection of various tools
+      gethomepage.dev/group: Tools
+      gethomepage.dev/icon: si-planet
+      gethomepage.dev/name: CyberChef
+      # Everything is done locally
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    tls:
+      - secretName: cyberchef-tls
+        hosts:
+          - cyberchef.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: cyberchef.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
