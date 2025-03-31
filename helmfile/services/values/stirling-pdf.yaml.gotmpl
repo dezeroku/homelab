@@ -1,0 +1,68 @@
+---
+# TODO: attach emptyDirs in required places and run as non-root
+#defaultPodOptions:
+#  securityContext:
+#    runAsUser: 19972
+#    runAsGroup: 19972
+#    fsGroup: 19972
+
+controllers:
+  main:
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: docker.stirlingpdf.com/stirlingtools/stirling-pdf
+          tag: 0.45.0
+          pullPolicy: IfNotPresent
+        env:
+          # DOCKER_ENABLE_SECURITY to tell docker to download security jar (required as true for auth login)
+          DOCKER_ENABLE_SECURITY: false
+          LANGS: pl_PL
+          SYSTEM_ENABLEANALYTICS: false
+          # TODO: disable survey when the option is available
+          # https://github.com/Stirling-Tools/Stirling-PDF/issues/1573
+          # This container is run stateless, so survey is asked on every restart
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 5Gi
+          requests:
+            memory: 128Mi
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8080
+
+serviceAccount:
+  create: true
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: One-stop-shop for all your PDF needs
+      gethomepage.dev/group: Tools
+      gethomepage.dev/icon: stirling-pdf
+      gethomepage.dev/name: Stirling PDF
+      nginx.ingress.kubernetes.io/proxy-body-size: "2Gi"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    tls:
+      - secretName: stirling-pdf-tls
+        hosts:
+          - stirling-pdf.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: stirling-pdf.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
