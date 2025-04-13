@@ -33,7 +33,7 @@ releases:
     inherit:
       - template: argocd-app
 
-  - name: redbot
+  - name: redbot-main
     chart: bjw-s/app-template
     version: 3.7.0
     inherit:
@@ -42,13 +42,32 @@ releases:
     # https://github.com/roboll/helmfile/issues/1329 result
     # This pattern will be shared by all metube deployments for the time being
     labels:
-      vaultRole: redbot
-      vaultSubPath: redbot
-      appName: redbot
+      vaultRole: redbot-main
+      vaultSubPath: redbot/main
+      appName: redbot-main
     values:
       - values/redbot-common.yaml.gotmpl
 
-  - name: redbot
+  - name: redbot-main
+    inherit:
+      - template: argocd-app
+
+  - name: redbot-premiers
+    chart: bjw-s/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+    # Using labels as "release values", in anticipation of
+    # https://github.com/roboll/helmfile/issues/1329 result
+    # This pattern will be shared by all metube deployments for the time being
+    labels:
+      vaultRole: redbot-premiers
+      vaultSubPath: redbot/premiers
+      appName: redbot-premiers
+    values:
+      - values/redbot-common.yaml.gotmpl
+
+  - name: redbot-premiers
     inherit:
       - template: argocd-app
 

@@ -32,7 +32,7 @@ controllers:
           TOKEN:
             valueFrom:
               secretKeyRef:
-                name: redbot-secrets
+                name: {{ .Release.Labels.appName }}-secrets
                 key: token
         resources:
           limits:

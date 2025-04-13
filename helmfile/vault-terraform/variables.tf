@@ -138,7 +138,11 @@ variable "invidious_hmac_key" {
 #  type = string
 #}
 
-variable "redbot_token" {
+variable "redbot_main_token" {
+  type = string
+}
+
+variable "redbot_premiers_token" {
   type = string
 }
 

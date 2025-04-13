@@ -44,7 +44,8 @@ home_assistant_prometheus_token = "example_token"
 # Can be generated with pwgen 20 1
 invidious_hmac_key = "example_key"
 #redbot_owner = ""
-redbot_token = ""
+redbot_main_token = ""
+redbot_premiers_token = ""
 homepage_jellyfin_apikey = ""
 # Can be generated with pwgen 20 1
 paperless_secret_key = "example_key"
