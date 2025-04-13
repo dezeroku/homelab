@@ -38,6 +38,16 @@ releases:
     version: 3.7.0
     inherit:
       - template: default
+    # Using labels as "release values", in anticipation of
+    # https://github.com/roboll/helmfile/issues/1329 result
+    # This pattern will be shared by all metube deployments for the time being
+    labels:
+      vaultRole: redbot
+      vaultSubPath: redbot
+      appName: redbot
+    values:
+      - values/redbot-common.yaml.gotmpl
+
   - name: redbot
     inherit:
       - template: argocd-app

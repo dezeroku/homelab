@@ -1,0 +1,78 @@
+defaultPodOptions:
+  securityContext:
+  # TODO: the PUID env approach doesn't really work with a proper securityContext
+#    runAsUser: 1000
+#    runAsGroup: 1000
+    fsGroup: 1000
+  nodeSelector:
+    # Lock the arch to amd64 to avoid problems with venv
+    # TODO: maybe let's make the whole venv ephemeral?
+    kubernetes.io/arch: amd64
+
+controllers:
+  main:
+    strategy: Recreate
+    containers:
+      main:
+        image:
+          repository: phasecorex/red-discordbot
+          tag: audio
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          PREFIX: /
+          PREFIX2: .
+          PUID: 1000
+          REDBOT_VERSION: "~=3.5.13"
+          #OWNER:
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: redbot
+          #      key: owner
+          TOKEN:
+            valueFrom:
+              secretKeyRef:
+                name: redbot-secrets
+                key: token
+        resources:
+          limits:
+            memory: 1536Mi
+          requests:
+            memory: 256Mi
+
+serviceAccount:
+  create: true
+  name: redbot
+
+persistence:
+  storage:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
+
+rawResources:
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: {{ .Release.Labels.vaultRole }}
+          serviceAccount: redbot
+  secrets:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/{{ .Release.Labels.vaultSubPath }}/secrets
+        destination:
+          name: {{ .Release.Labels.appName }}-secrets
+          create: true
+        vaultAuthRef: {{ .Release.Labels.appName }}-vault-auth
