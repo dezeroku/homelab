@@ -28,8 +28,8 @@ repositories:
     url: https://oauth2-proxy.github.io/manifests
   - name: argo-helm
     url: https://argoproj.github.io/argo-helm
-  - name: bjw-s
-    url: https://bjw-s.github.io/helm-charts
+  - name: bjw-s-labs
+    url: https://bjw-s-labs.github.io/helm-charts
   - name: nfd
     url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
   - name: intel
@@ -67,7 +67,7 @@ releases:
     dependencies:
       - chart: ./charts/longhorn-enhancements
         version: 0.1.0
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: longhorn
     inherit:
@@ -97,7 +97,7 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: cert-manager
     inherit:
@@ -154,7 +154,7 @@ releases:
   # We only care about vmsingle here
   - name: vm-hass
     namespace: victoria-metrics-stack
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -212,7 +212,7 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: oauth2-proxy
     inherit:
@@ -224,7 +224,7 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: argocd-app
     values:
@@ -275,7 +275,7 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: minio-k8s-backups
     inherit:

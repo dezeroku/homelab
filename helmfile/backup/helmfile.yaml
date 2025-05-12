@@ -18,8 +18,8 @@ repositories:
     url: https://charts.longhorn.io
   - name: minio
     url: https://operator.min.io/
-  - name: bjw-s
-    url: https://bjw-s.github.io/helm-charts
+  - name: bjw-s-labs
+    url: https://bjw-s-labs.github.io/helm-charts
 releases:
   - name: vault-secrets-operator
     chart: hashicorp/vault-secrets-operator
@@ -48,7 +48,7 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
 
   # Using vm instead of victoria-metrics-stack, because the latter causes
@@ -74,7 +74,7 @@ releases:
     namespace: default
 
   - name: homepage
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -88,5 +88,5 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0

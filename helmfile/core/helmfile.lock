@@ -1,7 +1,7 @@
 version: 0.0.0-dev
 dependencies:
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: argo-cd
   repository: https://argoproj.github.io/argo-helm
@@ -63,5 +63,5 @@ dependencies:
 - name: victoria-metrics-operator
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.40.4
-digest: sha256:058d7153cf9c4708ec040097ad889512896a5231b3bb38a30e9071587d1049a3
-generated: "2025-03-29T02:29:23.24360836+01:00"
+digest: sha256:6a17c3a581171b14eab8075bb1107e310f399ed7f0b9d593e1eddd7cd8664655
+generated: "2025-05-12T03:42:06.136228564+02:00"

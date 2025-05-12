@@ -6,8 +6,8 @@ helmDefaults:
   kubeContext: homeserver
 
 repositories:
-  - name: bjw-s
-    url: https://bjw-s.github.io/helm-charts
+  - name: bjw-s-labs
+    url: https://bjw-s-labs.github.io/helm-charts
   - name: minio
     url: https://operator.min.io/
   - name: itzg
@@ -16,7 +16,7 @@ repositories:
     url: https://immich-app.github.io/immich-charts
 releases:
   - name: pacoloco
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -25,7 +25,7 @@ releases:
       - template: argocd-app
 
   - name: invidious
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -34,7 +34,7 @@ releases:
       - template: argocd-app
 
   - name: redbot-main
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -53,7 +53,7 @@ releases:
       - template: argocd-app
 
   - name: redbot-premiers
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -72,7 +72,7 @@ releases:
       - template: argocd-app
 
   - name: lavalink
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -81,7 +81,7 @@ releases:
       - template: argocd-app
 
   - name: netbootxyz
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -90,7 +90,7 @@ releases:
       - template: argocd-app
 
   - name: home-assistant
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -100,7 +100,7 @@ releases:
 
   - name: media-storage
     namespace: media
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -112,7 +112,7 @@ releases:
 
   - name: filebrowser-media
     namespace: media
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -124,7 +124,7 @@ releases:
 
   - name: metube
     namespace: media
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     # Using labels as "release values", in anticipation of
     # https://github.com/roboll/helmfile/issues/1329 result
@@ -146,7 +146,7 @@ releases:
 
   - name: jellyfin
     namespace: media
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -162,7 +162,7 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: minio-core
     inherit:
@@ -174,14 +174,14 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: minio-private
     inherit:
       - template: argocd-app
 
   - name: homepage
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -190,7 +190,7 @@ releases:
       - template: argocd-app
 
   - name: paperless
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     dependencies:
       - chart: oci://registry-1.docker.io/bitnamicharts/redis
@@ -207,14 +207,14 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: bjw-s/app-template
+      - chart: bjw-s-labs/app-template
         version: 3.7.0
   - name: minecraft
     inherit:
       - template: argocd-app
 
   - name: ryot
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -223,7 +223,7 @@ releases:
       - template: argocd-app
 
   - name: speedtest
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -232,7 +232,7 @@ releases:
       - template: argocd-app
 
   - name: it-tools
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -255,7 +255,7 @@ releases:
   # use rawResources, thus we need this -enhancements one
   - name: immich-enhancements
     namespace: immich
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -267,7 +267,7 @@ releases:
 
   - name: navidrome
     namespace: media
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -279,7 +279,7 @@ releases:
 
   - name: metube-navidrome
     namespace: media
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     labels:
       mountSubPath: music
@@ -297,7 +297,7 @@ releases:
       - template: argocd-app
 
   - name: wikijs
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -306,7 +306,7 @@ releases:
       - template: argocd-app
 
   - name: kopia
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -315,7 +315,7 @@ releases:
       - template: argocd-app
 
   - name: flatnotes
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -324,7 +324,7 @@ releases:
       - template: argocd-app
 
   - name: yopass
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -333,7 +333,7 @@ releases:
       - template: argocd-app
 
   - name: silverbullet
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -342,7 +342,7 @@ releases:
       - template: argocd-app
 
   - name: mailrise
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -351,7 +351,7 @@ releases:
       - template: argocd-app
 
   - name: convertx
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -360,7 +360,7 @@ releases:
       - template: argocd-app
 
   - name: cyberchef
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default
@@ -369,7 +369,7 @@ releases:
       - template: argocd-app
 
   - name: stirling-pdf
-    chart: bjw-s/app-template
+    chart: bjw-s-labs/app-template
     version: 3.7.0
     inherit:
       - template: default

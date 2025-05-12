@@ -1,64 +1,88 @@
 version: 0.0.0-dev
 dependencies:
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: app-template
-  repository: https://bjw-s.github.io/helm-charts
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 3.7.0
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
   version: 3.7.0
 - name: immich
   repository: https://immich-app.github.io/immich-charts
@@ -72,5 +96,5 @@ dependencies:
 - name: tenant
   repository: https://operator.min.io/
   version: 7.0.0
-digest: sha256:f1781c2d9c32d275e7d44ee20aeef10463390177096c5d25a488ac9c184fbc1e
-generated: "2025-03-05T20:34:13.543817125+01:00"
+digest: sha256:7a7ee1bd06a8b5659dad2f8000a90428c1e74177510f05cf02824ccf77ec2e47
+generated: "2025-05-04T22:44:04.087179601+02:00"
