@@ -44,7 +44,8 @@ controllers:
       main:
         image:
           repository: quay.io/invidious/invidious
-          tag: master
+          # Use latest instead of master to play nicely with RKE2 embedded registry mirror
+          tag: latest
           pullPolicy: Always
         env:
           # https://github.com/iv-org/invidious/issues/2970
