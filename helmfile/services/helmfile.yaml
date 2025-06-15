@@ -376,3 +376,12 @@ releases:
   - name: stirling-pdf
     inherit:
       - template: argocd-app
+
+  - name: filebrowser-drive
+    chart: bjw-s-labs/app-template
+    version: 3.7.0
+    inherit:
+      - template: default
+  - name: filebrowser-drive
+    inherit:
+      - template: argocd-app

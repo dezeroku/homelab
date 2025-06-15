@@ -88,3 +88,17 @@ resource "vault_identity_group" "immich" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "filebrowser_drive_clients" {
+  name                       = "filebrowser-drive-clients"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}
+
+resource "vault_identity_group" "filebrowser_drive_admins" {
+  name                       = "filebrowser-drive-admins"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}

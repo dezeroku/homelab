@@ -24,17 +24,19 @@ module "user" {
   groups = each.value.groups
 
   groups_mapping = {
-    users              = vault_identity_group.users.id
-    media-viewers      = vault_identity_group.media_viewers.id
-    media-admins       = vault_identity_group.media_admins.id
-    download-viewers   = vault_identity_group.download_viewers.id
-    download-admins    = vault_identity_group.download_admins.id
-    monitoring-viewers = vault_identity_group.monitoring_viewers.id
-    monitoring-admins  = vault_identity_group.monitoring_admins.id
-    netbootxyz-admins  = vault_identity_group.netbootxyz_admins.id
-    storage-admins     = vault_identity_group.storage_admins.id
-    cluster-admins     = vault_identity_group.cluster_admins.id
-    paperless          = vault_identity_group.paperless.id
-    immich             = vault_identity_group.immich.id
+    users                     = vault_identity_group.users.id
+    media-viewers             = vault_identity_group.media_viewers.id
+    media-admins              = vault_identity_group.media_admins.id
+    download-viewers          = vault_identity_group.download_viewers.id
+    download-admins           = vault_identity_group.download_admins.id
+    monitoring-viewers        = vault_identity_group.monitoring_viewers.id
+    monitoring-admins         = vault_identity_group.monitoring_admins.id
+    netbootxyz-admins         = vault_identity_group.netbootxyz_admins.id
+    storage-admins            = vault_identity_group.storage_admins.id
+    cluster-admins            = vault_identity_group.cluster_admins.id
+    paperless                 = vault_identity_group.paperless.id
+    immich                    = vault_identity_group.immich.id
+    filebrowser-drive-admins  = vault_identity_group.filebrowser_drive_admins.id
+    filebrowser-drive-clients = vault_identity_group.filebrowser_drive_clients.id
   }
 }

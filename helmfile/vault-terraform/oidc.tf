@@ -40,6 +40,7 @@ resource "vault_identity_oidc_provider" "main" {
     vault_identity_oidc_client.ryot.client_id,
     vault_identity_oidc_client.wikijs.client_id,
     vault_identity_oidc_client.immich.client_id,
+    vault_identity_oidc_client.filebrowser_drive.client_id,
   ]
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,
