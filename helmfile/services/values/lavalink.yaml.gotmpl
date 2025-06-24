@@ -1,3 +1,7 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 defaultPodOptions:
   securityContext:
 #    runAsUser: 1000
@@ -9,6 +13,8 @@ defaultPodOptions:
 controllers:
   main:
     strategy: Recreate
+    serviceAccount:
+      identifier: lavalink
     containers:
       main:
         image:
@@ -91,11 +97,8 @@ service:
         port: 2333
 
 serviceAccount:
-  create: true
-
-  extraServiceAccounts:
-    yt-tokens:
-      create: true
+  lavalink: {}
+  yt-tokens: {}
 
 configMaps:
   config:

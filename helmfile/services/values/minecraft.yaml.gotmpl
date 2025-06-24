@@ -39,8 +39,12 @@ persistence:
     Size: 10Gi
 
 app-template:
+  global:
+    alwaysAppendIdentifierToResourceName: true
+
   serviceAccount:
-    create: true
+    main: {}
+
   rawResources:
     vault-auth:
       apiVersion: secrets.hashicorp.com/v1beta1
@@ -51,7 +55,7 @@ app-template:
           mount: k8s/homeserver
           kubernetes:
             role: minecraft
-            serviceAccount: minecraft
+            serviceAccount: minecraft-main
     rcon:
       apiVersion: secrets.hashicorp.com/v1beta1
       kind: VaultStaticSecret

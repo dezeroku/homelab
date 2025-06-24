@@ -18,7 +18,7 @@ resource "vault_kubernetes_auth_backend_role" "ryot" {
   role_name                        = "ryot"
   bound_service_account_namespaces = ["ryot"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["ryot"]
+  bound_service_account_names      = ["ryot-main"]
   token_policies                   = ["ryot"]
 }
 

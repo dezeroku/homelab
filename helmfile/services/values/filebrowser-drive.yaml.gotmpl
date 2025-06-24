@@ -1,9 +1,14 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 # TODO: run as non-root
 controllers:
   main:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -41,7 +46,7 @@ service:
         port: 80
 
 serviceAccount:
-  create: true
+  main: {}
 
 ingress:
   main:
@@ -136,7 +141,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: filebrowser-drive
-          serviceAccount: filebrowser-drive
+          serviceAccount: filebrowser-drive-main
   oidc-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

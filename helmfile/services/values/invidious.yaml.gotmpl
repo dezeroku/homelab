@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 defaultPodOptions:
   securityContext:
     runAsUser: 1000
@@ -16,6 +19,8 @@ controllers:
   sig-helper:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         args:
@@ -40,6 +45,8 @@ controllers:
     # invidious is single-threaded, so bumping number
     # of replicas significantly speeds up things such as loading thumbnails
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -282,15 +289,9 @@ persistence:
           - path: /yt-tokens
 
 serviceAccount:
-  name: invidious
-  create: true
-
-  extraServiceAccounts:
-    deployment-restart:
-      create: true
-
-    yt-tokens:
-      create: true
+  main: {}
+  deployment-restart: {}
+  yt-tokens: {}
 
 rbac:
   roles:
@@ -396,7 +397,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: invidious
-          serviceAccount: invidious
+          serviceAccount: invidious-main
   hmac-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

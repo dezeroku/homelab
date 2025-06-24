@@ -1,8 +1,13 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 controllers:
   main:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -67,7 +72,7 @@ service:
         port: 3000
 
 serviceAccount:
-  create: true
+  main: {}
 
 ingress:
   main:
@@ -150,7 +155,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: wikijs
-          serviceAccount: wikijs
+          serviceAccount: wikijs-main
   pgo-backup-s3-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

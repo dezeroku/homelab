@@ -1,10 +1,16 @@
+---
 # Mostly based on https://github.com/jameswynn/helm-charts/tree/main/charts/homepage
 # but converted to pure app-template for more control and easier upgrades
+
+global:
+  alwaysAppendIdentifierToResourceName: true
 
 controllers:
   main:
     #strategy: Recreate
     strategy: RollingUpdate
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -64,7 +70,7 @@ ingress:
               identifier: main
 
 serviceAccount:
-  create: true
+  main: {}
 
 configMaps:
   config:
@@ -201,7 +207,7 @@ rbac:
       roleRef:
         identifier: cluster-role
       subjects:
-        - identifier: default
+        - identifier: main
 
 rawResources:
   vault-auth:
@@ -213,7 +219,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: homepage
-          serviceAccount: homepage
+          serviceAccount: homepage-main
   jellyfin:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

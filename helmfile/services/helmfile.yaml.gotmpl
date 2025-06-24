@@ -17,7 +17,7 @@ repositories:
 releases:
   - name: pacoloco
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: pacoloco
@@ -26,7 +26,7 @@ releases:
 
   - name: invidious
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: invidious
@@ -35,7 +35,7 @@ releases:
 
   - name: redbot-main
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
     # Using labels as "release values", in anticipation of
@@ -54,7 +54,7 @@ releases:
 
   - name: redbot-premiers
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
     # Using labels as "release values", in anticipation of
@@ -73,7 +73,7 @@ releases:
 
   - name: lavalink
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: lavalink
@@ -82,7 +82,7 @@ releases:
 
   - name: netbootxyz
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: netbootxyz
@@ -91,7 +91,7 @@ releases:
 
   - name: home-assistant
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: home-assistant
@@ -101,7 +101,7 @@ releases:
   - name: media-storage
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: media-storage
@@ -113,7 +113,7 @@ releases:
   - name: filebrowser-media
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: filebrowser-media
@@ -125,7 +125,7 @@ releases:
   - name: metube
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     # Using labels as "release values", in anticipation of
     # https://github.com/roboll/helmfile/issues/1329 result
     # This pattern will be shared by all metube deployments for the time being
@@ -147,7 +147,7 @@ releases:
   - name: jellyfin
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: jellyfin
@@ -163,7 +163,7 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 3.7.0
+        version: 4.1.2
   - name: minio-core
     inherit:
       - template: argocd-app
@@ -175,14 +175,14 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 3.7.0
+        version: 4.1.2
   - name: minio-private
     inherit:
       - template: argocd-app
 
   - name: homepage
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: homepage
@@ -191,7 +191,7 @@ releases:
 
   - name: paperless
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     dependencies:
       - chart: oci://registry-1.docker.io/bitnamicharts/redis
         version: 20.1.3
@@ -208,14 +208,14 @@ releases:
       - template: default
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 3.7.0
+        version: 4.1.2
   - name: minecraft
     inherit:
       - template: argocd-app
 
   - name: ryot
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: ryot
@@ -224,7 +224,7 @@ releases:
 
   - name: speedtest
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: speedtest
@@ -233,7 +233,7 @@ releases:
 
   - name: it-tools
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: it-tools
@@ -256,7 +256,7 @@ releases:
   - name: immich-enhancements
     namespace: immich
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: immich-enhancements
@@ -268,7 +268,7 @@ releases:
   - name: navidrome
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: navidrome
@@ -280,7 +280,7 @@ releases:
   - name: metube-navidrome
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     labels:
       mountSubPath: music
       homepageName: MeTube (Navidrome)
@@ -298,7 +298,7 @@ releases:
 
   - name: wikijs
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: wikijs
@@ -307,7 +307,7 @@ releases:
 
   - name: kopia
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: kopia
@@ -316,7 +316,7 @@ releases:
 
   - name: flatnotes
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: flatnotes
@@ -325,7 +325,7 @@ releases:
 
   - name: yopass
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: yopass
@@ -334,7 +334,7 @@ releases:
 
   - name: silverbullet
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: silverbullet
@@ -343,7 +343,7 @@ releases:
 
   - name: mailrise
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: mailrise
@@ -352,7 +352,7 @@ releases:
 
   - name: convertx
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: convertx
@@ -361,7 +361,7 @@ releases:
 
   - name: cyberchef
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: cyberchef
@@ -370,7 +370,7 @@ releases:
 
   - name: stirling-pdf
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: stirling-pdf
@@ -379,7 +379,7 @@ releases:
 
   - name: filebrowser-drive
     chart: bjw-s-labs/app-template
-    version: 3.7.0
+    version: 4.1.2
     inherit:
       - template: default
   - name: filebrowser-drive

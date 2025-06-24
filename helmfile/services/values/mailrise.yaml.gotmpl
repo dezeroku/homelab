@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 defaultPodOptions:
   securityContext:
     # Designed to run with this user id
@@ -9,6 +12,8 @@ controllers:
   main:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -42,7 +47,7 @@ service:
         port: 8025
 
 serviceAccount:
-  create: true
+  main: {}
 
 # No ingress for now
 # It's only meant to be used from within the cluster for the time being
@@ -81,7 +86,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: mailrise
-          serviceAccount: mailrise
+          serviceAccount: mailrise-main
   pushover-general:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

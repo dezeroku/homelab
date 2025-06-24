@@ -3,7 +3,7 @@ resource "vault_kubernetes_auth_backend_role" "mailrise" {
   role_name                        = "mailrise"
   bound_service_account_namespaces = ["mailrise"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["mailrise"]
+  bound_service_account_names      = ["mailrise-main"]
   token_policies                   = ["mailrise"]
 }
 

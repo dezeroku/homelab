@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 # TODO: check if maintenance job is run automatically every 24h or we need a sidecar for that
 # Similarly it could be nice to run a full verification of backups once a week or once a month: https://kopia.io/docs/advanced/consistency/
 # TODO: enable zstd-better-compression globally
@@ -6,6 +9,8 @@ controllers:
   main:
     type: statefulset
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -180,7 +185,7 @@ service:
         port: 51515
 
 serviceAccount:
-  create: true
+  main: {}
 
 ingress:
   grpc:
@@ -272,7 +277,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: kopia
-          serviceAccount: kopia
+          serviceAccount: kopia-main
   control-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

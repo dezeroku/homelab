@@ -1,10 +1,16 @@
+---
 # Mostly based on https://github.com/jameswynn/helm-charts/tree/main/charts/homepage
 # but converted to pure app-template for more control and easier upgrades
+
+global:
+  alwaysAppendIdentifierToResourceName: true
 
 controllers:
   main:
     #strategy: Recreate
     strategy: RollingUpdate
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -57,7 +63,7 @@ ingress:
               identifier: main
 
 serviceAccount:
-  create: true
+  main: {}
 
 configMaps:
   config:
@@ -163,5 +169,5 @@ rawResources:
         name: homepage-cluster-role
       subjects:
         - kind: ServiceAccount
-          name: homepage
+          name: homepage-main
           namespace: homepage

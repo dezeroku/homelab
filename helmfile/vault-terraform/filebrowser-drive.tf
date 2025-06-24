@@ -21,7 +21,7 @@ resource "vault_kubernetes_auth_backend_role" "filebrowser_drive" {
   role_name                        = "filebrowser-drive"
   bound_service_account_namespaces = ["filebrowser-drive"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["filebrowser-drive"]
+  bound_service_account_names      = ["filebrowser-drive-main"]
   token_policies                   = ["filebrowser-drive"]
 }
 

@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 # TODO: add support for HW acceleration ffmpeg
 # Take a look at https://github.com/C4illin/ConvertX/issues/190 for details
 #defaultPodOptions:
@@ -38,9 +41,6 @@ service:
     ports:
       http:
         port: 3000
-
-serviceAccount:
-  create: true
 
 ingress:
   main:

@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 # TODO: attach emptyDirs in required places and run as non-root
 #defaultPodOptions:
 #  securityContext:
@@ -35,9 +38,6 @@ service:
     ports:
       http:
         port: 80
-
-serviceAccount:
-  create: true
 
 ingress:
   main:

@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 # TODO: attach emptyDirs in required places and run as non-root
 # TODO: download files for OCR setup, for at least Polish and Italian
 # https://github.com/Stirling-Tools/Stirling-PDF/blob/main/HowToUseOCR.md
@@ -41,9 +44,6 @@ service:
     ports:
       http:
         port: 8080
-
-serviceAccount:
-  create: true
 
 ingress:
   main:

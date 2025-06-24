@@ -3,7 +3,7 @@ resource "vault_kubernetes_auth_backend_role" "kopia" {
   role_name                        = "kopia"
   bound_service_account_namespaces = ["kopia"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["kopia"]
+  bound_service_account_names      = ["kopia-main"]
   token_policies                   = ["kopia"]
 }
 

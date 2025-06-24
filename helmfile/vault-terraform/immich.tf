@@ -22,7 +22,7 @@ resource "vault_kubernetes_auth_backend_role" "immich" {
   role_name                        = "immich"
   bound_service_account_namespaces = ["immich"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["immich"]
+  bound_service_account_names      = ["immich-main"]
   token_policies                   = ["immich"]
 }
 

@@ -1,3 +1,7 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 persistence:
   library:
     enabled: true
@@ -7,8 +11,7 @@ persistence:
     size: 100Gi
 
 serviceAccount:
-  name: immich
-  create: true
+  main: {}
 
 rawResources:
   db:
@@ -61,7 +64,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: immich
-          serviceAccount: immich
+          serviceAccount: immich-main
   pgo-backup-s3-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

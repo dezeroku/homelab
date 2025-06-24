@@ -1,28 +1,28 @@
 version: 0.0.0-dev
 dependencies:
-- name: app-template
-  repository: https://bjw-s-labs.github.io/helm-charts
-  version: 3.7.0
-- name: cert-manager
-  repository: https://charts.jetstack.io
-  version: v1.14.4
-- name: ingress-nginx
-  repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.11.1
-- name: longhorn
-  repository: https://charts.longhorn.io
-  version: 1.8.0
-- name: operator
-  repository: https://operator.min.io/
-  version: 7.0.0
-- name: tenant
-  repository: https://operator.min.io/
-  version: 7.0.0
-- name: vault-secrets-operator
-  repository: https://helm.releases.hashicorp.com
-  version: 0.5.1
-- name: victoria-metrics-k8s-stack
-  repository: https://victoriametrics.github.io/helm-charts/
-  version: 0.24.5
-digest: sha256:6ead65f8f7ed5c3c36cf3c3005b734d02dbeba9c97dc182215ded84428b1d9e2
-generated: "2025-05-12T03:39:12.220950333+02:00"
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.1.2
+  - name: cert-manager
+    repository: https://charts.jetstack.io
+    version: v1.14.4
+  - name: ingress-nginx
+    repository: https://kubernetes.github.io/ingress-nginx
+    version: 4.11.1
+  - name: longhorn
+    repository: https://charts.longhorn.io
+    version: 1.8.0
+  - name: operator
+    repository: https://operator.min.io/
+    version: 7.0.0
+  - name: tenant
+    repository: https://operator.min.io/
+    version: 7.0.0
+  - name: vault-secrets-operator
+    repository: https://helm.releases.hashicorp.com
+    version: 0.5.1
+  - name: victoria-metrics-k8s-stack
+    repository: https://victoriametrics.github.io/helm-charts/
+    version: 0.24.5
+digest: sha256:50b57d8b277c8ed4bc1b0a3f2343617e5fc0b502850fc02199f2e005f176b7cd
+generated: "2025-06-24T20:10:53.367678305+02:00"

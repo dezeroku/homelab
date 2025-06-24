@@ -3,7 +3,7 @@ resource "vault_kubernetes_auth_backend_role" "invidious" {
   role_name                        = "invidious"
   bound_service_account_namespaces = ["invidious"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["invidious"]
+  bound_service_account_names      = ["invidious-main"]
   token_policies                   = ["invidious"]
 }
 

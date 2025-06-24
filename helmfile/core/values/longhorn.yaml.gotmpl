@@ -1,3 +1,4 @@
+---
 ingress:
   enabled: true
   ingressClassName: nginx
@@ -37,6 +38,8 @@ defaultSettings:
   concurrentAutomaticEngineUpgradePerNodeLimit: 1
 
 app-template:
+  global:
+    alwaysAppendIdentifierToResourceName: true
   rawResources:
     k8s-backups:
       apiVersion: longhorn.io/v1beta1

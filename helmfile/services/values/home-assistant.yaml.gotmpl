@@ -1,10 +1,15 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 hostNetwork: true
 
 controllers:
   main:
     type: statefulset
     replicas: 1
+    serviceAccount:
+      identifier: main
     pod:
       hostNetwork: true
     containers:
@@ -27,6 +32,9 @@ controllers:
             memory: 2Gi
           requests:
             memory: 1Gi
+
+serviceAccount:
+  main: {}
 
 service:
   main:
@@ -145,7 +153,7 @@ rawResources:
        mount: k8s/homeserver
        kubernetes:
          role: home-assistant
-         serviceAccount: default
+         serviceAccount: home-assistant-main
   hass-prometheus-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

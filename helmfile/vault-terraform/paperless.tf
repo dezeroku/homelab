@@ -27,7 +27,7 @@ resource "vault_kubernetes_auth_backend_role" "paperless" {
   role_name                        = "paperless"
   bound_service_account_namespaces = ["paperless"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["paperless"]
+  bound_service_account_names      = ["paperless-main"]
   token_policies                   = ["paperless"]
 }
 

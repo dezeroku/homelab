@@ -3,7 +3,7 @@ resource "vault_kubernetes_auth_backend_role" "redbot-main" {
   role_name                        = "redbot-main"
   bound_service_account_namespaces = ["redbot-main"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["redbot"]
+  bound_service_account_names      = ["redbot-main"]
   token_policies                   = ["redbot-main"]
 }
 

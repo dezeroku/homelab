@@ -18,7 +18,7 @@ resource "vault_kubernetes_auth_backend_role" "wikijs" {
   role_name                        = "wikijs"
   bound_service_account_namespaces = ["wikijs"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["wikijs"]
+  bound_service_account_names      = ["wikijs-main"]
   token_policies                   = ["wikijs"]
 }
 

@@ -3,7 +3,7 @@ resource "vault_kubernetes_auth_backend_role" "minecraft" {
   role_name                        = "minecraft"
   bound_service_account_namespaces = ["minecraft"]
   token_ttl                        = 3600
-  bound_service_account_names      = ["minecraft"]
+  bound_service_account_names      = ["minecraft-main"]
   token_policies                   = ["minecraft"]
 }
 

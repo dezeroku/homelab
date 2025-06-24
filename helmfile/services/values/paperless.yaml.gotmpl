@@ -1,3 +1,7 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 # On a first startup:
 # * Set PAPERLESS_DISABLE_REGULAR_LOGIN: "false"
 # * Log in as admin user and connect the account with OIDC provider
@@ -13,6 +17,8 @@ controllers:
   gotenberg:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -35,6 +41,8 @@ controllers:
   tika:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -51,6 +59,8 @@ controllers:
   main:
     strategy: Recreate
     replicas: 1
+    serviceAccount:
+      identifier: main
     containers:
       main:
         image:
@@ -253,7 +263,7 @@ controllers:
         resources: {}
 
 serviceAccount:
-  create: true
+  main: {}
 
 service:
   main:
@@ -425,7 +435,7 @@ rawResources:
         mount: k8s/homeserver
         kubernetes:
           role: paperless
-          serviceAccount: paperless
+          serviceAccount: paperless-main
   pgo-backup-s3-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret

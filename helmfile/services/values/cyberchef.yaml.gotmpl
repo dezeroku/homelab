@@ -1,4 +1,7 @@
 ---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
 #defaultPodOptions:
 #  securityContext:
 #    runAsUser: 101
@@ -30,9 +33,6 @@ service:
     ports:
       http:
         port: 80
-
-serviceAccount:
-  create: true
 
 ingress:
   main:
