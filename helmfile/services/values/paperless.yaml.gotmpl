@@ -294,6 +294,7 @@ ingress:
       gethomepage.dev/group: Services
       gethomepage.dev/icon: paperless.png
       gethomepage.dev/name: Paperless
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=paperless"
       nginx.ingress.kubernetes.io/proxy-body-size: "100m"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.71.0/24"
       #nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=download-admins"

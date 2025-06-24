@@ -50,6 +50,7 @@ ingress:
       gethomepage.dev/group: Media
       gethomepage.dev/icon: navidrome.png
       gethomepage.dev/name: Navidrome
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=navidrome"
     tls:
       - secretName: navidrome-tls
         hosts:

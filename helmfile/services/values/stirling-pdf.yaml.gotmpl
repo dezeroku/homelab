@@ -56,6 +56,7 @@ ingress:
       gethomepage.dev/group: Tools
       gethomepage.dev/icon: stirling-pdf
       gethomepage.dev/name: Stirling PDF
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=stirling-pdf"
       nginx.ingress.kubernetes.io/proxy-body-size: "2Gi"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
     tls:

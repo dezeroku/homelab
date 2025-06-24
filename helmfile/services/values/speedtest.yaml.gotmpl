@@ -50,6 +50,7 @@ ingress:
       gethomepage.dev/group: Tools
       gethomepage.dev/icon: si-planet
       gethomepage.dev/name: SpeedTest
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=speedtest"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
     tls:

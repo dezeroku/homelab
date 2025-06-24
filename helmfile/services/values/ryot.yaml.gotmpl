@@ -70,6 +70,7 @@ ingress:
       gethomepage.dev/group: Services
       gethomepage.dev/icon: ryot.png
       gethomepage.dev/name: Ryot
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=ryot"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
     tls:
       - secretName: ryot-tls

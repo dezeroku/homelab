@@ -49,6 +49,7 @@ ingress:
       gethomepage.dev/group: {{ .Release.Labels.homepageGroup }}
       gethomepage.dev/icon: metube.png
       gethomepage.dev/name: {{ .Release.Labels.homepageName }}
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=download-admins"
       nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"

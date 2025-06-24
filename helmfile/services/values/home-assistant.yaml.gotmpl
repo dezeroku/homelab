@@ -55,6 +55,7 @@ ingress:
       gethomepage.dev/group: IoT
       gethomepage.dev/icon: home-assistant.png
       gethomepage.dev/name: Home Automation
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=home-assistant"
     tls:
       - secretName: home-assistant-general-tls
         hosts:

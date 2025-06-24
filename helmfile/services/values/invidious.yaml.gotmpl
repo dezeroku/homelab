@@ -228,6 +228,7 @@ ingress:
       gethomepage.dev/group: YT
       gethomepage.dev/icon: invidious.png
       gethomepage.dev/name: Invidious
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=invidious"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
       # These below are useful for importing the history
       # probably could be lowered to something like 5MBs too
