@@ -255,3 +255,15 @@ variable "mailrise_pushover_general_user_key" {
 variable "mailrise_pushover_general_api_key" {
   type = string
 }
+
+variable "mosquitto_username" {
+  type = string
+}
+
+variable "mosquitto_password" {
+  type = string
+}
+
+variable "mosquitto_passwordfile" {
+  type = string
+}

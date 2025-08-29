@@ -1,0 +1,131 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+# TODO: restart pod automatically when cert-manager refreshes Certificate
+controllers:
+  mosquitto:
+    serviceAccount:
+      identifier: main
+    pod:
+      securityContext:
+        runAsUser: 2000
+        runAsGroup: 2000
+        runAsNonRoot: true
+        fsGroup: 2000
+    containers:
+      app:
+        image:
+          repository: eclipse-mosquitto
+          tag: 2.0.22
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 100m
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+
+service:
+  mosquitto:
+    type: NodePort
+    ports:
+      mqtt:
+        port: 1883
+        nodePort: 31883
+
+serviceAccount:
+  main: {}
+
+configMaps:
+  config:
+    data:
+      mosquitto.conf: |
+        autosave_interval 60
+        connection_messages false
+        listener 1883
+        per_listener_settings false
+        persistence true
+        persistence_location /data
+        password_file /credentials/passwordfile
+        keyfile /certificate/tls.key
+        certfile /certificate/tls.crt
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn-ssd-double-replica
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
+  config:
+    type: configMap
+    identifier: config
+    advancedMounts:
+      mosquitto:
+        app:
+          - path: /mosquitto/config/mosquitto.conf
+            subPath: mosquitto.conf
+
+  credentials:
+    type: secret
+    name: mosquitto-credentials-secret
+    advancedMounts:
+      mosquitto:
+        app:
+          - path: /credentials
+
+  cert:
+    type: secret
+    name: mosquitto-tls
+    advancedMounts:
+      mosquitto:
+        app:
+          - path: /certificate
+
+rawResources:
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: mosquitto
+          serviceAccount: mosquitto-main
+  credentials:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/mosquitto/credentials
+        destination:
+          name: mosquitto-credentials-secret
+          create: true
+        vaultAuthRef: mosquitto-vault-auth
+
+  certificate:
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    spec:
+      spec:
+        secretName: mosquitto-tls
+        dnsNames:
+          - mosquitto.{{ requiredEnv "DOMAIN" }}
+        issuerRef:
+          name: cert-manager-letsencrypt-dns-prod
+          kind: ClusterIssuer

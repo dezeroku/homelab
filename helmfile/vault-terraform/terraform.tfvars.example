@@ -82,3 +82,7 @@ kopia_pushover_user_key = "user_key"
 kopia_pushover_app_token = "app_token"
 mailrise_pushover_general_user_key = "user_key"
 mailrise_pushover_general_api_key = "api_key"
+mosquitto_username = "admin"
+mosquitto_password = "password"
+# You can generate this value by running 'mosquitto_passwd -c passwordfile <username>' command and copying the generated file's contents
+mosquitto_passwordfile = "admin:hash"

@@ -385,3 +385,12 @@ releases:
   - name: filebrowser-drive
     inherit:
       - template: argocd-app
+
+  - name: mosquitto
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    inherit:
+      - template: default
+  - name: mosquitto
+    inherit:
+      - template: argocd-app
