@@ -1,6 +1,4 @@
 env:
-  # To have it easier with PGO images
-  DB_VECTOR_EXTENSION: pgvector
   A_DB_URL:
     valueFrom:
       secretKeyRef:
@@ -9,8 +7,14 @@ env:
         key: uri
   # Funnily enough it doesn't work without the SSL mangling
   DB_URL: $(A_DB_URL)?sslmode=require&sslmode=no-verify
-# image:
-  # tag: v1.125.3
+
+image:
+  # tag: v1.133.1
+  # tag: v1.137.0
+  tag: v1.142.0
+
+controller:
+  strategy: Recreate
 
 immich:
   metrics:

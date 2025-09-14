@@ -87,9 +87,12 @@ dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
     version: 4.1.2
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.1.2
   - name: immich
     repository: https://immich-app.github.io/immich-charts
-    version: 0.9.0
+    version: 0.9.3
   - name: minecraft
     repository: https://itzg.github.io/minecraft-server-charts/
     version: 4.24.0
@@ -99,5 +102,5 @@ dependencies:
   - name: tenant
     repository: https://operator.min.io/
     version: 7.0.0
-digest: sha256:612ea2783b5c57a196806e199755797b305ea79449ee574cff5cf272ea0223fd
-generated: "2025-06-24T02:34:54.947980801+02:00"
+digest: sha256:3b50437dd2e097fed5a6124e9fb51c3e9c1170c4e6498eede6d52330aa8a12f1
+generated: "2025-09-15T00:22:15.162892493+02:00"

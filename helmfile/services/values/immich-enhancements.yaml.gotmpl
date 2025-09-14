@@ -55,6 +55,10 @@ rawResources:
                   bucket: immich
                   endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
                   region: default
+            manual:
+              repoName: repo1
+              options:
+               - --type=full
   vault-auth:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultAuth
