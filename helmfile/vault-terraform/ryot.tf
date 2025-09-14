@@ -32,5 +32,18 @@ path "identity/oidc/client/ryot" {
 path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
   capabilities = ["read"]
 }
+path "kvv2/data/services/ryot/admin" {
+  capabilities = ["read"]
+}
 EOT
+}
+
+resource "vault_generic_secret" "ryot-admin" {
+  path = "kvv2/services/ryot/admin"
+
+  data_json = jsonencode(
+    {
+      "token" : var.ryot_admin_token,
+    }
+  )
 }

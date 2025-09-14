@@ -86,3 +86,4 @@ mosquitto_username = "admin"
 mosquitto_password = "password"
 # You can generate this value by running 'mosquitto_passwd -c passwordfile <username>' command and copying the generated file's contents
 mosquitto_passwordfile = "admin:hash"
+ryot_admin_token = "token"

@@ -32,7 +32,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/jellyfin/jellyfin
-          tag: 10.10.5
+          tag: 10.10.7
           pullPolicy: IfNotPresent
         env:
           JELLYFIN_PublishedServerUrl: https://jellyfin.{{ requiredEnv "DOMAIN" }}

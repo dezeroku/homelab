@@ -12,7 +12,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/ignisda/ryot
-          tag: v8.5.0
+          tag: v9.2.0
           pullPolicy: IfNotPresent
         env:
           TZ: Europe/Warsaw
@@ -34,6 +34,11 @@ controllers:
               secretKeyRef:
                 name: ryot-oidc-secret
                 key: client_secret
+          SERVER_ADMIN_ACCESS_TOKEN:
+            valueFrom:
+              secretKeyRef:
+                name: ryot-admin-secret
+                key: token
           SERVER_OIDC_ISSUER_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
           # For debugging OIDC (and other) issues
           # RUST_LOG: ryot=debug
@@ -171,4 +176,16 @@ rawResources:
             includes:
               - client_id
               - client_secret
+        vaultAuthRef: ryot-vault-auth
+  admin-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/ryot/admin
+        destination:
+          name: ryot-admin-secret
+          create: true
         vaultAuthRef: ryot-vault-auth

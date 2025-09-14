@@ -23,7 +23,7 @@ controllers:
       main:
         image:
           repository: gotenberg/gotenberg
-          tag: 8.7
+          tag: 8.23
           pullPolicy: IfNotPresent
         # The gotenberg chromium route is used to convert .eml files. We do not
         # want to allow external content like tracking pixels or even javascript.
@@ -65,7 +65,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/paperless-ngx/paperless-ngx
-          tag: 2.12.0
+          tag: 2.18.4
           pullPolicy: IfNotPresent
         env:
           A_OIDC_CLIENT_ID:
@@ -173,7 +173,7 @@ controllers:
           # Paperless also keeps originals, so it's fine to invalidate the OCR'd version
           PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
           PAPERLESS_EMPTY_TRASH_DIR: /usr/src/paperless/trash
-          PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{doc_pk}-{title}"
+          PAPERLESS_FILENAME_FORMAT: "{{ "{{`{{" }} created_year {{ "}}`}}" }}/{{ "{{`{{" }} correspondent {{ "}}`}}" }}/{{ "{{`{{" }} doc_pk {{ "}}`}}" }}-{{ "{{`{{" }} title {{ "}}`}}" }}"
         probes:
           readiness:
             enabled: true

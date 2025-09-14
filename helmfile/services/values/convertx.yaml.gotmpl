@@ -17,7 +17,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/c4illin/convertx
-          tag: v0.12.0
+          tag: v0.14.1
           pullPolicy: IfNotPresent
         env:
           # Access controlled via IP whitelist for now
@@ -66,3 +66,10 @@ ingress:
           - path: /
             service:
               identifier: main
+
+persistence:
+  data:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /app/data

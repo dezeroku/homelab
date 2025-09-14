@@ -267,3 +267,7 @@ variable "mosquitto_password" {
 variable "mosquitto_passwordfile" {
   type = string
 }
+
+variable "ryot_admin_token" {
+  type = string
+}
