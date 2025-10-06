@@ -14,6 +14,9 @@ resource "vault_policy" "invidious" {
 path "kvv2/data/services/invidious/hmac" {
   capabilities = ["read"]
 }
+path "kvv2/data/services/invidious/companion-hmac" {
+  capabilities = ["read"]
+}
 path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
   capabilities = ["read"]
 }
@@ -26,6 +29,16 @@ resource "vault_generic_secret" "invidious-hmac" {
   data_json = jsonencode(
     {
       "key" : var.invidious_hmac_key,
+    }
+  )
+}
+
+resource "vault_generic_secret" "invidious-companion-hmac" {
+  path = "kvv2/services/invidious/companion-hmac"
+
+  data_json = jsonencode(
+    {
+      "key" : var.invidious_companion_hmac_key,
     }
   )
 }

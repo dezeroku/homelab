@@ -16,27 +16,27 @@ defaultPodOptions:
     kubernetes.io/arch: amd64
 
 controllers:
-  sig-helper:
+  companion:
     strategy: Recreate
     replicas: 1
     serviceAccount:
       identifier: main
     containers:
       main:
-        args:
-          - --tcp
-          - 0.0.0.0:12999
         image:
-          repository: quay.io/invidious/inv-sig-helper
+          repository: quay.io/invidious/invidious-companion
           tag: latest
           pullPolicy: Always
         env:
-          RUST_LOG: info
+          SERVER_SECRET_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: invidious-companion-hmac-secret
+                key: key
         resources:
           limits:
-            memory: 256Mi
+            memory: 1024Mi
           requests:
-            cpu: 50m
             memory: 64Mi
 
   main:
@@ -58,7 +58,6 @@ controllers:
           # https://github.com/iv-org/invidious/issues/2970
           INVIDIOUS_PORT: 3000
           INVIDIOUS_CONFIG_FILE: /config/config.yaml
-          INVIDIOUS_SIGNATURE_SERVER: invidious-sig-helper:12999
           INVIDIOUS_DATABASE_URL:
             valueFrom:
               secretKeyRef:
@@ -69,16 +68,11 @@ controllers:
               secretKeyRef:
                 name: invidious-hmac-secret
                 key: key
-          INVIDIOUS_PO_TOKEN:
+          INVIDIOUS_INVIDIOUS_COMPANION_KEY:
             valueFrom:
               secretKeyRef:
-                name: invidious-yt-tokens
-                key: po_token
-          INVIDIOUS_VISITOR_DATA:
-            valueFrom:
-              secretKeyRef:
-                name: invidious-yt-tokens
-                key: visitor_data
+                name: invidious-companion-hmac-secret
+                key: key
         probes:
           readiness:
             enabled: true
@@ -125,15 +119,6 @@ controllers:
           - -c
           - until pg_isready -h "$(DB_HOST)" -p "$(DB_PORT)" -U "$(DB_USER)" -d "$(DB_NAME)"; do echo waiting for database; sleep 2; done;
         resources: {}
-      wait-for-sig-helper:
-        image:
-          repository: busybox
-          tag: 1.31
-        args:
-          - /bin/sh
-          - -c
-          - echo "Wait for sig-helper to be available"; while ! nc -z invidious-sig-helper 12999; do sleep 1; echo "-"; done; echo "Ready";
-        resources: {}
 
   deployment-restart:
     type: cronjob
@@ -156,52 +141,10 @@ controllers:
           - bash
           - -c
           - >-
-            kubectl rollout restart deployment/invidious-sig-helper &&
-            kubectl rollout status deployment/invidious-sig-helper &&
+            kubectl rollout restart deployment/invidious-companion &&
+            kubectl rollout status deployment/invidious-companion &&
             kubectl rollout restart deployment/invidious-main &&
             kubectl rollout status deployment/invidious-main
-
-  # This job needs to be triggered manually once, when the deployment is initially done
-  # Or you can wait 6 hours, so it triggers on its own
-  # TODO: do we want to trigger it from initContainer if secret is not present?
-  yt-tokens:
-    type: cronjob
-    serviceAccount:
-      identifier: yt-tokens
-    cronjob:
-      concurrencyPolicy: Forbid
-      schedule: '1 */6 * * *'
-      backoffLimit: 2
-      # TODO: wait for this field to be supported
-      # activeDeadlineSeconds: 600
-      #restartPolicy: Never
-    containers:
-      create-secret:
-        image:
-          repository: bitnami/kubectl
-          tag: 1.29
-          pullPolicy: IfNotPresent
-        command:
-          - bash
-          - -c
-          - >-
-            kubectl get secret invidious-yt-tokens && kubectl delete secret invidious-yt-tokens;
-            kubectl create secret generic invidious-yt-tokens --from-file=po_token=/yt-tokens/po_token --from-file=visitor_data=/yt-tokens/visitor_data
-    initContainers:
-      obtain-tokens:
-        securityContext:
-          # TODO: this container seems to require root at the moment, change it when fixed upstream
-          # https://github.com/iv-org/youtube-trusted-session-generator/issues/4
-          runAsUser: 0
-        image:
-          repository: quay.io/invidious/youtube-trusted-session-generator
-          tag: latest
-          pullPolicy: Always
-        args:
-          - /bin/sh
-          - -c
-          - ./startup.sh > /yt-tokens/raw_output; grep "visitor_data" /yt-tokens/raw_output | cut -d ":" -f2 | tr -d '[:blank:]' | tr -d '\n' > /yt-tokens/visitor_data ; grep "po_token" /yt-tokens/raw_output | cut -d ":" -f2 | tr -d '[:blank:]' | tr -d '\n' > /yt-tokens/po_token
-        resources: {}
 
 service:
   main:
@@ -211,11 +154,11 @@ service:
       http:
         port: 3000
 
-  sig-helper:
-    controller: sig-helper
+  companion:
+    controller: companion
     ports:
-      sig:
-        port: 12999
+      companion:
+        port: 8282
 
 ingress:
   main:
@@ -258,6 +201,8 @@ configMaps:
         domain: invidious.{{ requiredEnv "DOMAIN" }}
         https_only: true
         cache_annotations: true
+        invidious_companion:
+        - private_url: "http://invidious-companion:8282/companion"
         # statistics_enabled: false
         default_user_preferences:
           region: PL
@@ -279,20 +224,20 @@ persistence:
         main:
           - path: /config
 
-  yt-tokens:
+  companion-cache:
     enabled: true
-    type: emptyDir
+    type: persistentVolumeClaim
+    storageClass: longhorn-ssd-double-replica
+    accessMode: ReadWriteOnce
+    size: 1Gi
     advancedMounts:
-      yt-tokens:
-        create-secret:
-          - path: /yt-tokens
-        obtain-tokens:
-          - path: /yt-tokens
+      companion:
+        main:
+          - path: /var/tmp/youtubei.js
 
 serviceAccount:
   main: {}
   deployment-restart: {}
-  yt-tokens: {}
 
 rbac:
   roles:
@@ -305,31 +250,9 @@ rbac:
             - deployments
           resourceNames:
             - invidious-main
-            - invidious-sig-helper
+            - invidious-companion
           verbs:
             - get
-            - patch
-            - list
-            - watch
-    yt-tokens-role:
-      type: Role
-      rules:
-        - apiGroups:
-            - ""
-          resources:
-            - secrets
-          # no resourceNames because of https://github.com/kubernetes/kubernetes/issues/80295#issuecomment-512874100
-          verbs:
-            - create
-        - apiGroups:
-            - ""
-          resources:
-            - secrets
-          resourceNames:
-            - invidious-yt-tokens
-          verbs:
-            - get
-            - delete
             - patch
             - list
             - watch
@@ -340,12 +263,6 @@ rbac:
         identifier: deployment-restart-role
       subjects:
         - identifier: deployment-restart
-    yt-tokens-role-binding:
-      type: RoleBinding
-      roleRef:
-        identifier: yt-tokens-role
-      subjects:
-        - identifier: yt-tokens
 
 rawResources:
   db:
@@ -409,6 +326,18 @@ rawResources:
         path: services/invidious/hmac
         destination:
           name: invidious-hmac-secret
+          create: true
+        vaultAuthRef: invidious-vault-auth
+  companion-hmac-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/invidious/companion-hmac
+        destination:
+          name: invidious-companion-hmac-secret
           create: true
         vaultAuthRef: invidious-vault-auth
   pgo-backup-s3-secret:

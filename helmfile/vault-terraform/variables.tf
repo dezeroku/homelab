@@ -134,6 +134,10 @@ variable "invidious_hmac_key" {
   type = string
 }
 
+variable "invidious_companion_hmac_key" {
+  type = string
+}
+
 #variable "redbot_owner" {
 #  type = string
 #}
