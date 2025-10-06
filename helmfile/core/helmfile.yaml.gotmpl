@@ -18,8 +18,6 @@ repositories:
     url: https://helm.releases.hashicorp.com
   - name: longhorn
     url: https://charts.longhorn.io
-  - name: descheduler
-    url: https://kubernetes-sigs.github.io/descheduler/
   - name: deliveryhero
     url: https://charts.deliveryhero.io/
   - name: minio
@@ -170,18 +168,6 @@ releases:
     inherit:
       - template: default
   - name: pgo
-    inherit:
-      - template: argocd-app
-
-  - name: descheduler
-    namespace: kube-system
-    chart: descheduler/descheduler
-    version: 0.29.0
-    inherit:
-      - template: default
-  - name: descheduler
-    values:
-      - targetNamespace: kube-system
     inherit:
       - template: argocd-app
 
