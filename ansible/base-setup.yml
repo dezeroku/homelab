@@ -31,3 +31,4 @@
     # TODO: this caching could possibly be utilized by the Raspbian too,
     # but first let's make sure that it's stable with just Dells
     - {role: apt}
+    - {role: bluetooth}

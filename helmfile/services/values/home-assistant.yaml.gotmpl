@@ -14,9 +14,15 @@ controllers:
       hostNetwork: true
     containers:
       main:
+        securityContext:
+          capabilities:
+            add:
+              # For bluetooth
+              - NET_ADMIN
+              - NET_RAW
         image:
           repository: ghcr.io/home-assistant/home-assistant
-          tag: 2025.9.3
+          tag: 2025.10.1
           pullPolicy: IfNotPresent
         probes:
           readiness:
@@ -87,6 +93,14 @@ persistence:
         main:
           - path: /config/configuration.yaml
             subPath: configuration.yaml
+
+  dbus:
+    enabled: true
+    hostPath: /run/dbus
+    type: hostPath
+    globalMounts:
+      - path: /run/dbus
+        readOnly: true
 
 configMaps:
   config:
