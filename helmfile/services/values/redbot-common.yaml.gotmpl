@@ -88,12 +88,12 @@ ingress:
       cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Storage for lavalink music, {{ .Release.Name }}
-      gethomepage.dev/group: Media Management
+      gethomepage.dev/group: RedBot
       gethomepage.dev/icon: filebrowser.png
       gethomepage.dev/name: File Browser ({{ .Release.Name }})
       gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_emails=contact@dezeroku.com"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24,192.168.70.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?{{ .Release.Labels.ingressAuth }}"
       nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
     tls:

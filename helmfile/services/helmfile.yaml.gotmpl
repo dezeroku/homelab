@@ -45,6 +45,7 @@ releases:
       vaultRole: redbot-main
       vaultSubPath: redbot/main
       appName: redbot-main
+      ingressAuth: "allowed_groups=redbot-main-admins"
     values:
       - values/redbot-common.yaml.gotmpl
 
@@ -58,7 +59,7 @@ releases:
     version: 4.1.2
     labels:
       mountSubPath: "metube"
-      homepageGroup: Media Management
+      homepageGroup: RedBot
       existingClaim: redbot-main-localtracks
       ingressAuth: "allowed_groups=redbot-main-admins"
       deleteFileOnThrashCan: true
@@ -85,6 +86,7 @@ releases:
       vaultRole: redbot-premiers
       vaultSubPath: redbot/premiers
       appName: redbot-premiers
+      ingressAuth: "allowed_groups=redbot-premiers-admins"
     values:
       - values/redbot-common.yaml.gotmpl
 

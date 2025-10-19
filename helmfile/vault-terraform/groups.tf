@@ -109,3 +109,10 @@ resource "vault_identity_group" "redbot_main_admins" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "redbot_premiers_admins" {
+  name                       = "redbot-premiers-admins"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}
