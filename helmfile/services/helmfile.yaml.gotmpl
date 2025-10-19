@@ -57,12 +57,11 @@ releases:
     chart: bjw-s-labs/app-template
     version: 4.1.2
     labels:
-      mountSubPath: ""
-      homepageName: MeTube (Redbot Main)
+      mountSubPath: "metube"
       homepageGroup: Media Management
-      hostPrefix: metube.redbot-main
       existingClaim: redbot-main-localtracks
       ingressAuth: "allowed_groups=redbot-main-admins"
+      deleteFileOnThrashCan: true
     inherit:
       - template: default
     values:
@@ -153,9 +152,7 @@ releases:
     # This pattern will be shared by all metube deployments for the time being
     labels:
       mountSubPath: metube
-      homepageName: MeTube
       homepageGroup: YT
-      hostPrefix: metube
       existingClaim: media-storage-main
       ingressAuth: "allowed_groups=download-admins"
     inherit:
@@ -307,11 +304,10 @@ releases:
     version: 4.1.2
     labels:
       mountSubPath: music
-      homepageName: MeTube (Navidrome)
       homepageGroup: Media Management
-      hostPrefix: metube.navidrome
       existingClaim: media-storage-main
       ingressAuth: "allowed_groups=download-admins"
+      deleteFileOnThrashCan: true
     inherit:
       - template: default
     values:

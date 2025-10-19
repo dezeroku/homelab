@@ -43,7 +43,7 @@ ingress:
       gethomepage.dev/description: UI for managing media
       gethomepage.dev/group: Media Management
       gethomepage.dev/icon: filebrowser.png
-      gethomepage.dev/name: File Browser (Media)
+      gethomepage.dev/name: File Browser (media)
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=filebrowser-media"
       nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
       nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=media-admins,download-admins"
