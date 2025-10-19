@@ -52,6 +52,28 @@ releases:
     inherit:
       - template: argocd-app
 
+  - name: metube-redbot-main
+    namespace: redbot-main
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    labels:
+      mountSubPath: ""
+      homepageName: MeTube (Redbot Main)
+      homepageGroup: Media Management
+      hostPrefix: metube.redbot-main
+      existingClaim: redbot-main-localtracks
+      ingressAuth: "allowed_groups=redbot-main-admins"
+    inherit:
+      - template: default
+    values:
+      - values/metube-common.yaml.gotmpl
+
+  - name: metube-redbot-main
+    values:
+      - targetNamespace: redbot-main
+    inherit:
+      - template: argocd-app
+
   - name: redbot-premiers
     chart: bjw-s-labs/app-template
     version: 4.1.2
@@ -134,6 +156,8 @@ releases:
       homepageName: MeTube
       homepageGroup: YT
       hostPrefix: metube
+      existingClaim: media-storage-main
+      ingressAuth: "allowed_groups=download-admins"
     inherit:
       - template: default
     values:
@@ -286,6 +310,8 @@ releases:
       homepageName: MeTube (Navidrome)
       homepageGroup: Media Management
       hostPrefix: metube.navidrome
+      existingClaim: media-storage-main
+      ingressAuth: "allowed_groups=download-admins"
     inherit:
       - template: default
     values:

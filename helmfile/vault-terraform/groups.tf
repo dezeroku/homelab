@@ -102,3 +102,10 @@ resource "vault_identity_group" "filebrowser_drive_admins" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "redbot_main_admins" {
+  name                       = "redbot-main-admins"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}

@@ -42,12 +42,70 @@ controllers:
                 key: token
         resources:
           limits:
-            memory: 1536Mi
+            memory: 4Gi
           requests:
             memory: 256Mi
+      filebrowser:
+        image:
+          repository: filebrowser/filebrowser
+          tag: v2.43.0
+          pullPolicy: IfNotPresent
+        env:
+          # Auth via oauth2-proxy
+          FB_NOAUTH: true
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 1024Mi
+          requests:
+            memory: 128Mi
+        securityContext:
+          # TODO: make it 568
+          # Override for filebrowser
+          runAsUser: 0
+          runAsGroup: 0
+          fsGroup: 0
 
 serviceAccount:
   main: {}
+
+service:
+  filebrowser:
+    controller: main
+    ports:
+      http-filebrowser:
+        port: 80
+
+ingress:
+  filebrowser:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Storage for lavalink music, {{ .Release.Name }}
+      gethomepage.dev/group: Media Management
+      gethomepage.dev/icon: filebrowser.png
+      gethomepage.dev/name: File Browser ({{ .Release.Name }})
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_emails=contact@dezeroku.com"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    tls:
+      - secretName: filebrowser-{{ .Release.Name }}-tls
+        hosts:
+          - filebrowser.{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: filebrowser.{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: filebrowser
 
 persistence:
   storage:
@@ -57,6 +115,19 @@ persistence:
     size: 1Gi
     globalMounts:
       - path: /data
+
+  localtracks:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn-ssd-double-replica
+    accessMode: ReadWriteMany
+    size: 10Gi
+    advancedMounts:
+      main:
+        main:
+          - path: /localtracks
+        filebrowser:
+          - path: /srv
 
 rawResources:
   vault-auth:
