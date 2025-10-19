@@ -94,6 +94,27 @@ releases:
     inherit:
       - template: argocd-app
 
+  - name: metube-redbot-premiers
+    namespace: redbot-premiers
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    labels:
+      mountSubPath: "metube"
+      homepageGroup: RedBot
+      existingClaim: redbot-premiers-localtracks
+      ingressAuth: "allowed_groups=redbot-premiers-admins"
+      deleteFileOnThrashCan: true
+    inherit:
+      - template: default
+    values:
+      - values/metube-common.yaml.gotmpl
+
+  - name: metube-redbot-premiers
+    values:
+      - targetNamespace: redbot-premiers
+    inherit:
+      - template: argocd-app
+
   - name: lavalink
     chart: bjw-s-labs/app-template
     version: 4.1.2
