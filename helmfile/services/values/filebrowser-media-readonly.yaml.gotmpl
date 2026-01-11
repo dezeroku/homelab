@@ -1,0 +1,73 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: filebrowser/filebrowser
+          tag: v2.54.0
+          pullPolicy: IfNotPresent
+        env:
+          # Auth via oauth2-proxy
+          FB_NOAUTH: true
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 64Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 80
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: UI for viewing media files (e.g. for downloads)
+      gethomepage.dev/group: Media
+      gethomepage.dev/icon: filebrowser.png
+      gethomepage.dev/name: File Browser Read-Only (media)
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=filebrowser-media-readonly"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=media-viewers,media-admins"
+      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
+    tls:
+      - secretName: filebrowser-media-readonly-tls
+        hosts:
+          - filebrowser-readonly.media.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: filebrowser-readonly.media.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+persistence:
+  main:
+    enabled: true
+    type: persistentVolumeClaim
+    existingClaim: media-storage-main
+    globalMounts:
+      - path: /srv/Movies
+        subPath: Movies
+        readOnly: true
+      - path: /srv/Shows
+        subPath: Shows
+        readOnly: true

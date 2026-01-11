@@ -157,6 +157,18 @@ releases:
     inherit:
       - template: argocd-app
 
+  - name: filebrowser-media-readonly
+    namespace: media
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    inherit:
+      - template: default
+  - name: filebrowser-media-readonly
+    values:
+      - targetNamespace: media
+    inherit:
+      - template: argocd-app
+
   - name: metube
     namespace: media
     chart: bjw-s-labs/app-template
