@@ -33,7 +33,7 @@ server:
       gethomepage.dev/name: Vault
       # TODO: Adding a k8s IP range so oauth2-proxy can talk with Vault via the ingress
       # It can probably be done prettier
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,10.42.0.0/16"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24,10.42.0.0/16"
     hosts:
       - host: vault.{{ requiredEnv "DOMAIN" }}
         paths: []
