@@ -64,6 +64,9 @@ configMaps:
           pushover_general:
             urls:
               - !env_var PUSHOVER_GENERAL_URL
+          contact@dezeroku.com:
+            urls:
+              - !env_var PUSHOVER_GENERAL_URL
 
 persistence:
   config:

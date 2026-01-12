@@ -1,0 +1,279 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  web:
+    strategy: Recreate
+    replicas: 1
+    serviceAccount:
+      identifier: main
+    containers:
+      main:
+        image:
+          repository: ghcr.io/ente-io/web
+          # January 2025
+          tag: 460ee1671b08b119b894f0ddd71b4c906fb29647
+          pullPolicy: IfNotPresent
+        env:
+          ENTE_API_ORIGIN: https://api.ente.home.dezeroku.com
+          POSTGRES_USER:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: user
+          POSTGRES_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: password
+          POSTGRES_DB:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: dbname
+          POSTGRES_HOST:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: host
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 1Gi
+  server:
+    strategy: Recreate
+    replicas: 1
+    serviceAccount:
+      identifier: main
+    containers:
+      main:
+        image:
+          repository: ghcr.io/ente-io/server
+          # December 2025
+          tag: fa30e7c7bf695b1af49b895a72e4de86fb791e09
+          pullPolicy: IfNotPresent
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 1Gi
+        env:
+          ENTE_JWT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: ente-jwt-secret
+                key: secret
+          ENTE_KEY_ENCRYPTION:
+            valueFrom:
+              secretKeyRef:
+                name: ente-key
+                key: encryption
+          ENTE_KEY_HASH:
+            valueFrom:
+              secretKeyRef:
+                name: ente-key
+                key: hash
+          ENTE_DB_USER:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: user
+          ENTE_DB_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: password
+          ENTE_DB_NAME:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: dbname
+          ENTE_DB_HOST:
+            valueFrom:
+              secretKeyRef:
+                name: ente-db-pguser-ente
+                key: host
+          ENTE_DB_SSLMODE: require
+          ENTE_APPS_ACCOUNTS: http://ente-accounts:3001
+          # Using mailrise under the hood, not a real SMTP server
+          ENTE_SMTP_HOST: mailrise-main.mailrise
+          ENTE_SMTP_PORT: 8025
+          ENTE_SMTP_EMAIL: admin@ente.home.dezeroku.com
+          ENTE_SMTP_SENDER_NAME: Ente@dezeroku
+
+service:
+  accounts:
+    controller: web
+    ports:
+      http:
+        port: 3001
+  auth:
+    controller: web
+    ports:
+      http:
+        port: 3003
+  server:
+    controller: server
+    ports:
+      http:
+        port: 8080
+
+serviceAccount:
+  main: {}
+
+ingress:
+  auth:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: 2FA helper (ask me for help with setup)
+      gethomepage.dev/group: Services
+      gethomepage.dev/icon: si-planet
+      gethomepage.dev/name: Ente Auth
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=ente"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    hosts:
+      - host: auth.ente.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: auth
+
+    tls:
+      - secretName: ente-auth-tls
+        hosts:
+          - auth.ente.{{ requiredEnv "DOMAIN" }}
+  api:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+    hosts:
+      - host: api.ente.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: server
+    tls:
+      - secretName: ente-api-tls
+        hosts:
+          - api.ente.{{ requiredEnv "DOMAIN" }}
+
+rawResources:
+  db:
+    apiVersion: postgres-operator.crunchydata.com/v1beta1
+    kind: PostgresCluster
+    spec:
+      spec:
+        postgresVersion: 16
+        users:
+          - name: ente
+            databases:
+              - ente
+            # TODO: These permissions can be probably much more fine-grained
+            # We want to keep them quite lax, as the program itself is responsible
+            # for creating the initial table layout.
+            # This takes the burden off of our shoulders.
+            options: "SUPERUSER"
+        instances:
+          - name: ente-db
+            dataVolumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 1Gi
+        backups:
+          pgbackrest:
+            configuration:
+              - secret:
+                  name: ente-pgo-backup-s3-secret
+            global:
+              repo1-s3-uri-style: path
+              repo1-retention-full: "2"
+              repo1-retention-full-type: count
+            repos:
+              - name: repo1
+                schedules:
+                  full: "0 1 * * 0"
+                  differential: "0 1 * * 1-6"
+                s3:
+                  bucket: ente
+                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                  region: default
+            manual:
+              repoName: repo1
+              options:
+               - --type=full
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: ente
+          serviceAccount: ente-main
+  pgo-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: ente-pgo-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              s3.conf:
+                text: |
+                  [global]
+                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: ente-vault-auth
+  jwt-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/ente/jwt-secret
+        destination:
+          name: ente-jwt-secret
+          create: true
+        vaultAuthRef: ente-vault-auth
+  key-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/ente/key
+        destination:
+          name: ente-key
+          create: true
+        vaultAuthRef: ente-vault-auth

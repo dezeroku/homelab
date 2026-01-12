@@ -275,3 +275,15 @@ variable "mosquitto_passwordfile" {
 variable "ryot_admin_token" {
   type = string
 }
+
+variable "ente_jwt_secret" {
+  type = string
+}
+
+variable "ente_key_encryption" {
+  type = string
+}
+
+variable "ente_key_hash" {
+  type = string
+}

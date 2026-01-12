@@ -442,3 +442,12 @@ releases:
   - name: mosquitto
     inherit:
       - template: argocd-app
+
+  - name: ente
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    inherit:
+      - template: default
+  - name: ente
+    inherit:
+      - template: argocd-app
