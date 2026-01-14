@@ -13,7 +13,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/gtsteffaniak/filebrowser
-          tag: 1.0.0-stable
+          tag: 1.1.1-stable
           pullPolicy: IfNotPresent
         env:
           FILEBROWSER_CONFIG: /etc/filebrowser.yaml
@@ -99,9 +99,11 @@ configMaps:
           disableSettings: false
           singleClick: false
           permissions:
-            admin: false
+            create: true
+            delete: true
             modify: true
             share: true
+            admin: false
             api: false
         auth:
           methods:
