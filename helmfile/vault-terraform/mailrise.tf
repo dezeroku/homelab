@@ -11,19 +11,33 @@ resource "vault_policy" "mailrise" {
   name = "mailrise"
 
   policy = <<EOT
-path "kvv2/data/services/mailrise/pushover/general" {
+path "kvv2/data/services/mailrise/pushover/dezeroku/general" {
+  capabilities = ["read"]
+}
+path "kvv2/data/services/mailrise/ses" {
   capabilities = ["read"]
 }
 EOT
 }
 
-resource "vault_generic_secret" "mailrise-pushover-general" {
-  path = "kvv2/services/mailrise/pushover/general"
+resource "vault_generic_secret" "mailrise-pushover-dezeroku-general" {
+  path = "kvv2/services/mailrise/pushover/dezeroku/general"
 
   data_json = jsonencode(
     {
-      "user_key" : var.mailrise_pushover_general_user_key,
-      "api_key" : var.mailrise_pushover_general_api_key
+      "user_key" : var.mailrise_pushover_dezeroku_general_user_key,
+      "api_key" : var.mailrise_pushover_dezeroku_general_api_key
+    }
+  )
+}
+
+resource "vault_generic_secret" "mailrise-ses" {
+  path = "kvv2/services/mailrise/ses"
+
+  data_json = jsonencode(
+    {
+      "access_key_id" : var.ses_access_key_id,
+      "access_key_secret" : var.ses_access_key_secret,
     }
   )
 }

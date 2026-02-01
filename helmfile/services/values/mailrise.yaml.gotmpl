@@ -21,11 +21,16 @@ controllers:
           tag: 1.4.0
           pullPolicy: IfNotPresent
         env:
-          PUSHOVER_GENERAL_URL:
+          PUSHOVER_DEZEROKU_GENERAL_URL:
             valueFrom:
               secretKeyRef:
-                name: mailrise-pushover-general
+                name: mailrise-pushover-dezeroku-general
                 key: url
+          SES_PROXY_URL:
+            valueFrom:
+              secretKeyRef:
+                name: mailrise-ses
+                key: proxy_url
         probes:
           liveness:
             enabled: true
@@ -57,17 +62,27 @@ configMaps:
     enabled: true
     data:
       config.yaml: |
+        import_code: /custom/router.py
         configs:
           # Send to pushover_general@mailrise.xyz
           # to access this handler.
           # Remember to set k8s service as SMTP host
           pushover_general:
             urls:
-              - !env_var PUSHOVER_GENERAL_URL
+              - !env_var PUSHOVER_DEZEROKU_GENERAL_URL
           contact@dezeroku.com:
             urls:
-              - !env_var PUSHOVER_GENERAL_URL
-
+              - !env_var PUSHOVER_DEZEROKU_GENERAL_URL
+          # Wildcard catch-all: proxy emails to original addresses via SES
+          # Uses $to template variable to forward to the original recipient
+          "*@*":
+            urls:
+              - !env_var SES_PROXY_URL
+  router-custom:
+    enabled: true
+    data:
+      router.py: |
+      {{ readFile "./mailrise/router.py" | nindent 8 }}
 persistence:
   config:
     enabled: true
@@ -78,6 +93,15 @@ persistence:
         main:
           - path: /etc/mailrise.conf
             subPath: config.yaml
+  router-custom:
+    enabled: true
+    type: configMap
+    name: mailrise-router-custom
+    advancedMounts:
+      main:
+        main:
+          - path: /custom/router.py
+            subPath: router.py
 
 rawResources:
   vault-auth:
@@ -90,19 +114,37 @@ rawResources:
         kubernetes:
           role: mailrise
           serviceAccount: mailrise-main
-  pushover-general:
+  pushover-dezeroku-general-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret
     spec:
       spec:
         type: kv-v2
         mount: kvv2
-        path: services/mailrise/pushover/general
+        path: services/mailrise/pushover/dezeroku/general
         destination:
-          name: mailrise-pushover-general
+          name: mailrise-pushover-dezeroku-general
           create: true
           transformation:
             templates:
               url:
                 text: pover://{{ "{{`{{" }}.Secrets.user_key{{ "}}`}}" }}@{{ "{{`{{" }}.Secrets.api_key{{ "}}`}}" }}
+        vaultAuthRef: mailrise-vault-auth
+  ses-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/mailrise/ses
+        destination:
+          name: mailrise-ses
+          create: true
+          transformation:
+            templates:
+              proxy_url:
+                # $from and $to are template variables substituted by the router at runtime
+                # Vault secrets: access_key_id, access_key_secret
+                text: ses://$from/{{ "{{`{{" }}.Secrets.access_key_id{{ "}}`}}" }}/{{ "{{`{{" }}.Secrets.access_key_secret{{ "}}`}}" }}/eu-central-1/$to
         vaultAuthRef: mailrise-vault-auth

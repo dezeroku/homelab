@@ -38,6 +38,7 @@ resource "aws_iam_user_policy" "ses_po" {
             "ForAllValues:StringLike" : {
               "ses:FromAddress" : [
                 "homeserver-*@*",
+                "*@*.${var.domain}",
                 "*@${var.domain}"
               ]
             }

@@ -252,11 +252,11 @@ variable "kopia_pushover_user_key" {
   type = string
 }
 
-variable "mailrise_pushover_general_user_key" {
+variable "mailrise_pushover_dezeroku_general_user_key" {
   type = string
 }
 
-variable "mailrise_pushover_general_api_key" {
+variable "mailrise_pushover_dezeroku_general_api_key" {
   type = string
 }
 
