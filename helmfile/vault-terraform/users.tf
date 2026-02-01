@@ -40,5 +40,6 @@ module "user" {
     filebrowser-drive-clients = vault_identity_group.filebrowser_drive_clients.id
     redbot-main-admins        = vault_identity_group.redbot_main_admins.id
     redbot-premiers-admins    = vault_identity_group.redbot_premiers_admins.id
+    change-detection          = vault_identity_group.change_detection.id
   }
 }

@@ -116,3 +116,10 @@ resource "vault_identity_group" "redbot_premiers_admins" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "change_detection" {
+  name                       = "change-detection"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}

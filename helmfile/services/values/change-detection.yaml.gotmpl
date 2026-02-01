@@ -1,0 +1,103 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    serviceAccount:
+      identifier: main
+    containers:
+      main:
+        image:
+          repository: ghcr.io/dgtlmoon/changedetection.io
+          tag: 0.52.9
+          pullPolicy: IfNotPresent
+        env:
+          DISABLE_VERSION_CHECK: true
+          TZ: Europe/Warsaw
+          BASE_URL: change-detection.{{ requiredEnv "DOMAIN" }}
+          HIDE_REFERER: true
+          PLAYWRIGHT_DRIVER_URL: ws://localhost:3000
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 2Gi
+      sockpuppet:
+        image:
+          repository: dgtlmoon/sockpuppetbrowser
+          tag: latest
+          pullPolicy: IfNotPresent
+        env:
+          SCREEN_WIDTH: 1920
+          SCREEN_HEIGHT: 1024
+          SCREEN_DEPTH: 16
+          MAX_CONCURRENT_CHROME_PROCESSES: 5
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+        resources:
+          limits:
+            memory: 16Gi
+#        cap_add:
+#            - SYS_ADMIN
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 5000
+
+serviceAccount:
+  main: {}
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Monitor websites for changes
+      gethomepage.dev/group: Utils
+      gethomepage.dev/icon: si-planet
+      gethomepage.dev/name: Change Detection
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=change-detection"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24"
+      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=change-detection"
+    hosts:
+      - host: change-detection.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            service:
+              identifier: main
+
+    tls:
+      - secretName: change-detection-tls
+        hosts:
+          - change-detection.{{ requiredEnv "DOMAIN" }}
+
+persistence:
+  datastore:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn-ssd
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      main:
+        main:
+          - path: /datastore
