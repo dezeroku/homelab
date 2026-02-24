@@ -1,0 +1,28 @@
+# TODO: enable auth (Vault based?), currently it's just an IP allowlist
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+  hosts:
+    - host: {{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+      paths:
+        - path: /
+  tls:
+    - secretName: {{ .Release.Name }}-general-tls
+      hosts:
+        - {{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+pvc:
+  create: true
+  storage: 50Gi
+  storageClassName: longhorn-ssd
