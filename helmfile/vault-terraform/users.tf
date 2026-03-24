@@ -41,5 +41,6 @@ module "user" {
     redbot-main-admins        = vault_identity_group.redbot_main_admins.id
     redbot-premiers-admins    = vault_identity_group.redbot_premiers_admins.id
     change-detection          = vault_identity_group.change_detection.id
+    metube                    = vault_identity_group.metube.id
   }
 }

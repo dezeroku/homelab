@@ -182,7 +182,7 @@ releases:
       mountSubPath: metube
       homepageGroup: YT
       existingClaim: media-storage-main
-      ingressAuth: "allowed_groups=download-admins"
+      ingressAuth: "allowed_groups=download-admins,metube"
     inherit:
       - template: default
     values:

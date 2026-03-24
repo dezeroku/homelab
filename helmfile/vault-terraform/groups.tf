@@ -123,3 +123,10 @@ resource "vault_identity_group" "change_detection" {
   policies                   = []
   external_member_entity_ids = true
 }
+
+resource "vault_identity_group" "metube" {
+  name                       = "metube"
+  type                       = "internal"
+  policies                   = []
+  external_member_entity_ids = true
+}
