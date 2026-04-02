@@ -1,0 +1,174 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    serviceAccount:
+      identifier: main
+    containers:
+      main:
+        image:
+          repository: quay.io/hedgedoc/hedgedoc
+          tag: 1.10.7
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          # Disable local accounts
+          CMD_EMAIL: false
+          CMD_PROTOCOL_USESSL: true
+          CMD_DB_URL:
+            valueFrom:
+              secretKeyRef:
+                name: hedgedoc-db-app
+                key: uri
+          CMD_DOMAIN: hedgedoc.{{ requiredEnv "DOMAIN" }}
+          CMD_OAUTH2_PROVIDERNAME: "Vault"
+          CMD_OAUTH2_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: hedgedoc-oidc-secret
+                key: client_id
+          CMD_OAUTH2_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: hedgedoc-oidc-secret
+                key: client_secret
+          CMD_OAUTH2_SCOPE: "openid email profile"
+          CMD_OAUTH2_USER_PROFILE_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/userinfo
+          CMD_OAUTH2_TOKEN_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/token
+          CMD_OAUTH2_AUTHORIZATION_URL: https://vault.{{ requiredEnv "DOMAIN" }}/ui/vault/identity/oidc/provider/main/authorize
+          CMD_OAUTH2_USER_PROFILE_USERNAME_ATTR: "username"
+          CMD_OAUTH2_USER_PROFILE_DISPLAY_NAME_ATTR: "preferred_username"
+          CMD_OAUTH2_USER_PROFILE_EMAIL_ATTR: "email"
+          SERVER_OIDC_ISSUER_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 128Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 3000
+
+serviceAccount:
+  main: {}
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Yet Another Notes App
+      gethomepage.dev/group: Services
+      gethomepage.dev/icon: hedgedoc.png
+      gethomepage.dev/name: HedgeDoc
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=hedgedoc"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+      # Arbitrary size of attachments
+      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    tls:
+      - secretName: hedgedoc-tls
+        hosts:
+          - hedgedoc.{{ requiredEnv "DOMAIN" }}
+    hosts:
+      - host: hedgedoc.{{ requiredEnv "DOMAIN" }}
+        paths:
+          - path: /
+            service:
+              identifier: main
+
+rawResources:
+  db:
+    apiVersion: postgresql.cnpg.io/v1
+    kind: Cluster
+    spec:
+      spec:
+        instances: 1
+        imageName: ghcr.io/cloudnative-pg/postgresql:17
+        storage:
+          size: 5Gi
+        backup:
+          barmanObjectStore:
+            destinationPath: s3://hedgedoc/
+            endpointURL: https://api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+            s3Credentials:
+              accessKeyId:
+                name: hedgedoc-cnpg-backup-s3-secret
+                key: ACCESS_KEY_ID
+              secretAccessKey:
+                name: hedgedoc-cnpg-backup-s3-secret
+                key: ACCESS_SECRET_KEY
+            wal:
+              compression: gzip
+          retentionPolicy: "14d"
+  db-backup:
+    apiVersion: postgresql.cnpg.io/v1
+    kind: ScheduledBackup
+    spec:
+      spec:
+        schedule: "0 0 1 * * 0"
+        backupOwnerReference: self
+        cluster:
+          name: hedgedoc-db
+  vault-auth:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    spec:
+      spec:
+        method: kubernetes
+        mount: k8s/homeserver
+        kubernetes:
+          role: hedgedoc
+          serviceAccount: hedgedoc-main
+  cnpg-backup-s3-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: hedgedoc-cnpg-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              ACCESS_KEY_ID:
+                text: |
+                  {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+              ACCESS_SECRET_KEY:
+                text: |
+                  {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: hedgedoc-vault-auth
+  oidc-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v1
+        mount: /identity
+        path: oidc/client/hedgedoc
+        destination:
+          name: hedgedoc-oidc-secret
+          create: true
+          transformation:
+            includes:
+              - client_id
+              - client_secret
+        vaultAuthRef: hedgedoc-vault-auth

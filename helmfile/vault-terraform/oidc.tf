@@ -1,7 +1,7 @@
 resource "vault_identity_oidc_scope" "profile" {
   name = "profile"
   # Seems that this field really doesn't like jsonencode
-  template = "{\"username\":{{identity.entity.name}}}"
+  template = "{\"username\":{{identity.entity.name}},\"preferred_username\":{{identity.entity.name}}}"
 }
 
 resource "vault_identity_oidc_scope" "email" {
@@ -38,6 +38,7 @@ resource "vault_identity_oidc_provider" "main" {
     vault_identity_oidc_client.grafana_backup.client_id,
     vault_identity_oidc_client.paperless.client_id,
     vault_identity_oidc_client.ryot.client_id,
+    vault_identity_oidc_client.hedgedoc.client_id,
     vault_identity_oidc_client.wikijs.client_id,
     vault_identity_oidc_client.immich.client_id,
     vault_identity_oidc_client.filebrowser_drive.client_id,
