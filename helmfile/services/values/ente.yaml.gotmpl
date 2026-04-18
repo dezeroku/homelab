@@ -20,22 +20,22 @@ controllers:
           POSTGRES_USER:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: user
           POSTGRES_PASSWORD:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: password
           POSTGRES_DB:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: dbname
           POSTGRES_HOST:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: host
         probes:
           liveness:
@@ -88,22 +88,22 @@ controllers:
           ENTE_DB_USER:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: user
           ENTE_DB_PASSWORD:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: password
           ENTE_DB_NAME:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: dbname
           ENTE_DB_HOST:
             valueFrom:
               secretKeyRef:
-                name: ente-db-pguser-ente
+                name: ente-db-app
                 key: host
           ENTE_DB_SSLMODE: require
           ENTE_APPS_ACCOUNTS: http://ente-accounts:3001
@@ -178,50 +178,45 @@ ingress:
 
 rawResources:
   db:
-    apiVersion: postgres-operator.crunchydata.com/v1beta1
-    kind: PostgresCluster
+    apiVersion: postgresql.cnpg.io/v1
+    kind: Cluster
     spec:
       spec:
-        postgresVersion: 16
-        users:
-          - name: ente
-            databases:
-              - ente
-            # TODO: These permissions can be probably much more fine-grained
-            # We want to keep them quite lax, as the program itself is responsible
-            # for creating the initial table layout.
-            # This takes the burden off of our shoulders.
-            options: "SUPERUSER"
-        instances:
-          - name: ente-db
-            dataVolumeClaimSpec:
-              accessModes:
-                - "ReadWriteOnce"
-              resources:
-                requests:
-                  storage: 1Gi
-        backups:
-          pgbackrest:
-            configuration:
-              - secret:
-                  name: ente-pgo-backup-s3-secret
-            global:
-              repo1-s3-uri-style: path
-              repo1-retention-full: "2"
-              repo1-retention-full-type: count
-            repos:
-              - name: repo1
-                schedules:
-                  full: "0 1 * * 0"
-                  differential: "0 1 * * 1-6"
-                s3:
-                  bucket: ente
-                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
-                  region: default
-            manual:
-              repoName: repo1
-              options:
-               - --type=full
+        instances: 1
+        imageName: ghcr.io/cloudnative-pg/postgresql:17
+        storage:
+          size: 1Gi
+        bootstrap:
+          initdb:
+            database: ente
+        managed:
+          roles:
+            - name: ente
+              superuser: true
+              login: true
+        backup:
+          barmanObjectStore:
+            destinationPath: s3://ente/
+            endpointURL: https://api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+            s3Credentials:
+              accessKeyId:
+                name: ente-cnpg-backup-s3-secret
+                key: ACCESS_KEY_ID
+              secretAccessKey:
+                name: ente-cnpg-backup-s3-secret
+                key: ACCESS_SECRET_KEY
+            wal:
+              compression: gzip
+          retentionPolicy: "14d"
+  db-backup:
+    apiVersion: postgresql.cnpg.io/v1
+    kind: ScheduledBackup
+    spec:
+      spec:
+        schedule: "0 0 1 * * 0"
+        backupOwnerReference: self
+        cluster:
+          name: ente-db
   vault-auth:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultAuth
@@ -232,7 +227,7 @@ rawResources:
         kubernetes:
           role: ente
           serviceAccount: ente-main
-  pgo-backup-s3-secret:
+  cnpg-backup-s3-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
     kind: VaultStaticSecret
     spec:
@@ -241,17 +236,18 @@ rawResources:
         mount: kvv2
         path: core/minio/k8s-backups/backuper-credentials
         destination:
-          name: ente-pgo-backup-s3-secret
+          name: ente-cnpg-backup-s3-secret
           create: true
           transformation:
             excludes:
               - .*
             templates:
-              s3.conf:
+              ACCESS_KEY_ID:
                 text: |
-                  [global]
-                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
-                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+                  {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+              ACCESS_SECRET_KEY:
+                text: |
+                  {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
         vaultAuthRef: ente-vault-auth
   jwt-secret:
     apiVersion: secrets.hashicorp.com/v1beta1
