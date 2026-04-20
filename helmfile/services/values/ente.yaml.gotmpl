@@ -243,10 +243,10 @@ rawResources:
               - .*
             templates:
               ACCESS_KEY_ID:
-                text: |
+                text: |-
                   {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
               ACCESS_SECRET_KEY:
-                text: |
+                text: |-
                   {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
         vaultAuthRef: ente-vault-auth
   jwt-secret:
