@@ -480,3 +480,12 @@ releases:
   - name: zot
     inherit:
       - template: argocd-app
+
+  - name: chrony
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    inherit:
+      - template: default
+  - name: chrony
+    inherit:
+      - template: argocd-app

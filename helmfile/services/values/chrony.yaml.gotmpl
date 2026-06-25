@@ -1,0 +1,37 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    strategy: Recreate
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: dockurr/chrony
+          tag: 4.8
+          pullPolicy: IfNotPresent
+        env:
+          # TODO: would it be preferable to take the time from local node?
+          NTP_SERVERS: "pool.ntp.org"
+          TZ: Europe/Warsaw
+# No UDP probes for now it seems?
+#        probes:
+#          liveness:
+#            enabled: true
+#          readiness:
+#            enabled: true
+#          startup:
+#            enabled: true
+        resources:
+          limits:
+            memory: 128Mi
+
+service:
+  main:
+    controller: main
+    ports:
+      ntp:
+        port: 123
+        protocol: UDP
