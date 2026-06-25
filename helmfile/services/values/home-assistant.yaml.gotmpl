@@ -2,8 +2,6 @@
 global:
   alwaysAppendIdentifierToResourceName: true
 
-hostNetwork: true
-
 controllers:
   main:
     type: statefulset
@@ -22,7 +20,7 @@ controllers:
               - NET_RAW
         image:
           repository: ghcr.io/home-assistant/home-assistant
-          tag: 2025.10.1
+          tag: 2026.6.4
           pullPolicy: IfNotPresent
         probes:
           readiness:
