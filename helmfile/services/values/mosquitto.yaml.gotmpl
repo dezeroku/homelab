@@ -39,12 +39,12 @@ controllers:
               - ALL
 
 service:
-  mosquitto:
-    type: NodePort
+  main:
     ports:
       mqtt:
         port: 1883
-        nodePort: 31883
+      mqtt-tls:
+        port: 8883
 
 serviceAccount:
   main: {}
@@ -53,12 +53,19 @@ configMaps:
   config:
     data:
       mosquitto.conf: |
+        per_listener_settings true
+
         autosave_interval 60
         connection_messages false
-        listener 1883
-        per_listener_settings false
         persistence true
         persistence_location /data
+
+        listener 1883
+        protocol mqtt
+        password_file /credentials/passwordfile
+
+        listener 8883
+        protocol mqtt
         password_file /credentials/passwordfile
         keyfile /certificate/tls.key
         certfile /certificate/tls.crt
@@ -84,6 +91,7 @@ persistence:
   credentials:
     type: secret
     name: mosquitto-credentials-secret
+    defaultMode: 0500
     advancedMounts:
       mosquitto:
         app:
