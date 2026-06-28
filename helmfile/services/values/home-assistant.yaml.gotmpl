@@ -131,6 +131,46 @@ configMaps:
           port: 31333
           name: HASS Bridge
 
+        mqtt:
+          sensor:
+            - name: "Homelab Plug Power"
+              state_topic: "homelab-plug/status/switch:0"
+              value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.apower {{"{{"}}"{{"}}"}}"{{"}}"}}"
+              unit_of_measurement: "W"
+              device_class: power
+              state_class: measurement
+
+            - name: "Homelab Plug Current"
+              state_topic: "homelab-plug/status/switch:0"
+              value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.current {{"{{"}}"{{"}}"}}"{{"}}"}}"
+              unit_of_measurement: "A"
+              device_class: current
+              state_class: measurement
+
+            - name: "Homelab Plug Voltage"
+              state_topic: "homelab-plug/status/switch:0"
+              value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.voltage {{"{{"}}"{{"}}"}}"{{"}}"}}"
+              unit_of_measurement: "V"
+              device_class: voltage
+              state_class: measurement
+
+            - name: "Homelab Plug Energy"
+              state_topic: "homelab-plug/status/switch:0"
+              value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.aenergy.total {{"{{"}}"{{"}}"}}"{{"}}"}}"
+              unit_of_measurement: "Wh"
+              device_class: energy
+              state_class: total_increasing
+
+            - name: "Homelab Plug Temperature"
+              state_topic: "homelab-plug/status/switch:0"
+              value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.temperature.tC {{"{{"}}"{{"}}"}}"{{"}}"}}"
+              unit_of_measurement: "°C"
+              device_class: temperature
+              state_class: measurement
+
+            - name: "Homelab Plug Output State"
+              state_topic: "homelab-plug/status/switch:0"
+              value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.output {{"{{"}}"{{"}}"}}"{{"}}"}}"
         # logger:
         #   default: warning
         #   logs:
