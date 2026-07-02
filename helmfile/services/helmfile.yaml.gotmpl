@@ -489,3 +489,12 @@ releases:
   - name: chrony
     inherit:
       - template: argocd-app
+
+  - name: esphome
+    chart: bjw-s-labs/app-template
+    version: 4.1.2
+    inherit:
+      - template: default
+  - name: esphome
+    inherit:
+      - template: argocd-app

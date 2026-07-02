@@ -287,3 +287,15 @@ variable "ente_key_encryption" {
 variable "ente_key_hash" {
   type = string
 }
+
+variable "iot_wifi_ssid" {
+  type = string
+}
+
+variable "iot_wifi_password" {
+  type = string
+}
+
+variable "esphome_ota_password" {
+  type = string
+}
