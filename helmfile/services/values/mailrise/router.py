@@ -10,13 +10,117 @@ from email.utils import parseaddr
 from fnmatch import fnmatchcase
 from logging import Logger
 from string import Template
+import asyncio
+import html as html_lib
+import os
 import re
+import shutil
+import tempfile
 import typing as typ
 
 import apprise
 import yaml
 
-from mailrise.router import AppriseNotification, EmailMessage, Router
+from mailrise.router import AppriseNotification, EmailAttachment, EmailMessage, Router
+
+
+# Keep strong references to detached delivery tasks so the event loop does not
+# garbage-collect them mid-flight. Discarded via a done callback (see below).
+_DELIVERY_TASKS: typ.Set["asyncio.Task[None]"] = set()
+
+
+async def _deliver(
+    logger: Logger,
+    config: str,
+    title: str,
+    body: str,
+    body_format: typ.Optional[apprise.NotifyFormat],
+    notify_type: apprise.NotifyType,
+    attachments: typ.List[EmailAttachment],
+    recipient: str,
+) -> None:
+    """Send an Apprise notification independently of the SMTP connection.
+
+    Mailrise normally sends the notification synchronously inside the SMTP DATA
+    handler, so a client that hangs up before delivery finishes (e.g. immich,
+    which closes the connection right after the message body) gets the handler
+    task - and the in-flight notification - cancelled by aiosmtpd. Running the
+    send as a detached task decouples it from the connection lifetime, so the
+    push is delivered even when the sender does not wait for our 250 ack.
+    """
+    tmpdir: typ.Optional[str] = None
+    try:
+        ap_config = apprise.AppriseConfig()
+        ap_config.add_config(config, format="yaml")
+        ap = apprise.Apprise(ap_config)
+
+        attach: typ.Optional[apprise.AppriseAttachment] = None
+        if attachments:
+            # apprise 1.4.x has no in-memory attachment type, so spool each
+            # attachment to a temp file and add it by path (mirrors mailrise's
+            # own _AttachMailrise). Cleaned up in the finally block.
+            tmpdir = tempfile.mkdtemp(prefix="mailrise-router-")
+            attach = apprise.AppriseAttachment()
+            for item in attachments:
+                name = os.path.basename(item.filename) or "attachment"
+                path = os.path.join(tmpdir, name)
+                with open(path, "wb") as fobj:
+                    fobj.write(item.data)
+                attach.add(path)
+
+        ok = await ap.async_notify(
+            title=title,
+            body=body,
+            body_format=body_format,
+            notify_type=notify_type,
+            attach=attach,
+        )
+        if ok:
+            logger.info("Delivered notification to %s", recipient)
+        else:
+            logger.warning("Notification to %s failed to send", recipient)
+    except Exception:  # pylint: disable=broad-except
+        # Never let a background task die silently; this is our only feedback
+        # since the SMTP client is long gone by the time we run.
+        logger.exception("Error delivering notification to %s", recipient)
+    finally:
+        if tmpdir is not None:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def _strip_html(markup: str) -> str:
+    """Best-effort HTML -> plain text for text-only targets.
+
+    We convert here rather than let apprise do it because apprise 1.4.5's
+    html_to_text converter crashes (AttributeError in handle_starttag) on some
+    real-world HTML, such as immich's notification emails.
+    """
+    text = re.sub(r"(?is)<(script|style|head)\b.*?</\1>", "", markup)
+    text = re.sub(r"(?i)<br\s*/?>", "\n", text)
+    text = re.sub(r"(?i)</(p|div|tr|h[1-6]|li)>", "\n", text)
+    text = re.sub(r"(?s)<[^>]+>", "", text)
+    text = html_lib.unescape(text)
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n[ \t]+", "\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def _plain_text_body(email: EmailMessage) -> str:
+    """Return a plain-text body suitable for text-only notification targets."""
+    # Prefer a genuine text/plain alternative from the original message.
+    try:
+        part = email.email_message.get_body(preferencelist=("plain",))
+        if part is not None:
+            content = part.get_content()
+            if content and content.strip():
+                return content.strip()
+    except Exception:  # pylint: disable=broad-except
+        # Falls through to stripping the (possibly HTML) body below.
+        pass
+    if email.body_format == apprise.NotifyFormat.HTML or "<" in email.body:
+        return _strip_html(email.body)
+    return email.body
 
 
 class _Key(typ.NamedTuple):
@@ -139,16 +243,54 @@ class SimpleRouter(Router):  # pylint: disable=too-few-public-methods
                 "config": rcpt.key.as_configured(),
                 "type": rcpt.notify_type,
             }
-            yield AppriseNotification(
-                config=sender.config_template.safe_substitute(mapping),
-                config_format="yaml",
-                title=sender.title_template.safe_substitute(mapping),
-                body=sender.body_template.safe_substitute(mapping),
-                # Use the configuration body format if specified.
-                body_format=sender.body_format or email.body_format,
-                notify_type=rcpt.notify_type,
-                attachments=email.attachments,
+            config = sender.config_template.safe_substitute(mapping)
+            # Mailrise itself only logs failures, so announce every routing
+            # decision here. Log the target URL scheme(s) only, never the full
+            # URL, which embeds credentials.
+            schemes = re.findall(r"\b([a-z][a-z0-9+.-]*)://", config, re.IGNORECASE)
+            logger.info(
+                "Forwarding email from %s to %s (subject: %r) via %s",
+                from_addr or email.from_,
+                str(rcpt.key),
+                email.subject,
+                ", ".join(schemes) or "unknown target",
             )
+
+            # Only the SES catch-all forwards real mail: it must keep the
+            # original HTML body and attachments. Push notifications (Pushover)
+            # are text-only - send plain text and drop attachments. Sending
+            # plain text also sidesteps apprise 1.4.5's crashing HTML->text
+            # converter, which chokes on real-world HTML like immich's emails.
+            is_ses = any(scheme.lower() == "ses" for scheme in schemes)
+            if is_ses:
+                body_format = sender.body_format or email.body_format
+                attachments = email.attachments
+            else:
+                mapping["body"] = _plain_text_body(email)
+                body_format = apprise.NotifyFormat.TEXT
+                attachments = []
+
+            task = asyncio.create_task(
+                _deliver(
+                    logger,
+                    config,
+                    sender.title_template.safe_substitute(mapping),
+                    sender.body_template.safe_substitute(mapping),
+                    body_format,
+                    rcpt.notify_type,
+                    attachments,
+                    str(rcpt.key),
+                )
+            )
+            _DELIVERY_TASKS.add(task)
+            task.add_done_callback(_DELIVERY_TASKS.discard)
+
+        # We deliver notifications ourselves in detached tasks (see _deliver),
+        # so we hand nothing back to mailrise's connection-bound send loop. The
+        # unreachable yield keeps this a (now empty) async generator, which is
+        # the interface mailrise iterates over.
+        return
+        yield  # type: ignore[unreachable]  # pragma: no cover
 
     def get_sender(self, key: _Key) -> _SimpleSender | None:
         """Find a sender by recipient key."""

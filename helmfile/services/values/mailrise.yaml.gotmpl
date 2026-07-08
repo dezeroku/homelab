@@ -20,6 +20,10 @@ controllers:
           repository: ghcr.io/yoryan/mailrise
           tag: 1.4.0
           pullPolicy: IfNotPresent
+        command:
+          - mailrise
+          - -vvv
+          - /etc/mailrise.conf
         env:
           PUSHOVER_DEZEROKU_GENERAL_URL:
             valueFrom:
