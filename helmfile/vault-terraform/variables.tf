@@ -299,3 +299,7 @@ variable "iot_wifi_password" {
 variable "esphome_ota_password" {
   type = string
 }
+
+variable "esphome_api_password" {
+  type = string
+}

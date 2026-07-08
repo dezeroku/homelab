@@ -27,6 +27,7 @@ resource "vault_generic_secret" "esphome-secrets" {
       "mqtt_username" : var.mosquitto_username,
       "mqtt_password" : var.mosquitto_password,
       "esphome_ota_password" : var.esphome_ota_password,
+      "esphome_api_password" : var.esphome_api_password,
     }
   )
 }

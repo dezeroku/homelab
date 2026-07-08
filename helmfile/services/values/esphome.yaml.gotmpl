@@ -13,6 +13,9 @@ controllers:
     replicas: 1
     serviceAccount:
       identifier: main
+    pod:
+      # For the mDNS
+      hostNetwork: true
     initContainers:
       include-common-secrets:
         image:
