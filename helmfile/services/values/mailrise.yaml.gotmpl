@@ -26,6 +26,11 @@ controllers:
               secretKeyRef:
                 name: mailrise-pushover-dezeroku-general
                 key: url
+          PUSHOVER_DEZEROKU_MAILRISE_URL:
+            valueFrom:
+              secretKeyRef:
+                name: mailrise-pushover-dezeroku-mailrise
+                key: url
           SES_PROXY_URL:
             valueFrom:
               secretKeyRef:
@@ -72,7 +77,7 @@ configMaps:
               - !env_var PUSHOVER_DEZEROKU_GENERAL_URL
           contact@dezeroku.com:
             urls:
-              - !env_var PUSHOVER_DEZEROKU_GENERAL_URL
+              - !env_var PUSHOVER_DEZEROKU_MAILRISE_URL
           # Wildcard catch-all: proxy emails to original addresses via SES
           # Uses $to template variable to forward to the original recipient
           "*@*":
@@ -124,6 +129,22 @@ rawResources:
         path: services/mailrise/pushover/dezeroku/general
         destination:
           name: mailrise-pushover-dezeroku-general
+          create: true
+          transformation:
+            templates:
+              url:
+                text: pover://{{ "{{`{{" }}.Secrets.user_key{{ "}}`}}" }}@{{ "{{`{{" }}.Secrets.api_key{{ "}}`}}" }}
+        vaultAuthRef: mailrise-vault-auth
+  pushover-dezeroku-mailrise-secret:
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    spec:
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: services/mailrise/pushover/dezeroku/mailrise
+        destination:
+          name: mailrise-pushover-dezeroku-mailrise
           create: true
           transformation:
             templates:

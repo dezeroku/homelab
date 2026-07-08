@@ -14,6 +14,9 @@ resource "vault_policy" "mailrise" {
 path "kvv2/data/services/mailrise/pushover/dezeroku/general" {
   capabilities = ["read"]
 }
+path "kvv2/data/services/mailrise/pushover/dezeroku/mailrise" {
+  capabilities = ["read"]
+}
 path "kvv2/data/services/mailrise/ses" {
   capabilities = ["read"]
 }
@@ -27,6 +30,17 @@ resource "vault_generic_secret" "mailrise-pushover-dezeroku-general" {
     {
       "user_key" : var.mailrise_pushover_dezeroku_general_user_key,
       "api_key" : var.mailrise_pushover_dezeroku_general_api_key
+    }
+  )
+}
+
+resource "vault_generic_secret" "mailrise-pushover-dezeroku-mailrise" {
+  path = "kvv2/services/mailrise/pushover/dezeroku/mailrise"
+
+  data_json = jsonencode(
+    {
+      "user_key" : var.mailrise_pushover_dezeroku_mailrise_user_key,
+      "api_key" : var.mailrise_pushover_dezeroku_mailrise_api_key
     }
   )
 }

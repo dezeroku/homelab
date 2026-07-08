@@ -260,6 +260,14 @@ variable "mailrise_pushover_dezeroku_general_api_key" {
   type = string
 }
 
+variable "mailrise_pushover_dezeroku_mailrise_user_key" {
+  type = string
+}
+
+variable "mailrise_pushover_dezeroku_mailrise_api_key" {
+  type = string
+}
+
 variable "mosquitto_username" {
   type = string
 }
