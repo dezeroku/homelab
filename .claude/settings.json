@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/terraform.tfvars)",
+      "Read(**/*.tfvars)",
+      "Read(**/*.auto.tfvars)"
+    ]
+  }
+}
