@@ -498,3 +498,12 @@ releases:
   - name: esphome
     inherit:
       - template: argocd-app
+
+  - name: actual-budget
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    inherit:
+      - template: default
+  - name: actual-budget
+    inherit:
+      - template: argocd-app

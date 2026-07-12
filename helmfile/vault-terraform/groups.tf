@@ -21,6 +21,7 @@ locals {
     "redbot-premiers-admins"    = []
     "change-detection"          = []
     "metube"                    = []
+    "actual-budget"             = []
   }
 }
 

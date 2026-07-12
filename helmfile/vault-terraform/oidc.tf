@@ -43,6 +43,7 @@ locals {
     module.wikijs.oidc_client_id,
     module.immich.oidc_client_id,
     module.filebrowser-drive.oidc_client_id,
+    module.actual-budget.oidc_client_id,
   ])
 }
 

@@ -102,6 +102,18 @@ dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
     version: 4.1.2
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.1.2
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.1.2
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.1.2
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 5.0.1
   - name: immich
     repository: https://immich-app.github.io/immich-charts
     version: 0.9.3
@@ -117,5 +129,5 @@ dependencies:
   - name: zot
     repository: http://zotregistry.dev/helm-charts
     version: 0.1.98
-digest: sha256:c2ceff6544a27c971cf235a304a2a8a67ecfe782f14467cbaf6b5bf62bfaae2b
-generated: "2026-02-24T16:38:44.952113543+01:00"
+digest: sha256:c4c9c993c7eac8330a07fa42095d92675b91ed778842e638167f53c5cd425539
+generated: "2026-07-12T23:58:41.962650465+02:00"
