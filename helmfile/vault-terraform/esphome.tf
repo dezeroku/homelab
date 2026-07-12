@@ -7,8 +7,8 @@ module "esphome" {
     secrets = {
       iot_wifi_ssid        = var.iot_wifi_ssid
       iot_wifi_password    = var.iot_wifi_password
-      mqtt_username        = var.mosquitto_username
-      mqtt_password        = var.mosquitto_password
+      mqtt_username        = "esphome"
+      mqtt_password        = var.mosquitto_users["esphome"].password
       esphome_ota_password = var.esphome_ota_password
       esphome_api_password = var.esphome_api_password
     }

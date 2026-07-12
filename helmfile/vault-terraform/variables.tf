@@ -268,16 +268,12 @@ variable "mailrise_pushover_dezeroku_mailrise_api_key" {
   type = string
 }
 
-variable "mosquitto_username" {
-  type = string
-}
-
-variable "mosquitto_password" {
-  type = string
-}
-
-variable "mosquitto_passwordfile" {
-  type = string
+variable "mosquitto_users" {
+  type = map(object({
+    password          = string # plaintext, consumed by clients (esphome, HA, ...)
+    passwordfile_line = string # "username:$7$..." line from `mosquitto_passwd -b`
+  }))
+  sensitive = true
 }
 
 variable "ryot_admin_token" {

@@ -7,6 +7,10 @@ module "home-assistant" {
     prometheus = {
       token = var.home_assistant_prometheus_token
     }
+    mosquitto = {
+      mqtt_username = "home-assistant"
+      mqtt_password = var.mosquitto_users["home-assistant"].password
+    }
   }
 }
 

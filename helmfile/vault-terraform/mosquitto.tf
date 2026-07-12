@@ -4,11 +4,16 @@ module "mosquitto" {
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
   secrets = {
-    credentials = {
-      username     = var.mosquitto_username
-      password     = var.mosquitto_password
-      passwordfile = var.mosquitto_passwordfile
-    }
+    # The broker reads only `passwordfile` (all users' hashes). The per-user
+    # plaintext fields are stored alongside purely so the synced k8s secret
+    # documents which username maps to which password.
+    credentials = merge(
+      {
+        passwordfile = join("\n", [for u in var.mosquitto_users : u.passwordfile_line])
+      },
+      { for name, u in var.mosquitto_users : "${name}_username" => name },
+      { for name, u in var.mosquitto_users : "${name}_password" => u.password },
+    )
   }
 }
 
