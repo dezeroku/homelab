@@ -1,49 +1,43 @@
-resource "vault_identity_oidc_assignment" "ryot" {
-  name      = "ryot"
-  group_ids = [vault_identity_group.users.id]
-}
+module "ryot" {
+  source             = "./service"
+  name               = "ryot"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_identity_oidc_client" "ryot" {
-  name = "ryot"
-  redirect_uris = [
-    "https://ryot.${var.domain}/api/auth",
-  ]
-  assignments      = [vault_identity_oidc_assignment.ryot.name]
-  id_token_ttl     = 2400
-  access_token_ttl = 7200
-}
+  include_backuper_credentials = true
 
-resource "vault_kubernetes_auth_backend_role" "ryot" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "ryot"
-  bound_service_account_namespaces = ["ryot"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["ryot-main"]
-  token_policies                   = ["ryot"]
-}
+  oidc = {
+    redirect_uris = ["https://ryot.${var.domain}/api/auth"]
+    group_ids     = [vault_identity_group.this["users"].id]
+  }
 
-resource "vault_policy" "ryot" {
-  name = "ryot"
-
-  policy = <<EOT
-path "identity/oidc/client/ryot" {
-  capabilities = ["read"]
-}
-path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
-  capabilities = ["read"]
-}
-path "kvv2/data/services/ryot/admin" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "ryot-admin" {
-  path = "kvv2/services/ryot/admin"
-
-  data_json = jsonencode(
-    {
-      "token" : var.ryot_admin_token,
+  secrets = {
+    admin = {
+      token = var.ryot_admin_token
     }
-  )
+  }
+}
+
+moved {
+  from = vault_identity_oidc_assignment.ryot
+  to   = module.ryot.vault_identity_oidc_assignment.this[0]
+}
+
+moved {
+  from = vault_identity_oidc_client.ryot
+  to   = module.ryot.vault_identity_oidc_client.this[0]
+}
+
+moved {
+  from = vault_kubernetes_auth_backend_role.ryot
+  to   = module.ryot.vault_kubernetes_auth_backend_role.this[0]
+}
+
+moved {
+  from = vault_policy.ryot
+  to   = module.ryot.vault_policy.this[0]
+}
+
+moved {
+  from = vault_generic_secret.ryot-admin
+  to   = module.ryot.vault_generic_secret.this["admin"]
 }

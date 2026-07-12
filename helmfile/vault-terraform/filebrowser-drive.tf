@@ -1,36 +1,35 @@
-resource "vault_identity_oidc_assignment" "filebrowser_drive" {
-  name = "filebrowser_drive"
-  group_ids = [
-    vault_identity_group.filebrowser_drive_clients.id,
-    vault_identity_group.filebrowser_drive_admins.id,
-  ]
+module "filebrowser-drive" {
+  source             = "./service"
+  name               = "filebrowser-drive"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
+
+  oidc = {
+    redirect_uris = ["https://filebrowser-drive.${var.domain}/api/auth/oidc/callback"]
+    group_ids = [
+      vault_identity_group.this["filebrowser-drive-clients"].id,
+      vault_identity_group.this["filebrowser-drive-admins"].id,
+    ]
+    # The assignment was originally created with an underscore; keep it to avoid a replace.
+    assignment_name = "filebrowser_drive"
+  }
 }
 
-resource "vault_identity_oidc_client" "filebrowser_drive" {
-  name = "filebrowser-drive"
-  redirect_uris = [
-    "https://filebrowser-drive.${var.domain}/api/auth/oidc/callback"
-  ]
-  assignments      = [vault_identity_oidc_assignment.filebrowser_drive.name]
-  id_token_ttl     = 2400
-  access_token_ttl = 7200
+moved {
+  from = vault_identity_oidc_assignment.filebrowser_drive
+  to   = module.filebrowser-drive.vault_identity_oidc_assignment.this[0]
 }
 
-resource "vault_kubernetes_auth_backend_role" "filebrowser_drive" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "filebrowser-drive"
-  bound_service_account_namespaces = ["filebrowser-drive"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["filebrowser-drive-main"]
-  token_policies                   = ["filebrowser-drive"]
+moved {
+  from = vault_identity_oidc_client.filebrowser_drive
+  to   = module.filebrowser-drive.vault_identity_oidc_client.this[0]
 }
 
-resource "vault_policy" "filebrowser_drive" {
-  name = "filebrowser-drive"
-
-  policy = <<EOT
-path "identity/oidc/client/filebrowser-drive" {
-  capabilities = ["read"]
+moved {
+  from = vault_kubernetes_auth_backend_role.filebrowser_drive
+  to   = module.filebrowser-drive.vault_kubernetes_auth_backend_role.this[0]
 }
-EOT
+
+moved {
+  from = vault_policy.filebrowser_drive
+  to   = module.filebrowser-drive.vault_policy.this[0]
 }

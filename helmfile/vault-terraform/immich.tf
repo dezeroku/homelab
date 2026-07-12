@@ -1,37 +1,39 @@
-resource "vault_identity_oidc_assignment" "immich" {
-  name = "immich"
-  group_ids = [
-    vault_identity_group.immich.id,
-  ]
+module "immich" {
+  source             = "./service"
+  name               = "immich"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
+
+  include_backuper_credentials = true
+
+  # immich does not read its own OIDC client from Vault, so no client read grant.
+  grant_oidc_client_read = false
+
+  oidc = {
+    redirect_uris = [
+      "app.immich:///oauth-callback",
+      "https://immich.${var.domain}/auth/login",
+      "https://immich.${var.domain}/user-settings",
+    ]
+    group_ids = [vault_identity_group.this["immich"].id]
+  }
 }
 
-resource "vault_identity_oidc_client" "immich" {
-  name = "immich"
-  redirect_uris = [
-    "app.immich:///oauth-callback",
-    "https://immich.${var.domain}/auth/login",
-    "https://immich.${var.domain}/user-settings"
-  ]
-  assignments      = [vault_identity_oidc_assignment.immich.name]
-  id_token_ttl     = 2400
-  access_token_ttl = 7200
+moved {
+  from = vault_identity_oidc_assignment.immich
+  to   = module.immich.vault_identity_oidc_assignment.this[0]
 }
 
-resource "vault_kubernetes_auth_backend_role" "immich" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "immich"
-  bound_service_account_namespaces = ["immich"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["immich-main"]
-  token_policies                   = ["immich"]
+moved {
+  from = vault_identity_oidc_client.immich
+  to   = module.immich.vault_identity_oidc_client.this[0]
 }
 
-resource "vault_policy" "immich" {
-  name = "immich"
-
-  policy = <<EOT
-path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
-  capabilities = ["read"]
+moved {
+  from = vault_kubernetes_auth_backend_role.immich
+  to   = module.immich.vault_kubernetes_auth_backend_role.this[0]
 }
-EOT
+
+moved {
+  from = vault_policy.immich
+  to   = module.immich.vault_policy.this[0]
 }

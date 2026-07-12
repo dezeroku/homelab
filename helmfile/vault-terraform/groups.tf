@@ -1,132 +1,129 @@
-resource "vault_identity_group" "users" {
-  name                       = "users"
+locals {
+  # Vault identity groups. The value is the list of policies attached to the group;
+  # almost all are membership-only, while "users" carries the oidc-auth policy.
+  identity_groups = {
+    "users"                     = ["oidc-auth"]
+    "media-viewers"             = []
+    "media-admins"              = []
+    "download-viewers"          = []
+    "download-admins"           = []
+    "monitoring-viewers"        = []
+    "monitoring-editors"        = []
+    "monitoring-admins"         = []
+    "netbootxyz-admins"         = []
+    "storage-admins"            = []
+    "cluster-admins"            = []
+    "paperless"                 = []
+    "immich"                    = []
+    "filebrowser-drive-clients" = []
+    "filebrowser-drive-admins"  = []
+    "redbot-main-admins"        = []
+    "redbot-premiers-admins"    = []
+    "change-detection"          = []
+    "metube"                    = []
+  }
+}
+
+resource "vault_identity_group" "this" {
+  for_each = local.identity_groups
+
+  name                       = each.key
   type                       = "internal"
-  policies                   = ["oidc-auth"]
+  policies                   = each.value
   external_member_entity_ids = true
 }
 
-resource "vault_identity_group" "media_viewers" {
-  name                       = "media-viewers"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.users
+  to   = vault_identity_group.this["users"]
 }
 
-resource "vault_identity_group" "media_admins" {
-  name                       = "media-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.media_viewers
+  to   = vault_identity_group.this["media-viewers"]
 }
 
-resource "vault_identity_group" "download_viewers" {
-  name                       = "download-viewers"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.media_admins
+  to   = vault_identity_group.this["media-admins"]
 }
 
-resource "vault_identity_group" "download_admins" {
-  name                       = "download-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.download_viewers
+  to   = vault_identity_group.this["download-viewers"]
 }
 
-resource "vault_identity_group" "monitoring_viewers" {
-  name                       = "monitoring-viewers"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.download_admins
+  to   = vault_identity_group.this["download-admins"]
 }
 
-resource "vault_identity_group" "monitoring_editors" {
-  name                       = "monitoring-editors"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.monitoring_viewers
+  to   = vault_identity_group.this["monitoring-viewers"]
 }
 
-resource "vault_identity_group" "monitoring_admins" {
-  name                       = "monitoring-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.monitoring_editors
+  to   = vault_identity_group.this["monitoring-editors"]
 }
 
-resource "vault_identity_group" "netbootxyz_admins" {
-  name                       = "netbootxyz-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.monitoring_admins
+  to   = vault_identity_group.this["monitoring-admins"]
 }
 
-resource "vault_identity_group" "storage_admins" {
-  name                       = "storage-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.netbootxyz_admins
+  to   = vault_identity_group.this["netbootxyz-admins"]
 }
 
-resource "vault_identity_group" "cluster_admins" {
-  name                       = "cluster-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.storage_admins
+  to   = vault_identity_group.this["storage-admins"]
 }
 
-resource "vault_identity_group" "paperless" {
-  name                       = "paperless"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.cluster_admins
+  to   = vault_identity_group.this["cluster-admins"]
 }
 
-resource "vault_identity_group" "immich" {
-  name                       = "immich"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.paperless
+  to   = vault_identity_group.this["paperless"]
 }
 
-resource "vault_identity_group" "filebrowser_drive_clients" {
-  name                       = "filebrowser-drive-clients"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.immich
+  to   = vault_identity_group.this["immich"]
 }
 
-resource "vault_identity_group" "filebrowser_drive_admins" {
-  name                       = "filebrowser-drive-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.filebrowser_drive_clients
+  to   = vault_identity_group.this["filebrowser-drive-clients"]
 }
 
-resource "vault_identity_group" "redbot_main_admins" {
-  name                       = "redbot-main-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.filebrowser_drive_admins
+  to   = vault_identity_group.this["filebrowser-drive-admins"]
 }
 
-resource "vault_identity_group" "redbot_premiers_admins" {
-  name                       = "redbot-premiers-admins"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.redbot_main_admins
+  to   = vault_identity_group.this["redbot-main-admins"]
 }
 
-resource "vault_identity_group" "change_detection" {
-  name                       = "change-detection"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.redbot_premiers_admins
+  to   = vault_identity_group.this["redbot-premiers-admins"]
 }
 
-resource "vault_identity_group" "metube" {
-  name                       = "metube"
-  type                       = "internal"
-  policies                   = []
-  external_member_entity_ids = true
+moved {
+  from = vault_identity_group.change_detection
+  to   = vault_identity_group.this["change-detection"]
+}
+
+moved {
+  from = vault_identity_group.metube
+  to   = vault_identity_group.this["metube"]
 }

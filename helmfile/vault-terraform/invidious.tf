@@ -1,44 +1,36 @@
-resource "vault_kubernetes_auth_backend_role" "invidious" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "invidious"
-  bound_service_account_namespaces = ["invidious"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["invidious-main"]
-  token_policies                   = ["invidious"]
-}
+module "invidious" {
+  source             = "./service"
+  name               = "invidious"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_policy" "invidious" {
-  name = "invidious"
+  include_backuper_credentials = true
 
-  policy = <<EOT
-path "kvv2/data/services/invidious/hmac" {
-  capabilities = ["read"]
-}
-path "kvv2/data/services/invidious/companion-hmac" {
-  capabilities = ["read"]
-}
-path "kvv2/data/core/minio/k8s-backups/backuper-credentials" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "invidious-hmac" {
-  path = "kvv2/services/invidious/hmac"
-
-  data_json = jsonencode(
-    {
-      "key" : var.invidious_hmac_key,
+  secrets = {
+    hmac = {
+      key = var.invidious_hmac_key
     }
-  )
+    "companion-hmac" = {
+      key = var.invidious_companion_hmac_key
+    }
+  }
 }
 
-resource "vault_generic_secret" "invidious-companion-hmac" {
-  path = "kvv2/services/invidious/companion-hmac"
+moved {
+  from = vault_kubernetes_auth_backend_role.invidious
+  to   = module.invidious.vault_kubernetes_auth_backend_role.this[0]
+}
 
-  data_json = jsonencode(
-    {
-      "key" : var.invidious_companion_hmac_key,
-    }
-  )
+moved {
+  from = vault_policy.invidious
+  to   = module.invidious.vault_policy.this[0]
+}
+
+moved {
+  from = vault_generic_secret.invidious-hmac
+  to   = module.invidious.vault_generic_secret.this["hmac"]
+}
+
+moved {
+  from = vault_generic_secret.invidious-companion-hmac
+  to   = module.invidious.vault_generic_secret.this["companion-hmac"]
 }

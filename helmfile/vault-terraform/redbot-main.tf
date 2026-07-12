@@ -1,28 +1,29 @@
-resource "vault_kubernetes_auth_backend_role" "redbot-main" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "redbot-main"
-  bound_service_account_namespaces = ["redbot-main"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["redbot-main"]
-  token_policies                   = ["redbot-main"]
-}
+module "redbot-main" {
+  source             = "./service"
+  name               = "redbot-main"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_policy" "redbot-main" {
-  name = "redbot-main"
+  service_account_names = ["redbot-main"]
+  secrets_prefix        = "services/redbot/main"
 
-  policy = <<EOT
-path "kvv2/data/services/redbot/main/secrets" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "redbot-main-secrets" {
-  path = "kvv2/services/redbot/main/secrets"
-
-  data_json = jsonencode(
-    {
-      "token" : var.redbot_main_token
+  secrets = {
+    secrets = {
+      token = var.redbot_main_token
     }
-  )
+  }
+}
+
+moved {
+  from = vault_kubernetes_auth_backend_role.redbot-main
+  to   = module.redbot-main.vault_kubernetes_auth_backend_role.this[0]
+}
+
+moved {
+  from = vault_policy.redbot-main
+  to   = module.redbot-main.vault_policy.this[0]
+}
+
+moved {
+  from = vault_generic_secret.redbot-main-secrets
+  to   = module.redbot-main.vault_generic_secret.this["secrets"]
 }

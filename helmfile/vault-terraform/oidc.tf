@@ -26,23 +26,31 @@ resource "vault_identity_oidc_scope" "groups" {
   template = "{\"groups\":{{identity.entity.groups.names}}}"
 }
 
-resource "vault_identity_oidc_provider" "main" {
-  name          = "main"
-  https_enabled = true
-  issuer_host   = "vault.${var.domain}"
-  allowed_client_ids = [
-    vault_identity_oidc_client.oauth2-proxy.client_id,
+locals {
+  # SINGLE REGISTRATION POINT for OIDC clients allowed by the provider.
+  # Every service that creates an OIDC client MUST be listed here or its login breaks.
+  # (Sibling modules can't be reflected over, so this list is maintained by hand;
+  # compact() drops any null client_ids from modules where oidc happens to be unset.)
+  oidc_client_ids = compact([
+    module.oauth2-proxy.oidc_client_id,
     vault_identity_oidc_client.argocd.client_id,
     vault_identity_oidc_client.argocd-cli.client_id,
     vault_identity_oidc_client.grafana.client_id,
     vault_identity_oidc_client.grafana_backup.client_id,
-    vault_identity_oidc_client.paperless.client_id,
-    vault_identity_oidc_client.ryot.client_id,
-    vault_identity_oidc_client.hedgedoc.client_id,
-    vault_identity_oidc_client.wikijs.client_id,
-    vault_identity_oidc_client.immich.client_id,
-    vault_identity_oidc_client.filebrowser_drive.client_id,
-  ]
+    module.paperless.oidc_client_id,
+    module.ryot.oidc_client_id,
+    module.hedgedoc.oidc_client_id,
+    module.wikijs.oidc_client_id,
+    module.immich.oidc_client_id,
+    module.filebrowser-drive.oidc_client_id,
+  ])
+}
+
+resource "vault_identity_oidc_provider" "main" {
+  name               = "main"
+  https_enabled      = true
+  issuer_host        = "vault.${var.domain}"
+  allowed_client_ids = local.oidc_client_ids
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,
     vault_identity_oidc_scope.email.name,

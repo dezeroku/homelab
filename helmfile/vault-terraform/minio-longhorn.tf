@@ -1,43 +1,40 @@
-resource "vault_kubernetes_auth_backend_role" "minio_longhorn" {
-  backend                          = vault_auth_backend.kubernetes_homeserver_backup.path
-  role_name                        = "minio-longhorn"
-  bound_service_account_namespaces = ["minio-longhorn"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["default"]
-  token_policies                   = ["minio-longhorn"]
-}
+# Backup-cluster service: MinIO instance on the backup cluster that receives Longhorn backups.
+module "minio-longhorn" {
+  source             = "./service"
+  name               = "minio-longhorn"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver_backup.path
 
-resource "vault_policy" "minio_longhorn" {
-  name = "minio-longhorn"
+  service_account_names = ["default"]
+  secrets_prefix        = "services/minio/longhorn"
 
-  policy = <<EOT
-path "kvv2/data/services/minio/longhorn/root-credentials" {
-  capabilities = ["read"]
-}
-path "kvv2/data/services/minio/longhorn/longhorn-credentials" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "minio-longhorn-root-credentials" {
-  path = "kvv2/services/minio/longhorn/root-credentials"
-
-  data_json = jsonencode(
-    {
-      "rootUser" : var.minio_longhorn_root_username,
-      "rootPassword" : var.minio_longhorn_root_password
+  secrets = {
+    "root-credentials" = {
+      rootUser     = var.minio_longhorn_root_username
+      rootPassword = var.minio_longhorn_root_password
     }
-  )
+    "longhorn-credentials" = {
+      username = var.minio_longhorn_longhorn_username
+      password = var.minio_longhorn_longhorn_password
+    }
+  }
 }
 
-resource "vault_generic_secret" "minio-longhorn-longhorn-credentials" {
-  path = "kvv2/services/minio/longhorn/longhorn-credentials"
+moved {
+  from = vault_kubernetes_auth_backend_role.minio_longhorn
+  to   = module.minio-longhorn.vault_kubernetes_auth_backend_role.this[0]
+}
 
-  data_json = jsonencode(
-    {
-      "username" : var.minio_longhorn_longhorn_username,
-      "password" : var.minio_longhorn_longhorn_password
-    }
-  )
+moved {
+  from = vault_policy.minio_longhorn
+  to   = module.minio-longhorn.vault_policy.this[0]
+}
+
+moved {
+  from = vault_generic_secret.minio-longhorn-root-credentials
+  to   = module.minio-longhorn.vault_generic_secret.this["root-credentials"]
+}
+
+moved {
+  from = vault_generic_secret.minio-longhorn-longhorn-credentials
+  to   = module.minio-longhorn.vault_generic_secret.this["longhorn-credentials"]
 }

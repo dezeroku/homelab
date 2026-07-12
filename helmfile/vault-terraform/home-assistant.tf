@@ -1,28 +1,26 @@
-resource "vault_kubernetes_auth_backend_role" "home-assistant" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "home-assistant"
-  bound_service_account_namespaces = ["home-assistant"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["home-assistant-main"]
-  token_policies                   = ["home-assistant"]
-}
+module "home-assistant" {
+  source             = "./service"
+  name               = "home-assistant"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_policy" "home-assistant" {
-  name = "home-assistant"
-
-  policy = <<EOT
-path "kvv2/data/services/home-assistant/prometheus" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "home-assistant-prometheus-token" {
-  path = "kvv2/services/home-assistant/prometheus"
-
-  data_json = jsonencode(
-    {
-      "token" : var.home_assistant_prometheus_token
+  secrets = {
+    prometheus = {
+      token = var.home_assistant_prometheus_token
     }
-  )
+  }
+}
+
+moved {
+  from = vault_kubernetes_auth_backend_role.home-assistant
+  to   = module.home-assistant.vault_kubernetes_auth_backend_role.this[0]
+}
+
+moved {
+  from = vault_policy.home-assistant
+  to   = module.home-assistant.vault_policy.this[0]
+}
+
+moved {
+  from = vault_generic_secret.home-assistant-prometheus-token
+  to   = module.home-assistant.vault_generic_secret.this["prometheus"]
 }

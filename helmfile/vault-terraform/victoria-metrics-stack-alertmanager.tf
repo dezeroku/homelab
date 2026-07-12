@@ -1,63 +1,46 @@
-resource "vault_kubernetes_auth_backend_role" "victoria-metrics-stack-alertmanager_backup" {
-  backend                          = vault_auth_backend.kubernetes_homeserver_backup.path
-  role_name                        = "victoria-metrics-stack-alertmanager"
-  bound_service_account_namespaces = ["victoria-metrics-stack"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["vmalertmanager-vm-victoria-metrics-k8s-stack"]
-  token_policies                   = ["victoria-metrics-stack-alertmanager"]
-}
+module "victoria-metrics-stack-alertmanager" {
+  source             = "./service"
+  name               = "victoria-metrics-stack-alertmanager"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_kubernetes_auth_backend_role" "victoria-metrics-stack-alertmanager" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "victoria-metrics-stack-alertmanager"
-  bound_service_account_namespaces = ["victoria-metrics-stack"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["vmalertmanager-vm-victoria-metrics-k8s-stack"]
-  token_policies                   = ["victoria-metrics-stack-alertmanager"]
-}
+  namespace             = "victoria-metrics-stack"
+  service_account_names = ["vmalertmanager-vm-victoria-metrics-k8s-stack"]
+  secrets_prefix        = "victoria-metrics-stack"
 
-resource "vault_policy" "victoria-metrics-stack-alertmanager" {
-  name = "victoria-metrics-stack-alertmanager"
-
-  policy = <<EOT
-path "kvv2/data/victoria-metrics-stack/alertmanager-pagerduty-token" {
-  capabilities = ["read"]
-}
-path "kvv2/data/victoria-metrics-stack/alertmanager-pagerduty-token-backup" {
-  capabilities = ["read"]
-}
-path "kvv2/data/victoria-metrics-stack/alertmanager-deadmanssnitch-url" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "victoria-metrics-stack-alertmanager-pagerduty-token" {
-  path = "kvv2/victoria-metrics-stack/alertmanager-pagerduty-token"
-
-  data_json = jsonencode(
-    {
-      "token" : var.victoria_metrics_alertmanager_pagerduty_token
+  secrets = {
+    "alertmanager-pagerduty-token" = {
+      token = var.victoria_metrics_alertmanager_pagerduty_token
     }
-  )
+    "alertmanager-pagerduty-token-backup" = {
+      token = var.homeserver_backup_victoria_metrics_alertmanager_pagerduty_token
+    }
+    "alertmanager-deadmanssnitch-url" = {
+      url = var.victoria_metrics_alertmanager_deadmanssnitch_url
+    }
+  }
 }
 
-resource "vault_generic_secret" "victoria-metrics-stack-alertmanager-pagerduty-token-backup" {
-  path = "kvv2/victoria-metrics-stack/alertmanager-pagerduty-token-backup"
-
-  data_json = jsonencode(
-    {
-      "token" : var.homeserver_backup_victoria_metrics_alertmanager_pagerduty_token
-    }
-  )
+moved {
+  from = vault_kubernetes_auth_backend_role.victoria-metrics-stack-alertmanager
+  to   = module.victoria-metrics-stack-alertmanager.vault_kubernetes_auth_backend_role.this[0]
 }
 
-resource "vault_generic_secret" "victoria-metrics-stack-alertmanager-deadmanssnitch-url" {
-  path = "kvv2/victoria-metrics-stack/alertmanager-deadmanssnitch-url"
+moved {
+  from = vault_policy.victoria-metrics-stack-alertmanager
+  to   = module.victoria-metrics-stack-alertmanager.vault_policy.this[0]
+}
 
-  data_json = jsonencode(
-    {
-      "url" : var.victoria_metrics_alertmanager_deadmanssnitch_url
-    }
-  )
+moved {
+  from = vault_generic_secret.victoria-metrics-stack-alertmanager-pagerduty-token
+  to   = module.victoria-metrics-stack-alertmanager.vault_generic_secret.this["alertmanager-pagerduty-token"]
+}
+
+moved {
+  from = vault_generic_secret.victoria-metrics-stack-alertmanager-pagerduty-token-backup
+  to   = module.victoria-metrics-stack-alertmanager.vault_generic_secret.this["alertmanager-pagerduty-token-backup"]
+}
+
+moved {
+  from = vault_generic_secret.victoria-metrics-stack-alertmanager-deadmanssnitch-url
+  to   = module.victoria-metrics-stack-alertmanager.vault_generic_secret.this["alertmanager-deadmanssnitch-url"]
 }

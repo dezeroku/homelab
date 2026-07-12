@@ -1,57 +1,45 @@
-resource "vault_kubernetes_auth_backend_role" "mailrise" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "mailrise"
-  bound_service_account_namespaces = ["mailrise"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["mailrise-main"]
-  token_policies                   = ["mailrise"]
-}
+module "mailrise" {
+  source             = "./service"
+  name               = "mailrise"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_policy" "mailrise" {
-  name = "mailrise"
-
-  policy = <<EOT
-path "kvv2/data/services/mailrise/pushover/dezeroku/general" {
-  capabilities = ["read"]
-}
-path "kvv2/data/services/mailrise/pushover/dezeroku/mailrise" {
-  capabilities = ["read"]
-}
-path "kvv2/data/services/mailrise/ses" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "mailrise-pushover-dezeroku-general" {
-  path = "kvv2/services/mailrise/pushover/dezeroku/general"
-
-  data_json = jsonencode(
-    {
-      "user_key" : var.mailrise_pushover_dezeroku_general_user_key,
-      "api_key" : var.mailrise_pushover_dezeroku_general_api_key
+  secrets = {
+    "pushover/dezeroku/general" = {
+      user_key = var.mailrise_pushover_dezeroku_general_user_key
+      api_key  = var.mailrise_pushover_dezeroku_general_api_key
     }
-  )
+    "pushover/dezeroku/mailrise" = {
+      user_key = var.mailrise_pushover_dezeroku_mailrise_user_key
+      api_key  = var.mailrise_pushover_dezeroku_mailrise_api_key
+    }
+    "ses" = {
+      access_key_id     = var.ses_access_key_id
+      access_key_secret = var.ses_access_key_secret
+    }
+  }
 }
 
-resource "vault_generic_secret" "mailrise-pushover-dezeroku-mailrise" {
-  path = "kvv2/services/mailrise/pushover/dezeroku/mailrise"
-
-  data_json = jsonencode(
-    {
-      "user_key" : var.mailrise_pushover_dezeroku_mailrise_user_key,
-      "api_key" : var.mailrise_pushover_dezeroku_mailrise_api_key
-    }
-  )
+moved {
+  from = vault_kubernetes_auth_backend_role.mailrise
+  to   = module.mailrise.vault_kubernetes_auth_backend_role.this[0]
 }
 
-resource "vault_generic_secret" "mailrise-ses" {
-  path = "kvv2/services/mailrise/ses"
+moved {
+  from = vault_policy.mailrise
+  to   = module.mailrise.vault_policy.this[0]
+}
 
-  data_json = jsonencode(
-    {
-      "access_key_id" : var.ses_access_key_id,
-      "access_key_secret" : var.ses_access_key_secret,
-    }
-  )
+moved {
+  from = vault_generic_secret.mailrise-pushover-dezeroku-general
+  to   = module.mailrise.vault_generic_secret.this["pushover/dezeroku/general"]
+}
+
+moved {
+  from = vault_generic_secret.mailrise-pushover-dezeroku-mailrise
+  to   = module.mailrise.vault_generic_secret.this["pushover/dezeroku/mailrise"]
+}
+
+moved {
+  from = vault_generic_secret.mailrise-ses
+  to   = module.mailrise.vault_generic_secret.this["ses"]
 }

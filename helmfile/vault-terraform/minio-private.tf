@@ -1,43 +1,39 @@
-resource "vault_kubernetes_auth_backend_role" "minio_private" {
-  backend                          = vault_auth_backend.kubernetes_homeserver.path
-  role_name                        = "minio-private"
-  bound_service_account_namespaces = ["minio-private"]
-  token_ttl                        = 3600
-  bound_service_account_names      = ["default"]
-  token_policies                   = ["minio-private"]
-}
+module "minio-private" {
+  source             = "./service"
+  name               = "minio-private"
+  kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-resource "vault_policy" "minio_private" {
-  name = "minio-private"
+  service_account_names = ["default"]
+  secrets_prefix        = "services/minio/private"
 
-  policy = <<EOT
-path "kvv2/data/services/minio/private/root-credentials" {
-  capabilities = ["read"]
-}
-path "kvv2/data/services/minio/private/dezeroku-credentials" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-resource "vault_generic_secret" "minio-private-root-credentials" {
-  path = "kvv2/services/minio/private/root-credentials"
-
-  data_json = jsonencode(
-    {
-      "rootUser" : var.minio_private_root_username,
-      "rootPassword" : var.minio_private_root_password
+  secrets = {
+    "root-credentials" = {
+      rootUser     = var.minio_private_root_username
+      rootPassword = var.minio_private_root_password
     }
-  )
+    "dezeroku-credentials" = {
+      username = var.minio_private_dezeroku_username
+      password = var.minio_private_dezeroku_password
+    }
+  }
 }
 
-resource "vault_generic_secret" "minio-private-dezeroku-credentials" {
-  path = "kvv2/services/minio/private/dezeroku-credentials"
+moved {
+  from = vault_kubernetes_auth_backend_role.minio_private
+  to   = module.minio-private.vault_kubernetes_auth_backend_role.this[0]
+}
 
-  data_json = jsonencode(
-    {
-      "username" : var.minio_private_dezeroku_username,
-      "password" : var.minio_private_dezeroku_password
-    }
-  )
+moved {
+  from = vault_policy.minio_private
+  to   = module.minio-private.vault_policy.this[0]
+}
+
+moved {
+  from = vault_generic_secret.minio-private-root-credentials
+  to   = module.minio-private.vault_generic_secret.this["root-credentials"]
+}
+
+moved {
+  from = vault_generic_secret.minio-private-dezeroku-credentials
+  to   = module.minio-private.vault_generic_secret.this["dezeroku-credentials"]
 }
