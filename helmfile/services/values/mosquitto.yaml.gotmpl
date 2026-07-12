@@ -20,7 +20,12 @@ controllers:
       app:
         image:
           repository: eclipse-mosquitto
-          tag: 2.0.22
+          tag: 2.1.2-alpine
+        env:
+          # These are safe in our case, it's just that the secret is mounted in
+          # a directory as a symlink
+          - name: MOSQUITTO_UNSAFE_ALLOW_SYMLINKS
+            value: "1"
         probes:
           liveness:
             enabled: true
