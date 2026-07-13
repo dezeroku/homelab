@@ -62,7 +62,7 @@ ingress:
       gethomepage.dev/name: Actual Budget
       gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
       # Arbitrary size of uploads
-      # nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
     tls:
       - secretName: {{ .Release.Name }}-tls
         hosts:
