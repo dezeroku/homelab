@@ -67,9 +67,9 @@ ingress:
     tls:
       - secretName: filebrowser-drive-tls
         hosts:
-          - filebrowser-drive.{{ requiredEnv "DOMAIN" }}
+          - drive.{{ requiredEnv "DOMAIN" }}
     hosts:
-      - host: filebrowser-drive.{{ requiredEnv "DOMAIN" }}
+      - host: drive.{{ requiredEnv "DOMAIN" }}
         paths:
           - path: /
             service:
