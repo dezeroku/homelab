@@ -2,6 +2,17 @@
 bases:
   - ../lib/base.yaml.gotmpl
 
+# Per-release gateway configuration for the `gateway` template: the routes a
+# release exposes and the policies on them. See ../lib/values/routes.yaml.gotmpl
+# and ../lib/values/route-policies.yaml.gotmpl for the accepted keys.
+# Releases inheriting `gateway` with no entry here get a single `main` route at
+# <release>.<DOMAIN> and no policies.
+environments:
+  default:
+    values:
+      - releaseConfig: {}
+
+---
 helmDefaults:
   kubeContext: homeserver
 

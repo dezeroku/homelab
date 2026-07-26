@@ -1,0 +1,100 @@
+---
+# MeTube, a web UI for downloading media off YouTube and friends.
+# Consumed via the `metube` helmfile template.
+#
+# Everything it emits is named after itself - controller `metube`, service
+# `metube`, persistence `metube-downloads` - so the block can be dropped into a
+# release that already runs something else, and the downloader ends up next to
+# the main app rather than in a release of its own.
+#
+# Driven by the release's `metube` map under `releaseConfig` in environment
+# values (see the `environments:` part of the helmfile):
+#
+#   existingClaim        - PVC the downloads land in, mounted at /downloads.
+#                          Without it nothing is mounted and the release
+#                          defines `persistence.metube-downloads` itself
+#   subPath              - directory inside that claim to mount, instead of
+#                          the whole of it                    (default: none)
+#   deleteFileOnTrashcan - true: trashing a download in the UI also deletes it
+#                          from disk                          (default: false)
+#
+# MeTube has no authentication of its own, so it is only ever exposed behind
+# the gateway. It brings no route - inherit `gateway` and `oidc-secret`, and
+# point a route at the service:
+#
+#   redbot-main:
+#     routes:
+#       metube:
+#         service: metube
+#         networks: [lan, vpn_main]
+#         oidc: true
+#
+# Labels:
+#   chartRoot  - see base.yaml.gotmpl
+{{- define "metube.body" }}
+{{- $cfg := .Values | get (printf "releaseConfig.%s.metube" .Release.Name) dict }}
+{{- $claim := $cfg | get "existingClaim" "" }}
+{{- $subPath := $cfg | get "subPath" "" }}
+controllers:
+  metube:
+    strategy: Recreate
+    replicas: 1
+    pod:
+      securityContext:
+        # Stay consistent with the jellyfin deployment
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+    containers:
+      main:
+        image:
+          repository: ghcr.io/alexta69/metube
+          tag: 2026.07.24
+          pullPolicy: IfNotPresent
+        env:
+          # Only download whole playlists when pointed directly to one,
+          # not just a single video in the playlist
+          DEFAULT_OPTION_PLAYLIST_STRICT_MODE: true
+          DELETE_FILE_ON_TRASHCAN: {{ $cfg | get "deleteFileOnTrashcan" false }}
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+        resources:
+          limits:
+            # Allow for big decodes
+            memory: 8Gi
+          requests:
+            memory: 128Mi
+service:
+  metube:
+    controller: metube
+    ports:
+      http:
+        port: 8081
+{{- if $claim }}
+persistence:
+  metube-downloads:
+    enabled: true
+    type: persistentVolumeClaim
+    existingClaim: {{ $claim }}
+    advancedMounts:
+      metube:
+        main:
+          - path: /downloads
+{{- if $subPath }}
+            subPath: {{ $subPath }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- $body := include "metube.body" . | trim }}
+{{- $root := .Release.Labels | get "chartRoot" "" }}
+{{- if $body }}
+{{- if $root }}
+{{ $root }}:
+{{ $body | indent 2 }}
+{{- else }}
+{{ $body }}
+{{- end }}
+{{- end }}
