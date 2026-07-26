@@ -24,6 +24,7 @@ locals {
     "actual-budget"             = []
     "jellyfin"                  = []
     "esphome"                   = []
+    "flatnotes"                 = []
   }
 }
 

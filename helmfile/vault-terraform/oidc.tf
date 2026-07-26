@@ -46,6 +46,7 @@ locals {
     module.actual-budget.oidc_client_id,
     module.esphome.oidc_client_id,
     module.change-detection.oidc_client_id,
+    module.flatnotes.oidc_client_id,
   ])
 }
 

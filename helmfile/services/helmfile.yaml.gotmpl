@@ -86,6 +86,11 @@ environments:
               main:
                 networks: [lan, guest, vpn_main]
                 oidc: true
+          flatnotes:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main]
+                oidc: true
           esphome:
             routes:
               main:
@@ -498,8 +503,10 @@ releases:
 
   - name: flatnotes
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: oidc-secret
       - template: default
   - name: flatnotes
     inherit:
