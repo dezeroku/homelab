@@ -9,11 +9,12 @@ controllers:
       main:
         image:
           repository: jhaals/yopass
-          tag: 12.2.0
+          tag: 14.6.0
           pullPolicy: IfNotPresent
         env:
-          YOPASS_DATABASE: redis
-          YOPASS_REDIS: redis://yopass-dragonfly-db:6379/0
+          DATABASE: redis
+          REDIS: redis://yopass-dragonfly-db:6379/0
+          PUBLIC_URL: {{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
         probes:
           readiness:
             enabled: true
@@ -32,37 +33,21 @@ service:
       http:
         port: 1337
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Securely share secrets
       gethomepage.dev/group: Tools
-      gethomepage.dev/icon: si-planet
+      gethomepage.dev/icon: sh-yopass
       gethomepage.dev/name: yopass
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=yopass"
-      # For uploading small files
-      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    tls:
-      - secretName: yopass-tls
-        hosts:
-          - yopass.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: yopass.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
 
 rawResources:
   dragonfly-db:
-    apiVersion: dragonflydb.io/v1alpha1
-    kind: Dragonfly
-    spec:
+    manifest:
+      apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
       spec:
         replicas: 1
         resources:

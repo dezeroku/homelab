@@ -11,6 +11,10 @@ environments:
   default:
     values:
       - releaseConfig:
+          yopass:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
           stirling-pdf:
             routes:
               main:
@@ -435,8 +439,9 @@ releases:
 
   - name: yopass
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
       - template: default
   - name: yopass
     inherit:
