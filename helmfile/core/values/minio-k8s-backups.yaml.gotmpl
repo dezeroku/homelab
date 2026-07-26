@@ -35,61 +35,38 @@ tenant:
     - name: wikijs
   users:
     - name: minio-k8s-backups-backuper-user-secret
-ingress:
-  api:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      # TODO: Adding a k8s IP range so oauth2-proxy can talk with Vault via the ingress
-      # It can probably be done prettier
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.4.0/24,192.168.69.0/24,10.42.0.0/16"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: minio-api-general-tls
-        hosts:
-          - api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
-      - secretName: minio-star-api-general-tls
-        hosts:
-          - "*.api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}"
-    host: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
-  console:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: S3-compatible storage for K8S backups
-      gethomepage.dev/group: Storage
-      gethomepage.dev/icon: minio.png
-      gethomepage.dev/name: Minio (K8S Backups)
-      gethomepage.dev/pod-selector: "v1.min.io/tenant=k8s-backups"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: minio-console-general-tls
-        hosts:
-          - k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
-    host: k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
 
 app-template:
+  route:
+    api:
+      hostnames:
+        - api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+        - "*.api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}"
+      rules:
+        - backendRefs:
+          - name: minio
+            port: 80
+
+    console:
+      hostnames:
+        - k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: S3-compatible storage for K8S backups
+        gethomepage.dev/group: Storage
+        gethomepage.dev/icon: minio.png
+        gethomepage.dev/name: Minio (K8S Backups)
+        gethomepage.dev/pod-selector: "v1.min.io/tenant=k8s-backups"
+      rules:
+        - backendRefs:
+          - name: k8s-backups-console
+            port: 9090
+
   rawResources:
-    vault-auth:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultAuth
-      spec:
-        spec:
-          method: kubernetes
-          mount: k8s/homeserver
-          kubernetes:
-            role: minio-k8s-backups
-            # TODO: operator will only create the sa after the secret is already in place
-            # so let's use default for now
-            serviceAccount: default
     root-credentials:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v2
           mount: kvv2
@@ -107,9 +84,9 @@ app-template:
                     export MINIO_ROOT_PASSWORD={{ "{{`{{" }}.Secrets.rootPassword{{ "}}`}}" }}
           vaultAuthRef: minio-k8s-backups-vault-auth
     backuper-user-secret:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v2
           mount: kvv2

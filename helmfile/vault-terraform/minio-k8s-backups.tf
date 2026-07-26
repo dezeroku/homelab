@@ -3,8 +3,7 @@ module "minio-k8s-backups" {
   name               = "minio-k8s-backups"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  service_account_names = ["default"]
-  secrets_prefix        = "core/minio/k8s-backups"
+  secrets_prefix = "core/minio/k8s-backups"
 
   secrets = {
     "root-credentials" = {

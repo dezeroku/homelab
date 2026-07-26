@@ -5,6 +5,18 @@ bases:
 helmDefaults:
   kubeContext: homeserver
 
+environments:
+  default:
+    values:
+      - releaseConfig:
+          minio-k8s-backups:
+            routes:
+              api:
+                networks: [lan, cluster, vpn_main, pods]
+              console:
+                networks: [lan, vpn_main]
+---
+
 repositories:
   - name: victoria-metrics
     url: https://victoriametrics.github.io/helm-charts/
@@ -267,14 +279,19 @@ releases:
     inherit:
       - template: argocd-app
 
+  # TODO: migrate to something better
   - name: minio-k8s-backups
     chart: minio/tenant
-    version: 7.0.0
+    version: 7.1.1
+    labels:
+      chartRoot: app-template
     inherit:
+      - template: gateway
+      - template: vault
       - template: default
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 4.1.2
+        version: 5.0.1
   - name: minio-k8s-backups
     inherit:
       - template: argocd-app
