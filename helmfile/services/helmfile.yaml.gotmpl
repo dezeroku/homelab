@@ -11,6 +11,11 @@ environments:
   default:
     values:
       - releaseConfig:
+          homepage:
+            routes:
+              main:
+                hostname: '{{ requiredEnv "DOMAIN" }}'
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
           jellyfin:
             secrets: [ldap-bind-user]
             routes:
@@ -258,8 +263,10 @@ releases:
 
   - name: homepage
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: vault
       - template: default
   - name: homepage
     inherit:

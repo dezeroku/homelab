@@ -5,17 +5,18 @@
 global:
   alwaysAppendIdentifierToResourceName: true
 
+defaultPodOptions:
+  automountServiceAccountToken: true
+
 controllers:
   main:
     #strategy: Recreate
     strategy: RollingUpdate
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
           repository: ghcr.io/gethomepage/homepage
-          tag: v1.4.6
+          tag: v1.13.2
           pullPolicy: IfNotPresent
         env:
           TZ: Europe/Warsaw
@@ -51,26 +52,32 @@ service:
       http:
         port: 3000
 
-ingress:
-  main:
-    enabled: true
-    className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    tls:
-      - secretName: homepage-general-tls
-        hosts:
-          - {{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: {{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
-
-serviceAccount:
-  main: {}
+#ingress:
+#  main:
+#    enabled: true
+#    className: nginx
+#    annotations:
+#      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
+#      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
+#    tls:
+#      - secretName: homepage-general-tls
+#        hosts:
+#          - {{ requiredEnv "DOMAIN" }}
+#    hosts:
+#      - host: {{ requiredEnv "DOMAIN" }}
+#        paths:
+#          - path: /
+#            service:
+#              identifier: main
+#
+#    rules:
+#      - backendRefs:
+#        - name: {{ .Release.Name }}-main
+#          port: 3000
+#        matches:
+#        - path:
+#            type: PathPrefix
+#            value: /
 
 configMaps:
   config:
@@ -87,6 +94,8 @@ configMaps:
       docker.yaml: ""
       kubernetes.yaml: |
         mode: cluster
+        ingress: true
+        gateway: true
       services.yaml: ""
       settings.yaml: |
         layout:
@@ -194,10 +203,10 @@ rbac:
             - get
             - list
         - apiGroups:
-            - traefik.containo.us
-            - traefik.io
+            - gateway.networking.k8s.io
           resources:
-            - ingressroutes
+            - httproutes
+            - gateways
           verbs:
             - get
             - list
@@ -221,23 +230,13 @@ rbac:
       roleRef:
         identifier: cluster-role
       subjects:
-        - identifier: main
+        - identifier: {{ .Release.Name }}
 
 rawResources:
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: homepage
-          serviceAccount: homepage-main
   jellyfin:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
