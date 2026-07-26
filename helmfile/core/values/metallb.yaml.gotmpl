@@ -1,0 +1,43 @@
+# TODO: annotate this pool as taken in network_layout
+# 192.168.4.64/27 is meant for the metallb pools
+
+app-template:
+  global:
+    createDefaultServiceAccount: false
+
+  rawResources:
+    envoy-gateway:
+      forceRename: envoy-gateway
+      manifest:
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        spec:
+          addresses:
+            - 192.168.4.65/32
+
+    envoy-gateway-adv:
+      forceRename: envoy-gateway-adv
+      manifest:
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        spec:
+          ipAddressPools:
+            - envoy-gateway
+
+    ingress-nginx:
+      forceRename: ingress-nginx
+      manifest:
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        spec:
+          addresses:
+            - 192.168.4.66/32
+
+    ingress-nginx-adv:
+      forceRename: ingress-nginx-adv
+      manifest:
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        spec:
+          ipAddressPools:
+            - ingress-nginx

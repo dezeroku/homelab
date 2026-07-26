@@ -1,0 +1,205 @@
+app-template:
+  global:
+    createDefaultServiceAccount: false
+
+  rawResources:
+    ha-main-config:
+      forceRename: ha-main-config
+      manifest:
+        apiVersion: gateway.envoyproxy.io/v1alpha1
+        kind: EnvoyProxy
+        spec:
+          provider:
+            type: Kubernetes
+            kubernetes:
+              envoyDeployment:
+                #replicas: 3
+                replicas: 1
+                pod:
+                  affinity:
+                    podAntiAffinity:
+                      requiredDuringSchedulingIgnoredDuringExecution:
+                        - labelSelector:
+                            matchLabels:
+                              gateway.envoyproxy.io/owning-gateway-name: envoy-gateway-main
+                          topologyKey: kubernetes.io/hostname
+              envoyService:
+                type: LoadBalancer
+                annotations:
+                  metallb.universe.tf/address-pool: envoy-gateway
+                externalTrafficPolicy: Local
+    gateway-class:
+      forceRename: envoy-gateway
+      manifest:
+         apiVersion: gateway.networking.k8s.io/v1
+         kind: GatewayClass
+         spec:
+           controllerName: gateway.envoyproxy.io/gatewayclass-controller
+           parametersRef:
+             group: gateway.envoyproxy.io
+             kind: EnvoyProxy
+             name: ha-main-config
+             namespace: envoy-gateway
+    gateway:
+      forceRename: envoy-gateway-main
+      manifest:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: Gateway
+        metadata:
+          annotations:
+            cert-manager.io/cluster-issuer: cert-manager-letsencrypt-dns-prod
+        spec:
+          gatewayClassName: envoy-gateway
+          listeners:
+          - name: http
+            port: 80
+            protocol: HTTP
+            allowedRoutes:
+              namespaces:
+                from: All
+          - name: https
+            port: 443
+            protocol: HTTPS
+            hostname: "*.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: wildcard-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: All
+          - name: https-minio-k8s-backups
+            port: 443
+            protocol: HTTPS
+            hostname: "k8s-backups.minio.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: minio-k8s-backups-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minio-k8s-backups
+          - name: https-minio-k8s-backups-api
+            port: 443
+            protocol: HTTPS
+            hostname: "api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: minio-k8s-backups-api-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minio-k8s-backups
+          - name: https-minio-k8s-backups-api-wildcard
+            port: 443
+            protocol: HTTPS
+            hostname: "*.api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: minio-k8s-backups-api-wildcard-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minio-k8s-backups
+          - name: https-homepage
+            port: 443
+            protocol: HTTPS
+            hostname: "{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: homepage-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: homepage
+          - name: https-ente
+            port: 443
+            protocol: HTTPS
+            hostname: "*.ente.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: ente-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: ente
+          - name: https-media
+            port: 443
+            protocol: HTTPS
+            hostname: "*.media.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: media-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: media
+          - name: mosquitto
+            port: 1883
+            protocol: TCP
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: mosquitto
+          - name: mosquitto-tls
+            port: 8883
+            protocol: TCP
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: mosquitto
+          - name: lldap-tls
+            port: 636
+            protocol: TCP
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: lldap
+            # TODO: also add a rule for minecraft
+    ingress-fallback:
+      manifest:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        spec:
+          parentRefs:
+            - name: envoy-gateway-main
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: /
+              backendRefs:
+                - name: ingress-nginx-controller
+                  namespace: ingress-nginx
+                  port: 80

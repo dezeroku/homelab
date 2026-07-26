@@ -38,6 +38,8 @@ repositories:
     url: https://cloudnative-pg.github.io/charts
   - name: prometheus-community
     url: https://prometheus-community.github.io/helm-charts
+  - name: metallb
+    url: https://metallb.github.io/metallb
 releases:
   - name: prometheus-operator-crds
     chart: prometheus-community/prometheus-operator-crds
@@ -73,9 +75,12 @@ releases:
 
   - name: ingress-nginx
     chart: ingress-nginx/ingress-nginx
-    version: 4.11.1
+    version: 4.15.1
     inherit:
       - template: default
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
   - name: ingress-nginx
     inherit:
       - template: argocd-app
@@ -291,5 +296,29 @@ releases:
     inherit:
       - template: default
   - name: dragonly-operator
+    inherit:
+      - template: argocd-app
+
+  - name: envoy-gateway
+    chart: oci://docker.io/envoyproxy/gateway-helm
+    version: v1.8.3
+    inherit:
+      - template: default
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
+  - name: envoy-gateway
+    inherit:
+      - template: argocd-app
+
+  - name: metallb
+    chart: metallb/metallb
+    version: 0.16.1
+    inherit:
+      - template: default
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
+  - name: metallb
     inherit:
       - template: argocd-app

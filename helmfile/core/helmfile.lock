@@ -3,12 +3,12 @@ dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
     version: 4.1.2
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 5.0.1
   - name: argo-cd
     repository: https://argoproj.github.io/argo-helm
-    version: 9.0.1
-  - name: cert-manager
-    repository: https://charts.jetstack.io
-    version: v1.14.4
+    version: 10.2.1
   - name: cloudnative-pg
     repository: https://cloudnative-pg.github.io/charts
     version: 0.23.0
@@ -17,7 +17,7 @@ dependencies:
     version: 1.0.1
   - name: ingress-nginx
     repository: https://kubernetes.github.io/ingress-nginx
-    version: 4.11.1
+    version: 4.15.1
   - name: intel-device-plugins-gpu
     repository: https://intel.github.io/helm-charts
     version: 0.30.0
@@ -27,6 +27,9 @@ dependencies:
   - name: longhorn
     repository: https://charts.longhorn.io
     version: 1.8.0
+  - name: metallb
+    repository: https://metallb.github.io/metallb
+    version: 0.16.1
   - name: node-feature-discovery
     repository: https://kubernetes-sigs.github.io/node-feature-discovery/charts
     version: 0.16.4
@@ -44,7 +47,7 @@ dependencies:
     version: 19.0.0
   - name: tenant
     repository: https://operator.min.io/
-    version: 7.0.0
+    version: 7.1.1
   - name: vault
     repository: https://helm.releases.hashicorp.com
     version: 0.27.0
@@ -60,5 +63,5 @@ dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.40.4
-digest: sha256:aad5d5179b825745399fd54caeab69da5c93a7be913fa7bffc27167eb4ecc466
-generated: "2025-10-20T01:52:37.874914387+02:00"
+digest: sha256:be32ba6ca8209582e078f3cb6447d061658e279d6fbc147f07a5932ff1e63056
+generated: "2026-07-26T02:26:47.951365932+02:00"
