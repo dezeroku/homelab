@@ -1,0 +1,8 @@
+---
+# homepage: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  homepage:
+    routes:
+      main:
+        hostname: '{{ requiredEnv "DOMAIN" }}'
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]

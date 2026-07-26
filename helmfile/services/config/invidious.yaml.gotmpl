@@ -1,0 +1,8 @@
+---
+# invidious: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  invidious:
+    routes:
+      main:
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+    secrets: [hmac, companion-hmac]

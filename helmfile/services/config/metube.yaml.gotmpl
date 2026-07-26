@@ -1,0 +1,12 @@
+---
+# metube: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  metube:
+    metube:
+      existingClaim: media-storage-main
+      subPath: metube
+    routes:
+      main:
+        service: metube
+        networks: [lan, vpn_main, vpn_guest]
+        oidc: true

@@ -2,183 +2,23 @@
 bases:
   - ../lib/base.yaml.gotmpl
 
-# Per-release gateway configuration for the `gateway` template: the routes a
-# release exposes and the policies on them. See ../lib/values/routes.yaml.gotmpl
-# and ../lib/values/route-policies.yaml.gotmpl for the accepted keys.
-# Releases inheriting `gateway` with no entry here get a single `main` route at
-# <release>.<DOMAIN> and no policies.
+# Per-release configuration for the templates in ../lib: the routes a release
+# exposes on the shared gateway, the policies on them, and its Vault secrets.
+# See ../lib/values/routes.yaml.gotmpl and ../lib/values/route-policies.yaml.gotmpl
+# for the accepted keys.
+#
+# One file per release under config/, globbed in below, so that adding or
+# changing a release touches only its own file. A release inheriting `gateway`
+# with no file gets a single `main` route at <release>.<DOMAIN> and no policies.
+#
+# These are *.yaml.gotmpl, not *.yaml: helmfile only treats an environment
+# values file as a Go template when the extension says so, and the hostnames in
+# them are built from the DOMAIN env var. A plain .yaml here renders the
+# template syntax literally into the hostname.
 environments:
   default:
     values:
-      - releaseConfig:
-          redbot-main:
-            routes:
-              filebrowser:
-                networks: [lan, vpn_main, vpn_guest, vpn_family]
-                hostname: 'redbot-main-filebrowser.{{ requiredEnv "DOMAIN" }}'
-                service: filebrowser
-              metube:
-                networks: [lan, vpn_main, vpn_guest, vpn_family]
-                oidc: true
-                hostname: 'redbot-main-metube.{{ requiredEnv "DOMAIN" }}'
-                service: metube
-          redbot-premiers:
-            routes:
-              filebrowser:
-                networks: [lan, vpn_main, vpn_guest, vpn_family]
-                hostname: 'redbot-premiers-filebrowser.{{ requiredEnv "DOMAIN" }}'
-                service: filebrowser
-              metube:
-                networks: [lan, vpn_main, vpn_guest, vpn_family]
-                oidc: true
-                hostname: 'redbot-premiers-metube.{{ requiredEnv "DOMAIN" }}'
-                service: metube
-            filebrowser:
-              adminGroup: redbot-admins
-            metube:
-              existingClaim: redbot-main-localtracks
-              subPath: metube
-          navidrome:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-                service: main
-              metube:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-                hostname: navidrome-metube.{{ requiredEnv "DOMAIN" }}
-                oidc: true
-                service: metube
-          invidious:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-            secrets: [hmac, companion-hmac]
-          ryot:
-            routes:
-              main:
-                networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
-            secrets: [admin]
-          paperless:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-            secrets: [ses/incoming, redis, admin, secret-key]
-          immich-enhancements:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-                hostname: immich.{{ requiredEnv "DOMAIN" }}
-          hedgedoc:
-            routes:
-              main:
-                networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
-          yopass:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          home-assistant:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_family]
-          stirling-pdf:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          it-tools:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          homepage:
-            routes:
-              main:
-                hostname: '{{ requiredEnv "DOMAIN" }}'
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          speedtest:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          ente:
-            routes:
-              auth:
-                hostname: 'auth.ente.{{ requiredEnv "DOMAIN" }}'
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-              api:
-                hostname: 'api.ente.{{ requiredEnv "DOMAIN" }}'
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          filebrowser-drive:
-            filebrowser:
-              createUserDir: true
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-                hostname: drive.{{ requiredEnv "DOMAIN" }}
-          filebrowser-media:
-            filebrowser:
-              adminGroup: filebrowser-media
-            routes:
-              main:
-                networks: [lan, guest]
-                hostname: filebrowser.media.home.dezeroku.com
-          filebrowser-media-readonly:
-            filebrowser:
-              adminGroup: filebrowser-media
-              readOnly: true
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-                hostname: filebrowser-readonly.media.home.dezeroku.com
-          convertx:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
-          cyberchef:
-            routes:
-              main: {}
-          metube:
-            metube:
-              existingClaim: media-storage-main
-              subPath: metube
-            routes:
-              main:
-                service: metube
-                networks: [lan, vpn_main, vpn_guest]
-                oidc: true
-          jellyfin:
-            secrets: [ldap-bind-user]
-            routes:
-              main:
-                # TODO: Is cluster really needed here?
-                networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
-          change-detection:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main]
-                oidc: true
-          flatnotes:
-            routes:
-              main:
-                networks: [lan, guest, vpn_main]
-                oidc: true
-          esphome:
-            routes:
-              main:
-                networks: [lan, vpn_main]
-                oidc: true
-          actual-budget:
-            routes:
-              main: {}
-          lldap:
-            secrets: [jwt, key, user]
-            routes:
-              main:
-                networks: [lan, vpn_main]
-              # served at ldaps.lldap.<DOMAIN> by the naming convention
-              ldaps:
-                kind: TCPRoute
-          mosquitto:
-            routes:
-              main:
-                kind: TCPRoute
+      - config/*.yaml.gotmpl
 
 ---
 helmDefaults:

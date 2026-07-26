@@ -1,0 +1,8 @@
+---
+# esphome: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  esphome:
+    routes:
+      main:
+        networks: [lan, vpn_main]
+        oidc: true

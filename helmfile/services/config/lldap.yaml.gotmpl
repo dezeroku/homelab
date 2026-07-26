@@ -1,0 +1,11 @@
+---
+# lldap: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  lldap:
+    secrets: [jwt, key, user]
+    routes:
+      main:
+        networks: [lan, vpn_main]
+      # served at ldaps.lldap.<DOMAIN> by the naming convention
+      ldaps:
+        kind: TCPRoute

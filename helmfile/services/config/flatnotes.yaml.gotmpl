@@ -1,0 +1,8 @@
+---
+# flatnotes: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  flatnotes:
+    routes:
+      main:
+        networks: [lan, guest, vpn_main]
+        oidc: true

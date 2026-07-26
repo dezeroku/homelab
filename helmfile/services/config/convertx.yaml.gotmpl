@@ -1,0 +1,7 @@
+---
+# convertx: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  convertx:
+    routes:
+      main:
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]

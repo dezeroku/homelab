@@ -1,0 +1,19 @@
+---
+# redbot-premiers: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  redbot-premiers:
+    routes:
+      filebrowser:
+        networks: [lan, vpn_main, vpn_guest, vpn_family]
+        hostname: 'redbot-premiers-filebrowser.{{ requiredEnv "DOMAIN" }}'
+        service: filebrowser
+      metube:
+        networks: [lan, vpn_main, vpn_guest, vpn_family]
+        oidc: true
+        hostname: 'redbot-premiers-metube.{{ requiredEnv "DOMAIN" }}'
+        service: metube
+    filebrowser:
+      adminGroup: redbot-admins
+    metube:
+      existingClaim: redbot-main-localtracks
+      subPath: metube

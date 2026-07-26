@@ -1,0 +1,14 @@
+---
+# redbot-main: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  redbot-main:
+    routes:
+      filebrowser:
+        networks: [lan, vpn_main, vpn_guest, vpn_family]
+        hostname: 'redbot-main-filebrowser.{{ requiredEnv "DOMAIN" }}'
+        service: filebrowser
+      metube:
+        networks: [lan, vpn_main, vpn_guest, vpn_family]
+        oidc: true
+        hostname: 'redbot-main-metube.{{ requiredEnv "DOMAIN" }}'
+        service: metube

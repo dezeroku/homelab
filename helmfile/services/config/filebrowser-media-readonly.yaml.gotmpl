@@ -1,0 +1,11 @@
+---
+# filebrowser-media-readonly: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  filebrowser-media-readonly:
+    filebrowser:
+      adminGroup: filebrowser-media
+      readOnly: true
+    routes:
+      main:
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+        hostname: filebrowser-readonly.media.home.dezeroku.com

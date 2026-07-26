@@ -1,0 +1,9 @@
+---
+# jellyfin: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  jellyfin:
+    secrets: [ldap-bind-user]
+    routes:
+      main:
+        # TODO: Is cluster really needed here?
+        networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]

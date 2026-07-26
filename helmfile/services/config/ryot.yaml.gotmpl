@@ -1,0 +1,8 @@
+---
+# ryot: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  ryot:
+    routes:
+      main:
+        networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
+    secrets: [admin]

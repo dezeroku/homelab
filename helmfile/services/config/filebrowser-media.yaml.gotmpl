@@ -1,0 +1,10 @@
+---
+# filebrowser-media: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  filebrowser-media:
+    filebrowser:
+      adminGroup: filebrowser-media
+    routes:
+      main:
+        networks: [lan, guest]
+        hostname: filebrowser.media.home.dezeroku.com
