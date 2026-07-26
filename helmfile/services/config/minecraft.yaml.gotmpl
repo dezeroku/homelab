@@ -1,0 +1,9 @@
+---
+# minecraft: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  minecraft:
+    chart: itzg/minecraft
+    version: 4.24.0
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 4.1.2

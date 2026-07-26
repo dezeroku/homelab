@@ -1,7 +1,15 @@
 ---
 # immich-enhancements: see ../helmfile.yaml.gotmpl for what these keys mean.
+# TODO: specifying this as direct dependency of immich
+# seems to break the 'common library' chart
+# immich chart is based on too old version of the library chart to
+# use rawResources, thus we need this -enhancements one
 releaseConfig:
   immich-enhancements:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [vault, gateway]
+    namespace: immich
     routes:
       main:
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]

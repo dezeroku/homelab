@@ -2,6 +2,9 @@
 # mosquitto: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   mosquitto:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, vault]
     routes:
       main:
         kind: TCPRoute

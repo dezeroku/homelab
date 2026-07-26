@@ -2,6 +2,9 @@
 # esphome: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   esphome:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, oidc-secret]
     routes:
       main:
         networks: [lan, vpn_main]

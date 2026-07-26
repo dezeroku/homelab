@@ -2,6 +2,10 @@
 # filebrowser-media-readonly: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   filebrowser-media-readonly:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, filebrowser]
+    namespace: media
     filebrowser:
       adminGroup: filebrowser-media
       readOnly: true

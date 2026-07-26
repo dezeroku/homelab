@@ -2,6 +2,9 @@
 # hedgedoc: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   hedgedoc:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, oidc-secret]
     routes:
       main:
         networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]

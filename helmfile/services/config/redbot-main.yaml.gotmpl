@@ -2,6 +2,10 @@
 # redbot-main: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   redbot-main:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [filebrowser, metube, gateway, oidc-secret]
+    values: [values/redbot-common.yaml.gotmpl]
     routes:
       filebrowser:
         networks: [lan, vpn_main, vpn_guest, vpn_family]

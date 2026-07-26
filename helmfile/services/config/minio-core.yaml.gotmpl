@@ -1,0 +1,9 @@
+---
+# minio-core: see ../helmfile.yaml.gotmpl for what these keys mean.
+releaseConfig:
+  minio-core:
+    chart: minio/tenant
+    version: 7.0.0
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 4.1.2

@@ -2,6 +2,10 @@
 # jellyfin: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   jellyfin:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, vault-secrets]
+    namespace: media
     secrets: [ldap-bind-user]
     routes:
       main:

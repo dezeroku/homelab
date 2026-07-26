@@ -1,7 +1,12 @@
 ---
 # navidrome: see ../helmfile.yaml.gotmpl for what these keys mean.
+# TODO: it deserves its own namespace tbh
 releaseConfig:
   navidrome:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [metube, oidc-secret, gateway]
+    namespace: media
     routes:
       main:
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]

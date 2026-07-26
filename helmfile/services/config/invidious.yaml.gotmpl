@@ -2,6 +2,11 @@
 # invidious: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   invidious:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, vault-secrets]
+    labels:
+      vaultServiceAccount: invidious-main
     routes:
       main:
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]

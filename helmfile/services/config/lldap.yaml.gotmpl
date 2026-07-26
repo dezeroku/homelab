@@ -2,6 +2,9 @@
 # lldap: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   lldap:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, vault-secrets]
     secrets: [jwt, key, user]
     routes:
       main:

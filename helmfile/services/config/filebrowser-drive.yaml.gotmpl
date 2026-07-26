@@ -2,6 +2,9 @@
 # filebrowser-drive: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   filebrowser-drive:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [filebrowser, gateway]
     filebrowser:
       createUserDir: true
     routes:
