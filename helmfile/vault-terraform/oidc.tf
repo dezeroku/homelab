@@ -48,6 +48,7 @@ locals {
     module.change-detection.oidc_client_id,
     module.flatnotes.oidc_client_id,
     module.filebrowser-media.oidc_client_id,
+    module.filebrowser-media-readonly.oidc_client_id,
   ])
 }
 

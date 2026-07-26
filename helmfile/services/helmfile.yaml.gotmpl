@@ -82,6 +82,14 @@ environments:
               main:
                 networks: [lan, guest]
                 hostname: filebrowser.media.home.dezeroku.com
+          filebrowser-media-readonly:
+            filebrowser:
+              adminGroup: filebrowser-media
+              readOnly: true
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+                hostname: filebrowser-readonly.media.home.dezeroku.com
           convertx:
             routes:
               main:
@@ -293,8 +301,10 @@ releases:
   - name: filebrowser-media-readonly
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: filebrowser
       - template: default
   - name: filebrowser-media-readonly
     values:
