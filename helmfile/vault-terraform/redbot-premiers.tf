@@ -4,12 +4,22 @@ module "redbot-premiers" {
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
   service_account_names = ["redbot-premiers-main"]
-  secrets_prefix        = "services/redbot/premiers"
+  secrets_prefix        = "services/redbot/redbot-premiers"
 
   secrets = {
     secrets = {
       token = var.redbot_premiers_token
     }
+  }
+
+  oidc = {
+    redirect_uris = [
+      "https://redbot-premiers-filebrowser.${var.domain}/api/auth/oidc/callback",
+      "https://redbot-premiers-metube.${var.domain}/oauth2/callback"
+    ]
+    group_ids = [
+      vault_identity_group.this["redbot-premiers"].id,
+    ]
   }
 }
 

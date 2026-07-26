@@ -11,6 +11,33 @@ environments:
   default:
     values:
       - releaseConfig:
+          redbot-main:
+            routes:
+              filebrowser:
+                networks: [lan, vpn_main, vpn_guest, vpn_family]
+                hostname: 'redbot-main-filebrowser.{{ requiredEnv "DOMAIN" }}'
+                service: filebrowser
+              metube:
+                networks: [lan, vpn_main, vpn_guest, vpn_family]
+                oidc: true
+                hostname: 'redbot-main-metube.{{ requiredEnv "DOMAIN" }}'
+                service: metube
+          redbot-premiers:
+            routes:
+              filebrowser:
+                networks: [lan, vpn_main, vpn_guest, vpn_family]
+                hostname: 'redbot-premiers-filebrowser.{{ requiredEnv "DOMAIN" }}'
+                service: filebrowser
+              metube:
+                networks: [lan, vpn_main, vpn_guest, vpn_family]
+                oidc: true
+                hostname: 'redbot-premiers-metube.{{ requiredEnv "DOMAIN" }}'
+                service: metube
+            filebrowser:
+              adminGroup: redbot-admins
+            metube:
+              existingClaim: redbot-main-localtracks
+              subPath: metube
           navidrome:
             routes:
               main:
@@ -191,83 +218,31 @@ releases:
 
   - name: redbot-main
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: filebrowser
+      - template: metube
+      - template: gateway
+      - template: oidc-secret
       - template: default
-    # Using labels as "release values", in anticipation of
-    # https://github.com/roboll/helmfile/issues/1329 result
-    # This pattern will be shared by all metube deployments for the time being
-    labels:
-      vaultRole: redbot-main
-      vaultSubPath: redbot/main
-      appName: redbot-main
-      ingressAuth: "allowed_groups=redbot-main-admins"
     values:
       - values/redbot-common.yaml.gotmpl
-
   - name: redbot-main
     inherit:
       - template: argocd-app
 
-  - name: metube-redbot-main
-    namespace: redbot-main
-    chart: bjw-s-labs/app-template
-    version: 4.1.2
-    labels:
-      mountSubPath: "metube"
-      homepageGroup: RedBot
-      existingClaim: redbot-main-localtracks
-      ingressAuth: "allowed_groups=redbot-main-admins"
-      deleteFileOnThrashCan: true
-    inherit:
-      - template: default
-    values:
-      - values/metube-common.yaml.gotmpl
-
-  - name: metube-redbot-main
-    values:
-      - targetNamespace: redbot-main
-    inherit:
-      - template: argocd-app
-
   - name: redbot-premiers
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: filebrowser
+      - template: metube
+      - template: gateway
+      - template: oidc-secret
       - template: default
-    # Using labels as "release values", in anticipation of
-    # https://github.com/roboll/helmfile/issues/1329 result
-    # This pattern will be shared by all metube deployments for the time being
-    labels:
-      vaultRole: redbot-premiers
-      vaultSubPath: redbot/premiers
-      appName: redbot-premiers
-      ingressAuth: "allowed_groups=redbot-premiers-admins"
     values:
       - values/redbot-common.yaml.gotmpl
-
   - name: redbot-premiers
-    inherit:
-      - template: argocd-app
-
-  - name: metube-redbot-premiers
-    namespace: redbot-premiers
-    chart: bjw-s-labs/app-template
-    version: 4.1.2
-    labels:
-      mountSubPath: "metube"
-      homepageGroup: RedBot
-      existingClaim: redbot-premiers-localtracks
-      ingressAuth: "allowed_groups=redbot-premiers-admins"
-      deleteFileOnThrashCan: true
-    inherit:
-      - template: default
-    values:
-      - values/metube-common.yaml.gotmpl
-
-  - name: metube-redbot-premiers
-    values:
-      - targetNamespace: redbot-premiers
     inherit:
       - template: argocd-app
 

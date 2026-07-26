@@ -10,14 +10,18 @@ defaultPodOptions:
     fsGroup: 1000
   nodeSelector:
     # Lock the arch to amd64 to avoid problems with venv
-    # TODO: maybe let's make the whole venv ephemeral?
     kubernetes.io/arch: amd64
 
 controllers:
+  filebrowser:
+    pod:
+      securityContext:
+        # TODO: this gives us access to metube downloaded files
+        # manual uploads still end up with 1000:1000 ownership
+        # Check if redbot plays nicely with it
+        fsGroup: 568
   main:
     strategy: Recreate
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
@@ -38,74 +42,32 @@ controllers:
           TOKEN:
             valueFrom:
               secretKeyRef:
-                name: {{ .Release.Labels.appName }}-secrets
+                name: {{ .Release.Name }}-secrets
                 key: token
         resources:
           limits:
             memory: 4Gi
           requests:
             memory: 256Mi
-      filebrowser:
-        image:
-          repository: filebrowser/filebrowser
-          tag: v2.43.0
-          pullPolicy: IfNotPresent
-        env:
-          # Auth via oauth2-proxy
-          FB_NOAUTH: true
-        probes:
-          readiness:
-            enabled: true
-          liveness:
-            enabled: true
-        resources:
-          limits:
-            memory: 1024Mi
-          requests:
-            memory: 128Mi
-        securityContext:
-          # TODO: make it 568
-          # Override for filebrowser
-          runAsUser: 0
-          runAsGroup: 0
-          fsGroup: 0
 
-serviceAccount:
-  main: {}
-
-service:
+route:
   filebrowser:
-    controller: main
-    ports:
-      http-filebrowser:
-        port: 80
-
-ingress:
-  filebrowser:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Storage for lavalink music, {{ .Release.Name }}
       gethomepage.dev/group: RedBot
-      gethomepage.dev/icon: filebrowser.png
+      gethomepage.dev/icon: sh-filebrowser-quantum
       gethomepage.dev/name: File Browser ({{ .Release.Name }})
       gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24,192.168.70.0/24"
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?{{ .Release.Labels.ingressAuth }}"
-      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: filebrowser-{{ .Release.Name }}-tls
-        hosts:
-          - filebrowser.{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: filebrowser.{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: filebrowser
+
+  metube:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: UI for downloading media from Youtube
+      gethomepage.dev/group: RedBot
+      gethomepage.dev/icon: metube.png
+      gethomepage.dev/name: MeTube ({{ .Release.Name }})
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
 
 persistence:
   storage:
@@ -113,8 +75,10 @@ persistence:
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 1Gi
-    globalMounts:
-      - path: /data
+    advancedMounts:
+      main:
+        main:
+          - path: /data
 
   localtracks:
     enabled: true
@@ -126,29 +90,33 @@ persistence:
       main:
         main:
           - path: /localtracks
-        filebrowser:
+      filebrowser:
+        main:
           - path: /srv
+      metube:
+        main:
+          - path: /downloads
 
 rawResources:
   vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultAuth
       spec:
         method: kubernetes
         mount: k8s/homeserver
         kubernetes:
-          role: {{ .Release.Labels.vaultRole }}
-          serviceAccount: {{ .Release.Name }}-main
+          role: {{ .Release.Name }}
+          serviceAccount: {{ .Release.Name }}
   secrets:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
-        path: services/{{ .Release.Labels.vaultSubPath }}/secrets
+        path: services/redbot/{{ .Release.Name }}/secrets
         destination:
-          name: {{ .Release.Labels.appName }}-secrets
+          name: {{ .Release.Name }}-secrets
           create: true
-        vaultAuthRef: {{ .Release.Labels.appName }}-vault-auth
+        vaultAuthRef: {{ .Release.Name }}-vault-auth
