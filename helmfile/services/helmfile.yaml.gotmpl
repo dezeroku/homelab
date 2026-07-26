@@ -81,6 +81,11 @@ environments:
               main:
                 # TODO: Is cluster really needed here?
                 networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
+          change-detection:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main]
+                oidc: true
           esphome:
             routes:
               main:
@@ -591,8 +596,10 @@ releases:
 
   - name: change-detection
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: oidc-secret
       - template: default
   - name: change-detection
     inherit:
