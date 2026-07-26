@@ -22,6 +22,7 @@ locals {
     "change-detection"          = []
     "metube"                    = []
     "actual-budget"             = []
+    "jellyfin"                  = []
   }
 }
 

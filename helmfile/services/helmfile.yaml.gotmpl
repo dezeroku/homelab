@@ -11,6 +11,12 @@ environments:
   default:
     values:
       - releaseConfig:
+          jellyfin:
+            secrets: [ldap-bind-user]
+            routes:
+              main:
+                # TODO: Is cluster really needed here?
+                networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
           lldap:
             secrets: [jwt, key, user]
             routes:
@@ -215,8 +221,10 @@ releases:
   - name: jellyfin
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: vault-secrets
       - template: default
   - name: jellyfin
     values:
