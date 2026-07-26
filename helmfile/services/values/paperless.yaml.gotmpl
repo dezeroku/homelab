@@ -17,13 +17,11 @@ controllers:
   gotenberg:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
           repository: gotenberg/gotenberg
-          tag: 8.23
+          tag: 8.34
           pullPolicy: IfNotPresent
         # The gotenberg chromium route is used to convert .eml files. We do not
         # want to allow external content like tracking pixels or even javascript.
@@ -41,8 +39,6 @@ controllers:
   tika:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
@@ -59,13 +55,11 @@ controllers:
   main:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
           repository: ghcr.io/paperless-ngx/paperless-ngx
-          tag: 2.18.4
+          tag: 3.0.3
           pullPolicy: IfNotPresent
         env:
           A_OIDC_CLIENT_ID:
@@ -78,12 +72,7 @@ controllers:
               secretKeyRef:
                 name: paperless-oidc-secret
                 key: client_secret
-          A_REDIS_PASSWORD:
-            valueFrom:
-              secretKeyRef:
-                name: paperless-redis
-                key: password
-          PAPERLESS_REDIS: redis://:$(A_REDIS_PASSWORD)@paperless-redis-master:6379
+          PAPERLESS_REDIS: redis://paperless-dragonfly-db:6379/0
           PAPERLESS_DBHOST:
             valueFrom:
               secretKeyRef:
@@ -262,13 +251,9 @@ controllers:
           - echo "Wait for gotenberg to be available"; while ! nc -z paperless-gotenberg 3000; do sleep 1; echo "-"; done; echo "Ready";
         resources: {}
 
-serviceAccount:
-  main: {}
-
 service:
   main:
     controller: main
-    primary: true
     ports:
       http:
         port: 8000
@@ -283,32 +268,18 @@ service:
       http:
         port: 3000
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Document Management
       gethomepage.dev/group: Services
       gethomepage.dev/icon: paperless.png
       gethomepage.dev/name: Paperless
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=paperless"
-      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.71.0/24"
-      #nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=download-admins"
-      #nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-    tls:
-      - secretName: paperless-tls
-        hosts:
-          - paperless.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: paperless.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
+    rules:
+      - backendRefs:
+          - identifier: main
 
 persistence:
   data:
@@ -375,20 +346,33 @@ persistence:
       main:
         main:
           - path: /usr/src/paperless/trash
-redis:
-  architecture: standalone
-  auth:
-    existingSecret: paperless-redis
-    existingSecretPasswordKey: password
-  persistence:
-    storageClass: longhorn
-    size: 5Gi
-
 rawResources:
+  dragonfly-db:
+    manifest:
+      apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      spec:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        snapshot:
+          cron: "*/5 * * * *"
+          persistentVolumeClaimSpec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 2Gi
+            storageClassName: longhorn-ssd
   db:
-    apiVersion: postgres-operator.crunchydata.com/v1beta1
-    kind: PostgresCluster
-    spec:
+    manifest:
+      apiVersion: postgres-operator.crunchydata.com/v1beta1
+      kind: PostgresCluster
       spec:
         postgresVersion: 16
         users:
@@ -427,20 +411,10 @@ rawResources:
                   bucket: paperless
                   endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
                   region: default
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: paperless
-          serviceAccount: paperless-main
   pgo-backup-s3-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -458,66 +432,6 @@ rawResources:
                   repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
                   repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
         vaultAuthRef: paperless-vault-auth
-  secret-key:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/paperless/secret-key
-        destination:
-          name: paperless-secret-key
-          create: true
-        vaultAuthRef: paperless-vault-auth
-  admin:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/paperless/admin
-        destination:
-          name: paperless-admin
-          create: true
-        vaultAuthRef: paperless-vault-auth
-  redis:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/paperless/redis
-        destination:
-          name: paperless-redis
-          create: true
-        vaultAuthRef: paperless-vault-auth
-  redis:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/paperless/redis
-        destination:
-          name: paperless-redis
-          create: true
-        vaultAuthRef: paperless-vault-auth
-  ses-incoming:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/paperless/ses/incoming
-        destination:
-          name: paperless-ses-incoming
-          create: true
-        vaultAuthRef: paperless-vault-auth
 #  smtp:
 #    apiVersion: secrets.hashicorp.com/v1beta1
 #    kind: VaultStaticSecret
@@ -530,19 +444,3 @@ rawResources:
 #          name: paperless-smtp
 #          create: true
 #        vaultAuthRef: paperless-vault-auth
-  oidc-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v1
-        mount: /identity
-        path: oidc/client/paperless
-        destination:
-          name: paperless-oidc-secret
-          create: true
-          transformation:
-            includes:
-              - client_id
-              - client_secret
-        vaultAuthRef: paperless-vault-auth

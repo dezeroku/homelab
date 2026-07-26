@@ -172,10 +172,6 @@ variable "paperless_admin_email" {
   type = string
 }
 
-variable "paperless_redis_password" {
-  type = string
-}
-
 variable "paperless_ses_incoming_recipients" {
   type = list(string)
 }

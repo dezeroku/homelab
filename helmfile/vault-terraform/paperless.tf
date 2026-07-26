@@ -26,9 +26,6 @@ module "paperless" {
       password = var.paperless_admin_password
       email    = var.paperless_admin_email
     }
-    "redis" = {
-      password = var.paperless_redis_password
-    }
     "ses/incoming" = {
       queue_url             = module.paperless_ses_incoming.queue_url
       bucket_name           = module.paperless_ses_incoming.bucket_name
