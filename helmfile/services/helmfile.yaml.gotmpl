@@ -11,6 +11,11 @@ environments:
   default:
     values:
       - releaseConfig:
+          ryot:
+            routes:
+              main:
+                networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
+            secrets: [admin]
           hedgedoc:
             routes:
               main:
@@ -325,8 +330,11 @@ releases:
 
   - name: ryot
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: vault-secrets
+      - template: oidc-secret
       - template: default
   - name: ryot
     inherit:

@@ -6,13 +6,11 @@ controllers:
   main:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
           repository: ghcr.io/ignisda/ryot
-          tag: v9.2.0
+          tag: v10.4.0
           pullPolicy: IfNotPresent
         env:
           TZ: Europe/Warsaw
@@ -37,7 +35,7 @@ controllers:
           SERVER_ADMIN_ACCESS_TOKEN:
             valueFrom:
               secretKeyRef:
-                name: ryot-admin-secret
+                name: ryot-admin
                 key: token
           SERVER_OIDC_ISSUER_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
           # For debugging OIDC (and other) issues
@@ -61,38 +59,21 @@ service:
       http:
         port: 8000
 
-serviceAccount:
-  main: {}
-
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Track consumed media
       gethomepage.dev/group: Services
       gethomepage.dev/icon: ryot.png
       gethomepage.dev/name: Ryot
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=ryot"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    tls:
-      - secretName: ryot-tls
-        hosts:
-          - ryot.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: ryot.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
 
 rawResources:
   db:
-    apiVersion: postgres-operator.crunchydata.com/v1beta1
-    kind: PostgresCluster
-    spec:
+    manifest:
+      apiVersion: postgres-operator.crunchydata.com/v1beta1
+      kind: PostgresCluster
       spec:
         postgresVersion: 16
         users:
@@ -130,20 +111,10 @@ rawResources:
                   bucket: ryot
                   endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
                   region: default
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: ryot
-          serviceAccount: ryot-main
   pgo-backup-s3-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -160,32 +131,4 @@ rawResources:
                   [global]
                   repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
                   repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
-        vaultAuthRef: ryot-vault-auth
-  oidc-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v1
-        mount: /identity
-        path: oidc/client/ryot
-        destination:
-          name: ryot-oidc-secret
-          create: true
-          transformation:
-            includes:
-              - client_id
-              - client_secret
-        vaultAuthRef: ryot-vault-auth
-  admin-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/ryot/admin
-        destination:
-          name: ryot-admin-secret
-          create: true
         vaultAuthRef: ryot-vault-auth
