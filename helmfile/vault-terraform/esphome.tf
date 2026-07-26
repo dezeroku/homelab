@@ -13,6 +13,11 @@ module "esphome" {
       esphome_api_password = var.esphome_api_password
     }
   }
+
+  oidc = {
+    redirect_uris = ["https://esphome.${var.domain}/oauth2/callback"]
+    group_ids     = [vault_identity_group.this["esphome"].id]
+  }
 }
 
 moved {

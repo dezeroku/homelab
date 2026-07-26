@@ -23,6 +23,7 @@ locals {
     "metube"                    = []
     "actual-budget"             = []
     "jellyfin"                  = []
+    "esphome"                   = []
   }
 }
 

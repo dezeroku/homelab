@@ -44,6 +44,7 @@ locals {
     module.immich.oidc_client_id,
     module.filebrowser-drive.oidc_client_id,
     module.actual-budget.oidc_client_id,
+    module.esphome.oidc_client_id,
   ])
 }
 

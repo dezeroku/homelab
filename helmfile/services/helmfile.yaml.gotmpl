@@ -81,6 +81,11 @@ environments:
               main:
                 # TODO: Is cluster really needed here?
                 networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
+          esphome:
+            routes:
+              main:
+                networks: [lan, vpn_main]
+                oidc: true
           lldap:
             secrets: [jwt, key, user]
             routes:
@@ -610,8 +615,10 @@ releases:
 
   - name: esphome
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: oidc-secret
       - template: default
   - name: esphome
     inherit:

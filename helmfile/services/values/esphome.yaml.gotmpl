@@ -11,8 +11,6 @@ controllers:
   main:
     type: deployment
     replicas: 1
-    serviceAccount:
-      identifier: main
     pod:
       # For the mDNS
       hostNetwork: true
@@ -52,37 +50,15 @@ service:
       http:
         port: 6052
 
-serviceAccount:
-  main: {}
-
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: ESP Home Device Builder
       gethomepage.dev/group: IoT
       gethomepage.dev/icon: esphome.png
       gethomepage.dev/name: esphome
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=esphome"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_emails=contact@dezeroku.com"
-      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-      # Arbitrary size of uploads
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: esphome-general-tls
-        hosts:
-          - esphome.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: esphome.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: main
 
 persistence:
   config:
@@ -110,20 +86,23 @@ persistence:
         readOnly: true
 
 rawResources:
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: {{ .Release.Name }}
-          serviceAccount: {{ .Release.Name }}-main
+# TODO: setting requestBuffer alongside web sockets upgrades is a known breaking point for envoy-gateway as of 2026
+# Skipping this part for now and hoping it'll get fixed/improved in the future
+#  backend-traffic-policy:
+#    manifest:
+#      apiVersion: gateway.envoyproxy.io/v1alpha1
+#      kind: BackendTrafficPolicy
+#      spec:
+#        requestBuffer:
+#          limit: "300M"
+#        targetRefs:
+#        - group: gateway.networking.k8s.io
+#          kind: HTTPRoute
+#          name: {{ .Release.Name }}-main
   secrets-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
