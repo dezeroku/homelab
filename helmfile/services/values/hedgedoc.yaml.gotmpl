@@ -6,13 +6,11 @@ controllers:
   main:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
           repository: quay.io/hedgedoc/hedgedoc
-          tag: 1.10.7
+          tag: 1.11.1
           pullPolicy: IfNotPresent
         env:
           TZ: Europe/Warsaw
@@ -62,40 +60,21 @@ service:
       http:
         port: 3000
 
-serviceAccount:
-  main: {}
-
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Yet Another Notes App
       gethomepage.dev/group: Services
       gethomepage.dev/icon: hedgedoc.png
       gethomepage.dev/name: HedgeDoc
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=hedgedoc"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-      # Arbitrary size of attachments
-      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-    tls:
-      - secretName: hedgedoc-tls
-        hosts:
-          - hedgedoc.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: hedgedoc.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
 
 rawResources:
   db:
-    apiVersion: postgresql.cnpg.io/v1
-    kind: Cluster
-    spec:
+    manifest:
+      apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
       spec:
         instances: 1
         imageName: ghcr.io/cloudnative-pg/postgresql:17
@@ -116,28 +95,18 @@ rawResources:
               compression: gzip
           retentionPolicy: "14d"
   db-backup:
-    apiVersion: postgresql.cnpg.io/v1
-    kind: ScheduledBackup
-    spec:
+    manifest:
+      apiVersion: postgresql.cnpg.io/v1
+      kind: ScheduledBackup
       spec:
         schedule: "0 0 1 * * 0"
         backupOwnerReference: self
         cluster:
           name: hedgedoc-db
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: hedgedoc
-          serviceAccount: hedgedoc-main
   cnpg-backup-s3-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -155,20 +124,4 @@ rawResources:
               ACCESS_SECRET_KEY:
                 text: |-
                   {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
-        vaultAuthRef: hedgedoc-vault-auth
-  oidc-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v1
-        mount: /identity
-        path: oidc/client/hedgedoc
-        destination:
-          name: hedgedoc-oidc-secret
-          create: true
-          transformation:
-            includes:
-              - client_id
-              - client_secret
         vaultAuthRef: hedgedoc-vault-auth
