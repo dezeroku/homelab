@@ -10,8 +10,6 @@ repositories:
     url: https://victoriametrics.github.io/helm-charts/
   - name: ingress-nginx
     url: https://kubernetes.github.io/ingress-nginx
-  - name: jetstack
-    url: https://charts.jetstack.io
   - name: nixys
     url: https://registry.nixys.ru/chartrepo/public
   - name: hashicorp
@@ -95,14 +93,23 @@ releases:
       - template: argocd-app
 
   - name: cert-manager
-    chart: jetstack/cert-manager
-    version: 1.14.4
+    chart: oci://quay.io/jetstack/charts/cert-manager
+    version: 1.21.0
     inherit:
       - template: default
-    dependencies:
-      - chart: bjw-s-labs/app-template
-        version: 4.1.2
   - name: cert-manager
+    inherit:
+      - template: argocd-app
+
+  - name: cert-manager-enhancements
+    namespace: cert-manager
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    inherit:
+      - template: default
+  - name: cert-manager-enhancements
+    values:
+      - targetNamespace: cert-manager
     inherit:
       - template: argocd-app
 

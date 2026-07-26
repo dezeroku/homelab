@@ -2,6 +2,10 @@
 installCRDs: true
 enableCertificateOwnerRef: true
 
+config:
+  gatewayAPI:
+    enabled: true
+
 resources:
   requests:
     cpu: 10m
@@ -27,48 +31,3 @@ cainjector:
     limits:
       memory: 256Mi
       cpu: 250m
-
-app-template:
-  rawResources:
-    vault-auth:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultAuth
-      spec:
-        spec:
-          method: kubernetes
-          mount: k8s/homeserver
-          kubernetes:
-            role: cert-manager
-            serviceAccount: cert-manager
-    dns-prod-credentials:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
-        spec:
-          type: kv-v2
-          mount: kvv2
-          path: cert-manager/letsencrypt-dns-prod-credentials-secret
-          destination:
-            name: cert-manager-dns-prod-credentials-secret
-            create: true
-          vaultAuthRef: cert-manager-vault-auth
-    letsencrypt-dns-prod:
-      apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      spec:
-        spec:
-          acme:
-            server: https://acme-v02.api.letsencrypt.org/directory
-            email: acme@dezeroku.com
-            privateKeySecretRef:
-              name: letsencrypt-dns-prod
-            solvers:
-              - dns01:
-                  route53:
-                    region: us-east-1
-                    accessKeyIDSecretRef:
-                      name: cert-manager-dns-prod-credentials-secret
-                      key: AWS_ACCESS_KEY_ID
-                    secretAccessKeySecretRef:
-                      name: cert-manager-dns-prod-credentials-secret
-                      key: AWS_SECRET_ACCESS_KEY
