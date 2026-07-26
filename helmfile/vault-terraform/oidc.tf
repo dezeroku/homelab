@@ -50,6 +50,7 @@ locals {
     module.filebrowser-media.oidc_client_id,
     module.filebrowser-media-readonly.oidc_client_id,
     module.metube.oidc_client_id,
+    module.navidrome.oidc_client_id,
   ])
 }
 

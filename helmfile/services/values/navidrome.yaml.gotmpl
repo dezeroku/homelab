@@ -17,7 +17,7 @@ controllers:
       main:
         image:
           repository: deluan/navidrome
-          tag: 0.58.0
+          tag: 0.63.2
           pullPolicy: IfNotPresent
         env:
           ND_ENABLEINSIGHTSCOLLECTOR: false
@@ -39,44 +39,47 @@ service:
       http:
         port: 4533
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Music Server
       gethomepage.dev/group: Media
       gethomepage.dev/icon: navidrome.png
       gethomepage.dev/name: Navidrome
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=navidrome"
-    tls:
-      - secretName: navidrome-tls
-        hosts:
-          - navidrome.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: navidrome.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
+
+  metube:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: UI for downloading media from Youtube
+      gethomepage.dev/group: Media Management
+      gethomepage.dev/icon: metube.png
+      gethomepage.dev/name: MeTube ({{ .Release.Name }})
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
 
 persistence:
   music:
     enabled: true
     type: persistentVolumeClaim
     existingClaim: media-storage-main
-    globalMounts:
-      - path: /music
-        subPath: music
-        readOnly: true
-
+    advancedMounts:
+      main:
+        main:
+          - path: /music
+            subPath: music
+            readOnly: true
+      metube:
+        main:
+          - path: /downloads
+            subPath: music
   data:
     enabled: true
     type: persistentVolumeClaim
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 5Gi
-    globalMounts:
-      - path: /data
+    advancedMounts:
+      main:
+        main:
+          - path: /data

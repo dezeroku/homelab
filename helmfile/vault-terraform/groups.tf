@@ -27,6 +27,7 @@ locals {
     "filebrowser-media"          = []
     "filebrowser-media-readonly" = []
     "metube"                     = []
+    "navidrome"                  = []
   }
 }
 

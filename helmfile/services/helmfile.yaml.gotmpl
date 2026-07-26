@@ -11,6 +11,16 @@ environments:
   default:
     values:
       - releaseConfig:
+          navidrome:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+                service: main
+              metube:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+                hostname: navidrome-metube.{{ requiredEnv "DOMAIN" }}
+                oidc: true
+                service: metube
           invidious:
             routes:
               main:
@@ -480,32 +490,16 @@ releases:
       - template: argocd-app
 
   - name: navidrome
+    # TODO: it deserves its own namespace tbh
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: metube
+      - template: oidc-secret
+      - template: gateway
       - template: default
   - name: navidrome
-    values:
-      - targetNamespace: media
-    inherit:
-      - template: argocd-app
-
-  - name: metube-navidrome
-    namespace: media
-    chart: bjw-s-labs/app-template
-    version: 4.1.2
-    labels:
-      mountSubPath: music
-      homepageGroup: Media Management
-      existingClaim: media-storage-main
-      ingressAuth: "allowed_groups=download-admins"
-      deleteFileOnThrashCan: true
-    inherit:
-      - template: default
-    values:
-      - values/metube-common.yaml.gotmpl
-  - name: metube-navidrome
     values:
       - targetNamespace: media
     inherit:
