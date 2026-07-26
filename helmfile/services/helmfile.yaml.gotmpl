@@ -68,6 +68,13 @@ environments:
               api:
                 hostname: 'api.ente.{{ requiredEnv "DOMAIN" }}'
                 networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+          filebrowser-drive:
+            filebrowser:
+              createUserDir: true
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+                hostname: drive.{{ requiredEnv "DOMAIN" }}
           convertx:
             routes:
               main:
@@ -572,8 +579,10 @@ releases:
 
   - name: filebrowser-drive
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: filebrowser
+      - template: gateway
       - template: default
   - name: filebrowser-drive
     inherit:

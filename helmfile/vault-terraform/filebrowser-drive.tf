@@ -4,7 +4,7 @@ module "filebrowser-drive" {
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
   oidc = {
-    redirect_uris = ["https://filebrowser-drive.${var.domain}/api/auth/oidc/callback"]
+    redirect_uris = ["https://drive.${var.domain}/api/auth/oidc/callback"]
     group_ids = [
       vault_identity_group.this["filebrowser-drive-clients"].id,
       vault_identity_group.this["filebrowser-drive-admins"].id,

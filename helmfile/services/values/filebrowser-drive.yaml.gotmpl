@@ -2,120 +2,18 @@
 global:
   alwaysAppendIdentifierToResourceName: true
 
-# TODO: run as non-root
-controllers:
+route:
   main:
-    strategy: Recreate
-    replicas: 1
-    serviceAccount:
-      identifier: main
-    containers:
-      main:
-        image:
-          repository: ghcr.io/gtsteffaniak/filebrowser
-          tag: 1.1.1-stable
-          pullPolicy: IfNotPresent
-        env:
-          FILEBROWSER_CONFIG: /etc/filebrowser.yaml
-          FILEBROWSER_OIDC_CLIENT_ID:
-            valueFrom:
-              secretKeyRef:
-                name: filebrowser-drive-oidc-secret
-                key: client_id
-          FILEBROWSER_OIDC_CLIENT_SECRET:
-            valueFrom:
-              secretKeyRef:
-                name: filebrowser-drive-oidc-secret
-                key: client_secret
-        probes:
-          readiness:
-            enabled: true
-          liveness:
-            enabled: true
-        resources:
-          limits:
-            memory: 4Gi
-          requests:
-            memory: 256Mi
-
-service:
-  main:
-    controller: main
-    ports:
-      http:
-        port: 80
-
-serviceAccount:
-  main: {}
-
-ingress:
-  main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Cloud storage
       gethomepage.dev/group: Services
       gethomepage.dev/icon: filebrowser.png
       gethomepage.dev/name: Drive
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=filebrowser-drive"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.71.0/24"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/server-snippet: |
-        client_max_body_size 0;
-    tls:
-      - secretName: filebrowser-drive-tls
-        hosts:
-          - drive.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: drive.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
 
-configMaps:
-  config:
-    enabled: true
-    data:
-      config.yaml: |
-        server:
-          #logging:
-          #  - levels: "info|warning|error"
-          sources:
-            - path: "/srv"
-              config:
-                defaultEnabled: true
-                createUserDir: true
-        userDefaults:
-          preview:
-            image: true
-            popup: true
-            video: false
-            office: false
-            highQuality: false
-          darkMode: true
-          disableSettings: false
-          singleClick: false
-          permissions:
-            create: true
-            delete: true
-            modify: true
-            share: true
-            admin: false
-            api: false
-        auth:
-          methods:
-            password:
-              enabled: false # only allow OIDC
-            oidc:
-              enabled: true
-              issuerUrl: "https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main"
-              scopes: "email openid profile groups"
-              userIdentifier: "username"
-              createUser: true
-              adminGroup: "filebrowser-drive-admins"
+# The data filebrowser serves; everything else comes from the `filebrowser`
+# block in ../lib/values/filebrowser.yaml.gotmpl
 persistence:
   main:
     enabled: true
@@ -123,41 +21,7 @@ persistence:
     storageClass: longhorn-ssd
     accessMode: ReadWriteOnce
     size: 200Gi
-    globalMounts:
-      - path: /srv
-  config:
-    enabled: true
-    type: configMap
-    name: filebrowser-drive-config
     advancedMounts:
-      main:
+      filebrowser:
         main:
-          - path: /etc/filebrowser.yaml
-            subPath: config.yaml
-rawResources:
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: filebrowser-drive
-          serviceAccount: filebrowser-drive-main
-  oidc-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v1
-        mount: /identity
-        path: oidc/client/filebrowser-drive
-        destination:
-          name: filebrowser-drive-oidc-secret
-          create: true
-          transformation:
-            includes:
-              - client_id
-              - client_secret
-        vaultAuthRef: filebrowser-drive-vault-auth
+          - path: /srv
