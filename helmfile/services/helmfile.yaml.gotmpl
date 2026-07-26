@@ -32,6 +32,10 @@ environments:
             routes:
               main:
                 networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+          convertx:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
           cyberchef:
             routes:
               main: {}
@@ -467,8 +471,9 @@ releases:
 
   - name: convertx
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
       - template: default
   - name: convertx
     inherit:

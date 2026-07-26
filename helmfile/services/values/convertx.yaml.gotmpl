@@ -17,7 +17,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/c4illin/convertx
-          tag: v0.14.1
+          tag: v0.18.0
           pullPolicy: IfNotPresent
         env:
           # Access controlled via IP whitelist for now
@@ -42,30 +42,15 @@ service:
       http:
         port: 3000
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Convert files to different formats
       gethomepage.dev/group: Tools
-      gethomepage.dev/icon: si-planet
+      gethomepage.dev/icon: sh-convertx
       gethomepage.dev/name: ConvertX
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=convertx"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    tls:
-      - secretName: convertx-tls
-        hosts:
-          - convertx.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: convertx.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
 
 persistence:
   data:
