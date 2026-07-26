@@ -25,6 +25,7 @@ locals {
     "jellyfin"                  = []
     "esphome"                   = []
     "flatnotes"                 = []
+    "filebrowser-media"         = []
   }
 }
 

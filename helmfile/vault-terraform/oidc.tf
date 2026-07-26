@@ -47,6 +47,7 @@ locals {
     module.esphome.oidc_client_id,
     module.change-detection.oidc_client_id,
     module.flatnotes.oidc_client_id,
+    module.filebrowser-media.oidc_client_id,
   ])
 }
 
