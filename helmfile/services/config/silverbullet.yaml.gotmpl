@@ -3,4 +3,9 @@
 releaseConfig:
   silverbullet:
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
+    templates: [gateway, oidc-secret]
+    routes:
+      main:
+        networks: [lan, guest, vpn_main]
+        oidc: true

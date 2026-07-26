@@ -53,6 +53,7 @@ locals {
     module.redbot-main.oidc_client_id,
     module.redbot-premiers.oidc_client_id,
     module.navidrome.oidc_client_id,
+    module.silverbullet.oidc_client_id,
   ])
 }
 

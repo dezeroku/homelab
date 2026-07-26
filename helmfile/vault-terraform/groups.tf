@@ -29,6 +29,7 @@ locals {
     "filebrowser-media-readonly" = []
     "metube"                     = []
     "navidrome"                  = []
+    "silverbullet"               = []
   }
 }
 
