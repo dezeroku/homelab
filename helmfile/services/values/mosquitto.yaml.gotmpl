@@ -1,15 +1,10 @@
 ---
-# TODO: switch to the UDP services exposed via ingress-nginx
-# Why wasn't it done this way in the first place?
-
 global:
   alwaysAppendIdentifierToResourceName: true
 
 # TODO: restart pod automatically when cert-manager refreshes Certificate
 controllers:
   mosquitto:
-    serviceAccount:
-      identifier: main
     pod:
       securityContext:
         runAsUser: 2000
@@ -50,9 +45,6 @@ service:
         port: 1883
       mqtt-tls:
         port: 8883
-
-serviceAccount:
-  main: {}
 
 configMaps:
   config:
@@ -109,21 +101,20 @@ persistence:
         app:
           - path: /certificate
 
+route:
+  main:
+    rules:
+      - backendRefs:
+        - name: mosquitto-main
+          port: 1883
+        - name: mosquitto-main
+          port: 8883
+
 rawResources:
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: mosquitto
-          serviceAccount: mosquitto-main
   credentials:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -132,11 +123,10 @@ rawResources:
           name: mosquitto-credentials-secret
           create: true
         vaultAuthRef: mosquitto-vault-auth
-
   certificate:
-    apiVersion: cert-manager.io/v1
-    kind: Certificate
-    spec:
+    manifest:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
       spec:
         secretName: mosquitto-tls
         dnsNames:

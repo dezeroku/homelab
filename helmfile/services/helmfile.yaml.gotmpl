@@ -67,6 +67,10 @@ environments:
               # served at ldaps.lldap.<DOMAIN> by the naming convention
               ldaps:
                 kind: TCPRoute
+          mosquitto:
+            routes:
+              main:
+                kind: TCPRoute
 
 ---
 helmDefaults:
@@ -533,8 +537,10 @@ releases:
 
   - name: mosquitto
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: vault
       - template: default
   - name: mosquitto
     inherit:
