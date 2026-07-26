@@ -17,31 +17,35 @@ configs:
   rbac:
     policy.default: 'role:admin'
 
+  # TODO: get rid of this part, when cert-manager certificate generation is added in the upstream chart
+  # Currently there's no built-in way to restart repo server automatically after cert rotation
   params:
     # We terminate TLS on ingress' level
     server.insecure: true
 
 server:
-  ingress:
+  httproute:
     enabled: true
-    tls: true
-    ingressClassName: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: GitOps management system for Kubernetes
       gethomepage.dev/group: Cluster
       gethomepage.dev/icon: argocd.png
       gethomepage.dev/name: ArgoCD
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    parentRefs:
+      - name: envoy-gateway-main
+        namespace: envoy-gateway
+    hostnames:
+      - argocd.{{ requiredEnv "DOMAIN" }}
 
-  ingressGrpc:
-    enabled: true
-    tls: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+# TODO: Experimental in chart, not yet fully supported
+#  grpcroute:
+#    enabled: true
+#    parentRefs:
+#      - name: envoy-gateway-main
+#        namespace: envoy-gateway
+#    hostnames:
+#      - grpc.argocd.{{ requiredEnv "DOMAIN" }}
 
 repoServer:
   volumes:
@@ -67,11 +71,14 @@ dex:
   enabled: false
 
 app-template:
+  global:
+    createDefaultServiceAccount: false
+
   rawResources:
     vault-auth:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultAuth
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultAuth
         spec:
           method: kubernetes
           mount: k8s/homeserver
@@ -79,9 +86,9 @@ app-template:
             role: argocd
             serviceAccount: argocd-server
     credentials-homelab:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v2
           mount: kvv2
@@ -93,9 +100,9 @@ app-template:
             create: true
           vaultAuthRef: argocd-vault-auth
     oidc:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v1
           mount: /identity
@@ -111,9 +118,9 @@ app-template:
                 - client_secret
           vaultAuthRef: argocd-vault-auth
     oidc-cli:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v1
           mount: /identity

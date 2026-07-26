@@ -218,12 +218,12 @@ releases:
 
   - name: argocd
     chart: argo-helm/argo-cd
-    version: 9.0.1
+    version: 10.2.1
     inherit:
       - template: default
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 4.1.2
+        version: 5.0.1
   - name: argocd-app
     values:
       - targetNamespace: argocd
