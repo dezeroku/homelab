@@ -50,6 +50,14 @@ environments:
             routes:
               main:
                 networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+          ente:
+            routes:
+              auth:
+                hostname: 'auth.ente.{{ requiredEnv "DOMAIN" }}'
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+              api:
+                hostname: 'api.ente.{{ requiredEnv "DOMAIN" }}'
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
           convertx:
             routes:
               main:
@@ -554,8 +562,10 @@ releases:
 
   - name: ente
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
+      - template: vault
       - template: default
   - name: ente
     inherit:

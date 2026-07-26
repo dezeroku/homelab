@@ -6,8 +6,6 @@ controllers:
   web:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
@@ -50,8 +48,6 @@ controllers:
   server:
     strategy: Recreate
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
@@ -130,57 +126,28 @@ service:
       http:
         port: 8080
 
-serviceAccount:
-  main: {}
-
-ingress:
+route:
   auth:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: 2FA helper (ask me for help with setup)
       gethomepage.dev/group: Services
-      gethomepage.dev/icon: si-planet
+      gethomepage.dev/icon: sh-ente-auth
       gethomepage.dev/name: Ente Auth
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=ente"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    hosts:
-      - host: auth.ente.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: auth
-
-    tls:
-      - secretName: ente-auth-tls
-        hosts:
-          - auth.ente.{{ requiredEnv "DOMAIN" }}
+    rules:
+      - backendRefs:
+        - identifier: auth
   api:
-    enabled: true
-    className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    hosts:
-      - host: api.ente.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: server
-    tls:
-      - secretName: ente-api-tls
-        hosts:
-          - api.ente.{{ requiredEnv "DOMAIN" }}
+    rules:
+      - backendRefs:
+        - identifier: server
 
 rawResources:
   db:
-    apiVersion: postgresql.cnpg.io/v1
-    kind: Cluster
-    spec:
+    manifest:
+      apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
       spec:
         instances: 1
         imageName: ghcr.io/cloudnative-pg/postgresql:17
@@ -209,28 +176,18 @@ rawResources:
               compression: gzip
           retentionPolicy: "14d"
   db-backup:
-    apiVersion: postgresql.cnpg.io/v1
-    kind: ScheduledBackup
-    spec:
+    manifest:
+      apiVersion: postgresql.cnpg.io/v1
+      kind: ScheduledBackup
       spec:
         schedule: "0 0 1 * * 0"
         backupOwnerReference: self
         cluster:
           name: ente-db
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: ente
-          serviceAccount: ente-main
   cnpg-backup-s3-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -250,9 +207,9 @@ rawResources:
                   {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
         vaultAuthRef: ente-vault-auth
   jwt-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -262,9 +219,9 @@ rawResources:
           create: true
         vaultAuthRef: ente-vault-auth
   key-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
