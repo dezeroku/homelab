@@ -6,8 +6,6 @@ controllers:
   main:
     type: statefulset
     replicas: 1
-    serviceAccount:
-      identifier: main
     pod:
       hostNetwork: true
     containers:
@@ -20,7 +18,7 @@ controllers:
               - NET_RAW
         image:
           repository: ghcr.io/home-assistant/home-assistant
-          tag: 2026.6.4
+          tag: 2026.7.4
           pullPolicy: IfNotPresent
         probes:
           readiness:
@@ -37,9 +35,6 @@ controllers:
           requests:
             memory: 1Gi
 
-serviceAccount:
-  main: {}
-
 service:
   main:
     controller: main
@@ -47,30 +42,15 @@ service:
       http:
         port: 8123
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.71.0/24"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Home Assistant
       gethomepage.dev/group: IoT
       gethomepage.dev/icon: home-assistant.png
       gethomepage.dev/name: Home Automation
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=home-assistant"
-    tls:
-      - secretName: home-assistant-general-tls
-        hosts:
-          - &host home-assistant.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: *host
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: main
 
 persistence:
   config-storage:
@@ -127,6 +107,7 @@ configMaps:
           # TODO: this is a very much hardcoded node IP
           trusted_proxies:
             - 192.168.4.0/24
+            - 10.42.0.0/16
         homekit:
           port: 31333
           name: HASS Bridge
@@ -197,25 +178,15 @@ serviceMonitor:
           insecureSkipVerify: true
 
 rawResources:
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-       method: kubernetes
-       mount: k8s/homeserver
-       kubernetes:
-         role: home-assistant
-         serviceAccount: home-assistant-main
   hass-prometheus-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
-        path: services/home-assistant/prometheus
+        path: services/{{ .Release.Name }}/prometheus
         destination:
-          name: home-assistant-hass-prometheus-secret
+          name: {{ .Release.Name }}-hass-prometheus-secret
           create: true
-        vaultAuthRef: home-assistant-vault-auth
+        vaultAuthRef: {{ .Release.Name }}-vault-auth
