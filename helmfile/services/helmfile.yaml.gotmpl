@@ -11,6 +11,10 @@ environments:
   default:
     values:
       - releaseConfig:
+          stirling-pdf:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
           it-tools:
             routes:
               main:
@@ -477,8 +481,9 @@ releases:
 
   - name: stirling-pdf
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
       - template: default
   - name: stirling-pdf
     inherit:
