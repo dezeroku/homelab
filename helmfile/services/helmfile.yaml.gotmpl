@@ -11,6 +11,11 @@ environments:
   default:
     values:
       - releaseConfig:
+          invidious:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+            secrets: [hmac, companion-hmac]
           ryot:
             routes:
               main:
@@ -90,8 +95,12 @@ releases:
 
   - name: invidious
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
+    labels:
+      vaultServiceAccount: invidious-main
     inherit:
+      - template: gateway
+      - template: vault-secrets
       - template: default
   - name: invidious
     inherit:

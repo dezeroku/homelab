@@ -7,6 +7,7 @@ defaultPodOptions:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
+  automountServiceAccountToken: true
   nodeSelector:
     # TODO: currently Invidious does not provide multi-manifest images and pushes
     # all the architectures under different tags
@@ -31,7 +32,7 @@ controllers:
           SERVER_SECRET_KEY:
             valueFrom:
               secretKeyRef:
-                name: invidious-companion-hmac-secret
+                name: invidious-companion-hmac
                 key: key
         resources:
           limits:
@@ -66,12 +67,12 @@ controllers:
           INVIDIOUS_HMAC_KEY:
             valueFrom:
               secretKeyRef:
-                name: invidious-hmac-secret
+                name: invidious-hmac
                 key: key
           INVIDIOUS_INVIDIOUS_COMPANION_KEY:
             valueFrom:
               secretKeyRef:
-                name: invidious-companion-hmac-secret
+                name: invidious-companion-hmac
                 key: key
         probes:
           readiness:
@@ -160,36 +161,18 @@ service:
       companion:
         port: 8282
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Alternative UI for Youtube
       gethomepage.dev/group: YT
       gethomepage.dev/icon: invidious.png
       gethomepage.dev/name: Invidious
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=invidious"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-      # These below are useful for importing the history
-      # probably could be lowered to something like 5MBs too
-      # On the other hand they're mostly one-off runs, so
-      # let's juts keep the defaults and change when needed
-      #nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      #nginx.ingress.kubernetes.io/server-snippet: |
-      #  client_max_body_size 0;
-    tls:
-      - secretName: invidious-general-tls
-        hosts:
-          - invidious.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: invidious.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
+    rules:
+      - backendRefs:
+          - identifier: main
 
 configMaps:
   config:
@@ -266,9 +249,9 @@ rbac:
 
 rawResources:
   db:
-    apiVersion: postgres-operator.crunchydata.com/v1beta1
-    kind: PostgresCluster
-    spec:
+    manifest:
+      apiVersion: postgres-operator.crunchydata.com/v1beta1
+      kind: PostgresCluster
       spec:
         postgresVersion: 15
         users:
@@ -306,44 +289,10 @@ rawResources:
                   bucket: invidious
                   endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
                   region: default
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: invidious
-          serviceAccount: invidious-main
-  hmac-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/invidious/hmac
-        destination:
-          name: invidious-hmac-secret
-          create: true
-        vaultAuthRef: invidious-vault-auth
-  companion-hmac-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/invidious/companion-hmac
-        destination:
-          name: invidious-companion-hmac-secret
-          create: true
-        vaultAuthRef: invidious-vault-auth
   pgo-backup-s3-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
