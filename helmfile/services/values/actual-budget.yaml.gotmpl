@@ -49,31 +49,15 @@ service:
       http:
         port: 5006
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Home Budgeting solution
       gethomepage.dev/group: Services
       gethomepage.dev/icon: {{ .Release.Name }}.png
       gethomepage.dev/name: Actual Budget
       gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
-      # Arbitrary size of uploads
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: {{ .Release.Name }}-tls
-        hosts:
-          - {{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: {{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: main
 
 persistence:
   data:
@@ -84,31 +68,3 @@ persistence:
     size: 1Gi
     globalMounts:
       - path: /data
-
-rawResources:
-  vault-auth:
-    manifest:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultAuth
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: {{ .Release.Name }}
-          serviceAccount: {{ .Release.Name }}
-  oidc-secret:
-    manifest:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
-        type: kv-v1
-        mount: /identity
-        path: oidc/client/{{ .Release.Name }}
-        destination:
-          name: {{ .Release.Name }}-oidc-secret
-          create: true
-          transformation:
-            includes:
-              - client_id
-              - client_secret
-        vaultAuthRef: {{ .Release.Name }}-vault-auth

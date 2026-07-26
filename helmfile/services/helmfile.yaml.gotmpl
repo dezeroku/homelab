@@ -86,6 +86,9 @@ environments:
               main:
                 networks: [lan, vpn_main]
                 oidc: true
+          actual-budget:
+            routes:
+              main: {}
           lldap:
             secrets: [jwt, key, user]
             routes:
@@ -628,6 +631,8 @@ releases:
     chart: bjw-s-labs/app-template
     version: 5.0.1
     inherit:
+      - template: gateway
+      - template: oidc-secret
       - template: default
   - name: actual-budget
     inherit:
