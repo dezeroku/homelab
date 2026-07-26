@@ -16,6 +16,9 @@ environments:
               main:
                 hostname: '{{ requiredEnv "DOMAIN" }}'
                 networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+          cyberchef:
+            routes:
+              main: {}
           jellyfin:
             secrets: [ldap-bind-user]
             routes:
@@ -454,8 +457,9 @@ releases:
 
   - name: cyberchef
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
       - template: default
   - name: cyberchef
     inherit:

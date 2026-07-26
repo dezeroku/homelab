@@ -15,7 +15,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/gchq/cyberchef
-          tag: 10.19.4
+          tag: 11.3.0
           pullPolicy: IfNotPresent
         probes:
           readiness:
@@ -32,30 +32,14 @@ service:
     controller: main
     ports:
       http:
-        port: 80
+        port: 8080
 
-ingress:
+route:
   main:
-    enabled: true
-    className: nginx
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Another collection of various tools
       gethomepage.dev/group: Tools
-      gethomepage.dev/icon: si-planet
+      gethomepage.dev/icon: sh-cyberchef
       gethomepage.dev/name: CyberChef
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=cyberchef"
-      # Everything is done locally
-      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.69.0/24,192.168.70.0/24,192.168.71.0/24"
-    tls:
-      - secretName: cyberchef-tls
-        hosts:
-          - cyberchef.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: cyberchef.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            service:
-              identifier: main
