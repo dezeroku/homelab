@@ -21,6 +21,11 @@ environments:
               main:
                 networks: [lan, guest, cluster, vpn_main, vpn_guest, vpn_family]
             secrets: [admin]
+          immich-enhancements:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+                hostname: immich.{{ requiredEnv "DOMAIN" }}
           hedgedoc:
             routes:
               main:
@@ -95,8 +100,6 @@ repositories:
     url: https://operator.min.io/
   - name: itzg
     url: https://itzg.github.io/minecraft-server-charts/
-  - name: immich
-    url: https://immich-app.github.io/immich-charts
   - name: zot
     url: http://zotregistry.dev/helm-charts
 releases:
@@ -399,8 +402,8 @@ releases:
       - template: argocd-app
 
   - name: immich
-    chart: immich/immich
-    version: 0.9.3
+    chart: oci://ghcr.io/immich-app/immich-charts/immich
+    version: 0.13.1
     inherit:
       - template: default
   - name: immich
@@ -414,8 +417,10 @@ releases:
   - name: immich-enhancements
     namespace: immich
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: vault
+      - template: gateway
       - template: default
   - name: immich-enhancements
     values:

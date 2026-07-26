@@ -10,14 +10,25 @@ persistence:
     accessMode: ReadWriteOnce
     size: 300Gi
 
-serviceAccount:
-  main: {}
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Photos storage
+      gethomepage.dev/group: Services
+      gethomepage.dev/icon: immich.png
+      gethomepage.dev/name: Immich
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=server"
+    rules:
+      - backendRefs:
+          - name: immich-server
+            port: 2283
 
 rawResources:
   db:
-    apiVersion: postgres-operator.crunchydata.com/v1beta1
-    kind: PostgresCluster
-    spec:
+    manifest:
+      apiVersion: postgres-operator.crunchydata.com/v1beta1
+      kind: PostgresCluster
       spec:
         postgresVersion: 16
         users:
@@ -59,20 +70,10 @@ rawResources:
               repoName: repo1
               options:
                - --type=full
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
-      spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: immich
-          serviceAccount: immich-main
   pgo-backup-s3-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
