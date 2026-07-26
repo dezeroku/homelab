@@ -1,6 +1,6 @@
 locals {
   namespace             = coalesce(var.namespace, var.name)
-  service_account_names = coalesce(var.service_account_names, ["${var.name}-main"])
+  service_account_names = coalesce(var.service_account_names, [var.name, "${var.name}-main"])
   secrets_prefix        = coalesce(var.secrets_prefix, "services/${var.name}")
 
   oidc_client_name     = var.oidc == null ? null : coalesce(var.oidc.client_name, var.name)
