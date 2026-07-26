@@ -20,13 +20,13 @@ locals {
     "redbot-main-admins"         = []
     "redbot-premiers-admins"     = []
     "change-detection"           = []
-    "metube"                     = []
     "actual-budget"              = []
     "jellyfin"                   = []
     "esphome"                    = []
     "flatnotes"                  = []
     "filebrowser-media"          = []
     "filebrowser-media-readonly" = []
+    "metube"                     = []
   }
 }
 

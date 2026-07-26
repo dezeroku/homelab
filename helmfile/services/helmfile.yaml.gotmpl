@@ -97,6 +97,15 @@ environments:
           cyberchef:
             routes:
               main: {}
+          metube:
+            metube:
+              existingClaim: media-storage-main
+              subPath: metube
+            routes:
+              main:
+                service: metube
+                networks: [lan, vpn_main, vpn_guest]
+                oidc: true
           jellyfin:
             secrets: [ldap-bind-user]
             routes:
@@ -315,19 +324,12 @@ releases:
   - name: metube
     namespace: media
     chart: bjw-s-labs/app-template
-    version: 4.1.2
-    # Using labels as "release values", in anticipation of
-    # https://github.com/roboll/helmfile/issues/1329 result
-    # This pattern will be shared by all metube deployments for the time being
-    labels:
-      mountSubPath: metube
-      homepageGroup: YT
-      existingClaim: media-storage-main
-      ingressAuth: "allowed_groups=download-admins,metube"
+    version: 5.0.1
     inherit:
+      - template: metube
+      - template: gateway
+      - template: oidc-secret
       - template: default
-    values:
-      - values/metube-common.yaml.gotmpl
   - name: metube
     values:
       - targetNamespace: media
