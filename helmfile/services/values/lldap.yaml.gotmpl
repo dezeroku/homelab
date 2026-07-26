@@ -1,0 +1,123 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    type: statefulset
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: lldap/lldap
+          tag: v0.6.3
+          pullPolicy: IfNotPresent
+        probes:
+          liveness: &probe
+            enabled: true
+          readiness: *probe
+          startup: *probe
+        env:
+          TZ: Europe/Warsaw
+          LLDAP_LDAP_BASE_DN: "dc=home,dc=dezeroku,dc=com"
+          LLDAP_JWT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-jwt
+                key: secret
+          LLDAP_KEY_SEED:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-key
+                key: seed
+          LLDAP_LDAP_USER_PASS:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-user
+                key: password
+          LLDAP_LDAPS_OPTIONS__ENABLED: true
+          LLDAP_LDAPS_OPTIONS__CERT_FILE: /cert/tls.crt
+          LLDAP_LDAPS_OPTIONS__KEY_FILE: /cert/tls.key
+service:
+  ldap:
+    controller: main
+    ports:
+      ldap:
+        port: 3890
+  ldaps:
+    controller: main
+    ports:
+      ldaps:
+        port: 636
+        targetPort: 6360
+  frontend:
+    controller: main
+    ports:
+      http:
+        port: 17170
+
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Light LDAP implementation
+      gethomepage.dev/group: Server
+      gethomepage.dev/icon: {{ .Release.Name }}.png
+      gethomepage.dev/name: lldap
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+    rules:
+      - backendRefs:
+        - identifier: frontend
+
+  ldaps:
+    rules:
+      - backendRefs:
+        - identifier: ldaps
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn-ssd
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
+
+  cert:
+    enabled: true
+    type: secret
+    name: {{ .Release.Name }}-ldaps-tls
+    globalMounts:
+      - path: /cert
+
+rawResources:
+  # TODO: it sounds like a good moment to start defining these via separate gateway classes?
+  security-policy-ldaps:
+    manifest:
+      apiVersion: gateway.envoyproxy.io/v1alpha1
+      kind: SecurityPolicy
+      spec:
+        authorization:
+          defaultAction: Deny
+          rules:
+          - action: Allow
+            principal:
+              clientCIDRs:
+              - 192.168.1.0/24
+              - 192.168.69.0/24
+              - 10.42.0.0/16
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: {{ .Release.Name }}-ldaps
+  certificate:
+    manifest:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      spec:
+        secretName: {{ .Release.Name }}-ldaps-tls
+        dnsNames:
+          - ldaps.lldap.{{ requiredEnv "DOMAIN" }}
+        issuerRef:
+          name: cert-manager-letsencrypt-dns-prod
+          kind: ClusterIssuer

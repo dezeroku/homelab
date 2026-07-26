@@ -10,7 +10,15 @@ bases:
 environments:
   default:
     values:
-      - releaseConfig: {}
+      - releaseConfig:
+          lldap:
+            secrets: [jwt, key, user]
+            routes:
+              main:
+                networks: [lan, vpn_main]
+              # served at ldaps.lldap.<DOMAIN> by the naming convention
+              ldaps:
+                kind: TCPRoute
 
 ---
 helmDefaults:
@@ -516,5 +524,16 @@ releases:
     inherit:
       - template: default
   - name: actual-budget
+    inherit:
+      - template: argocd-app
+
+  - name: lldap
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    inherit:
+      - template: gateway
+      - template: vault-secrets
+      - template: default
+  - name: lldap
     inherit:
       - template: argocd-app

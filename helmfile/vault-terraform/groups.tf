@@ -34,6 +34,12 @@ resource "vault_identity_group" "this" {
   external_member_entity_ids = true
 }
 
+resource "lldap_group" "this" {
+  for_each = local.identity_groups
+
+  display_name = each.key
+}
+
 moved {
   from = vault_identity_group.users
   to   = vault_identity_group.this["users"]

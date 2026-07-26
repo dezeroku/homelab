@@ -24,5 +24,6 @@ module "user" {
   groups = each.value.groups
 
   # Single source of truth: derived from the groups declared in groups.tf.
-  groups_mapping = { for name, group in vault_identity_group.this : name => group.id }
+  groups_mapping       = { for name, group in vault_identity_group.this : name => group.id }
+  lldap_groups_mapping = { for name, group in lldap_group.this : name => group.id }
 }

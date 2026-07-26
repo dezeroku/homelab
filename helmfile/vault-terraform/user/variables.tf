@@ -21,3 +21,7 @@ variable "groups" {
 variable "groups_mapping" {
   type = map(string)
 }
+
+variable "lldap_groups_mapping" {
+  type = map(string)
+}

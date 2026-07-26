@@ -307,3 +307,15 @@ variable "esphome_ota_password" {
 variable "esphome_api_password" {
   type = string
 }
+
+variable "lldap_jwt_secret" {
+  type = string
+}
+
+variable "lldap_key_seed" {
+  type = string
+}
+
+variable "lldap_admin_password" {
+  type = string
+}

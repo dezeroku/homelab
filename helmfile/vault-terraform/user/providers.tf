@@ -5,5 +5,9 @@ terraform {
       source  = "hashicorp/vault"
       version = "~> 3.19.0"
     }
+    lldap = {
+      source  = "tasansga/lldap"
+      version = "~> 0.4.1"
+    }
   }
 }
