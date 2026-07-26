@@ -11,6 +11,10 @@ environments:
   default:
     values:
       - releaseConfig:
+          it-tools:
+            routes:
+              main:
+                networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
           homepage:
             routes:
               main:
@@ -328,8 +332,9 @@ releases:
 
   - name: it-tools
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
     inherit:
+      - template: gateway
       - template: default
   - name: it-tools
     inherit:
