@@ -97,9 +97,12 @@ releases:
 
   - name: vault
     chart: hashicorp/vault
-    version: 0.27.0
+    version: 0.34.0
     inherit:
       - template: default
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
   - name: vault
     inherit:
       - template: argocd-app

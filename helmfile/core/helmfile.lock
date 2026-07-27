@@ -1,4 +1,4 @@
-version: 0.0.0-dev
+version: v1.5.2
 dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
@@ -50,7 +50,7 @@ dependencies:
     version: 7.1.1
   - name: vault
     repository: https://helm.releases.hashicorp.com
-    version: 0.27.0
+    version: 0.34.0
   - name: vault-secrets-operator
     repository: https://helm.releases.hashicorp.com
     version: 0.9.1
@@ -63,5 +63,5 @@ dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.40.4
-digest: sha256:be32ba6ca8209582e078f3cb6447d061658e279d6fbc147f07a5932ff1e63056
-generated: "2026-07-26T02:26:47.951365932+02:00"
+digest: sha256:29c590c1742b20f76b4e47999ce1119284e04db0119c7c8a129e118a11d67634
+generated: "2026-07-27T02:23:25.342606416+02:00"
