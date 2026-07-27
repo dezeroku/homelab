@@ -6,11 +6,11 @@ module "paperless_ses_incoming" {
 }
 
 module "paperless" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "paperless"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  include_backuper_credentials = true
+  backuper_credentials_path = local.backuper_credentials_path
 
   oidc = {
     redirect_uris = ["https://paperless.${var.domain}/accounts/oidc/vault/login/callback/"]

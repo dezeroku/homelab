@@ -1,9 +1,9 @@
 module "ente" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "ente"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  include_backuper_credentials = true
+  backuper_credentials_path = local.backuper_credentials_path
 
   secrets = {
     "jwt-secret" = {

@@ -1,5 +1,5 @@
 module "oauth2-proxy" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "oauth2-proxy"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

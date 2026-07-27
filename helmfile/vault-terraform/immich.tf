@@ -1,9 +1,9 @@
 module "immich" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "immich"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  include_backuper_credentials = true
+  backuper_credentials_path = local.backuper_credentials_path
 
   # immich does not read its own OIDC client from Vault, so no client read grant.
   grant_oidc_client_read = false

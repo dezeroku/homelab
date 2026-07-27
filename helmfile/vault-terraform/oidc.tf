@@ -26,42 +26,22 @@ resource "vault_identity_oidc_scope" "groups" {
   template = "{\"groups\":{{identity.entity.groups.names}}}"
 }
 
-locals {
-  # SINGLE REGISTRATION POINT for OIDC clients allowed by the provider.
-  # Every service that creates an OIDC client MUST be listed here or its login breaks.
-  # (Sibling modules can't be reflected over, so this list is maintained by hand;
-  # compact() drops any null client_ids from modules where oidc happens to be unset.)
-  oidc_client_ids = compact([
-    module.oauth2-proxy.oidc_client_id,
-    vault_identity_oidc_client.argocd.client_id,
-    vault_identity_oidc_client.argocd-cli.client_id,
-    vault_identity_oidc_client.grafana.client_id,
-    vault_identity_oidc_client.grafana_backup.client_id,
-    module.paperless.oidc_client_id,
-    module.ryot.oidc_client_id,
-    module.hedgedoc.oidc_client_id,
-    module.wikijs.oidc_client_id,
-    module.immich.oidc_client_id,
-    module.filebrowser-drive.oidc_client_id,
-    module.actual-budget.oidc_client_id,
-    module.esphome.oidc_client_id,
-    module.change-detection.oidc_client_id,
-    module.flatnotes.oidc_client_id,
-    module.filebrowser-media.oidc_client_id,
-    module.filebrowser-media-readonly.oidc_client_id,
-    module.metube.oidc_client_id,
-    module.redbot-main.oidc_client_id,
-    module.redbot-premiers.oidc_client_id,
-    module.navidrome.oidc_client_id,
-    module.silverbullet.oidc_client_id,
-  ])
-}
-
 resource "vault_identity_oidc_provider" "main" {
-  name               = "main"
-  https_enabled      = true
-  issuer_host        = "vault.${var.domain}"
-  allowed_client_ids = local.oidc_client_ids
+  name          = "main"
+  https_enabled = true
+  issuer_host   = "vault.${var.domain}"
+
+  # Every client is allowed to use the provider. Authorization is not done here
+  # but per client, by the assignment that names the groups permitted to log in
+  # (see the `oidc` variable of the service module) - this list only ever said
+  # "this client exists on purpose", and every client in this Vault is created by
+  # this terraform or by the private repo's.
+  #
+  # It used to be an explicit list of client ids, which meant a forgotten entry
+  # broke that service's login silently, and - the reason it is gone - that a
+  # client created in another state (the private repo) could not be registered
+  # without that state and this one depending on each other.
+  allowed_client_ids = ["*"]
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,
     vault_identity_oidc_scope.email.name,

@@ -1,9 +1,9 @@
 module "ryot" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "ryot"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  include_backuper_credentials = true
+  backuper_credentials_path = local.backuper_credentials_path
 
   oidc = {
     redirect_uris = ["https://ryot.${var.domain}/api/auth"]

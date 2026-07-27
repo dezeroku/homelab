@@ -1,5 +1,5 @@
 module "redbot-premiers" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "redbot-premiers"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

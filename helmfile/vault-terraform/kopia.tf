@@ -1,5 +1,5 @@
 module "kopia" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "kopia"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

@@ -1,9 +1,9 @@
 module "invidious" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "invidious"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  include_backuper_credentials = true
+  backuper_credentials_path = local.backuper_credentials_path
 
   secrets = {
     hmac = {

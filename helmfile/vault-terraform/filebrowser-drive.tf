@@ -1,5 +1,5 @@
 module "filebrowser-drive" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "filebrowser-drive"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

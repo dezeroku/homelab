@@ -1,5 +1,5 @@
 module "cert-manager" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "cert-manager"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

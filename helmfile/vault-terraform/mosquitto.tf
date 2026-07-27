@@ -1,5 +1,5 @@
 module "mosquitto" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "mosquitto"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

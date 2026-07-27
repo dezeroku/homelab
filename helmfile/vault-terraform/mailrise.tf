@@ -1,5 +1,5 @@
 module "mailrise" {
-  source             = "./service"
+  source             = "../lib/terraform/service"
   name               = "mailrise"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
