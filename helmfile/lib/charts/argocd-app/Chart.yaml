@@ -1,6 +1,0 @@
----
-apiVersion: v2
-name: argocd-app
-description: Add argocd Application resource
-type: application
-version: 0.1.0

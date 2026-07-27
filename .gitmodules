@@ -1,0 +1,3 @@
+[submodule "helmfile/lib"]
+	path = helmfile/lib
+	url = git@github.com:dezeroku/helmfile-lib
