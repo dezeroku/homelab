@@ -16,3 +16,7 @@ releaseConfig:
         oidc: true
         hostname: 'redbot-main-metube.{{ requiredEnv "DOMAIN" }}'
         service: metube
+    filebrowser:
+      adminGroup: redbot-admins
+    metube:
+      existingClaim: redbot-main-localtracks

@@ -3,8 +3,7 @@ module "redbot-premiers" {
   name               = "redbot-premiers"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  service_account_names = ["redbot-premiers-main"]
-  secrets_prefix        = "services/redbot/redbot-premiers"
+  secrets_prefix = "services/redbot/redbot-premiers"
 
   secrets = {
     secrets = {
