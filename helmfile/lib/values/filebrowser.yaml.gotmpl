@@ -65,7 +65,7 @@ auth:
       enabled: false # only allow OIDC
     oidc:
       enabled: true
-      issuerUrl: "https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main"
+      issuerUrl: "{{ .Values.cluster.vault.oidcIssuer }}"
       scopes: "email openid profile groups"
       userIdentifier: "username"
       createUser: true
@@ -129,7 +129,9 @@ persistence:
   filebrowser-db:
     enabled: true
     type: persistentVolumeClaim
-    storageClass: longhorn-ssd
+{{- with .Values.cluster.storageClass }}
+    storageClass: {{ . }}
+{{- end }}
     accessMode: ReadWriteOnce
     size: 1Gi
     advancedMounts:

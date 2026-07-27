@@ -14,7 +14,7 @@ rawResources:
       kind: VaultAuth
       spec:
         method: kubernetes
-        mount: k8s/homeserver
+        mount: {{ .Values.cluster.vault.kubernetesMount | required "cluster.vault.kubernetesMount is unset - see lib/cluster-defaults.yaml.gotmpl" }}
         kubernetes:
           role: {{ .Release.Labels | get "vaultRole" .Release.Name }}
           serviceAccount: {{ .Release.Labels | get "vaultServiceAccount" .Release.Name }}

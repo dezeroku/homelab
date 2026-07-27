@@ -1,4 +1,15 @@
 ---
+# Everything the fragments below need to know about the cluster, as
+# `.Values.cluster.*`: the lib's defaults first, then the repository's own
+# answers from the `cluster.yaml.gotmpl` sitting next to the helmfile
+# directories. A directory that needs to differ overrides the same keys in its
+# own `environments:` block, which is merged after both.
+environments:
+  default:
+    values:
+      - ../lib/cluster-defaults.yaml.gotmpl
+      - ../cluster.yaml.gotmpl
+
 templates:
   default:
     namespace: "{{`{{ .Release.Name }}`}}"

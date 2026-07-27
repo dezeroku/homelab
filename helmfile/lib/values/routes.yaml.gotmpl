@@ -21,6 +21,7 @@
 # Labels:
 #   chartRoot  - see base.yaml.gotmpl
 {{- define "routes.body" }}
+{{- $gateway := .Values.cluster.gateway }}
 {{- $domain := requiredEnv "DOMAIN" }}
 {{- $release := .Release.Name }}
 {{- $routes := .Values | get (printf "releaseConfig.%s.routes" $release) (dict "main" dict) }}
@@ -39,8 +40,8 @@ route:
 {{-   end }}
 {{- end }}
     parentRefs:
-      - name: envoy-gateway-main
-        namespace: envoy-gateway
+      - name: {{ $gateway.name }}
+        namespace: {{ $gateway.namespace }}
 {{- with ($route | get "service" "") }}
     rules:
       - backendRefs:

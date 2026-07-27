@@ -19,20 +19,11 @@
 # Labels:
 #   chartRoot  - see base.yaml.gotmpl
 #
-# Network definitions taken directly from
-# https://github.com/dezeroku/network_layout
+# The networks themselves are the cluster's, not the lib's - they come from
+# `cluster.networks`, see lib/cluster-defaults.yaml.gotmpl.
 {{- define "route-policies.body" }}
-{{- $networks := dict
-      "pods"        (list "10.42.0.0/16")
-      "lan"         (list "192.168.1.0/24")
-      "guest"       (list "192.168.2.0/24")
-      "iot"         (list "192.168.3.0/24")
-      "cluster"     (list "192.168.4.0/24")
-      "iot_int"     (list "192.168.5.0/24")
-      "vpn_main"    (list "192.168.69.0/24")
-      "vpn_guest"   (list "192.168.70.0/24")
-      "vpn_family"  (list "192.168.71.0/24")
-}}
+{{- $networks := .Values.cluster.networks }}
+{{- $issuer := .Values.cluster.vault.oidcIssuer }}
 {{- $domain := requiredEnv "DOMAIN" }}
 {{- $release := .Release.Name }}
 {{- $routes := .Values | get (printf "releaseConfig.%s.routes" $release) (dict "main" dict) }}
@@ -75,7 +66,7 @@ rawResources:
 {{-     $host := first (ternary ($route | get "hostnames" list) (list ($route | get "hostname" $default)) (hasKey $route "hostnames")) }}
         oidc:
           provider:
-            issuer: "https://vault.{{ $domain }}/v1/identity/oidc/provider/main"
+            issuer: "{{ $issuer }}"
           clientIDRef:
             name: "{{ $release }}-oidc-secret"
           clientSecret:

@@ -1,0 +1,49 @@
+---
+# Defaults for everything the lib needs to know about the cluster it deploys to.
+#
+# Loaded as environment values by base.yaml.gotmpl, together with the consuming
+# repository's own `cluster.yaml.gotmpl` - which sits next to the helmfile
+# directories, is merged on top of this file and is where a repo says what is
+# true of *its* cluster:
+#
+#   helmfile/
+#     cluster.yaml.gotmpl   <- the repo's answers, written once
+#     lib/                  <- this file
+#     core/                 <- bases: ../lib/base.yaml.gotmpl
+#     services/             <-  "
+#
+# A single helmfile directory that needs something different - the backup
+# cluster, say - can override any of it again in its own `environments:` block,
+# which is merged last.
+#
+# Everything here is reachable as `.Values.cluster.*` from the fragments in
+# values/.
+cluster:
+  # The shared Envoy gateway that routes.yaml.gotmpl attaches every route to.
+  gateway:
+    name: envoy-gateway-main
+    namespace: envoy-gateway
+
+  # Named CIDR blocks, for the `networks` key of a route (see
+  # route-policies.yaml.gotmpl). Nothing sensible to default to - a repo that
+  # wants to restrict routes by source address defines its own.
+  networks: {}
+
+  # StorageClass for the volumes the lib's own blocks create, e.g. the
+  # filebrowser user database. Empty means the cluster's default class.
+  storageClass: ""
+
+  vault:
+    # Kubernetes auth mount the VaultAuth of every release binds to. Named
+    # after the cluster, so there is no useful default - set it in the repo's
+    # cluster.yaml.gotmpl.
+    kubernetesMount: ""
+    # kv-v2 mount and path prefix behind the `secrets` key of a release, which
+    # reads <secretsMount>/<secretsPathPrefix>/<release>/<name>.
+    secretsMount: kvv2
+    secretsPathPrefix: services
+    # kv-v1 mount holding the OIDC clients, read at <identityMount>/oidc/client/<release>.
+    identityMount: /identity
+    # Issuer for both app-side OIDC and the gateway's own, i.e. Vault acting as
+    # the OIDC provider.
+    oidcIssuer: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main

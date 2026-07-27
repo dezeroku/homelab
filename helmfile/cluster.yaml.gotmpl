@@ -1,0 +1,22 @@
+---
+# What the lib needs to know about this cluster, for every helmfile directory
+# next to this file - core/, services/, backup/. Merged on top of
+# lib/cluster-defaults.yaml.gotmpl, which documents the full set of keys and
+# holds the ones that are the same everywhere.
+cluster:
+  storageClass: longhorn-ssd
+
+  vault:
+    kubernetesMount: k8s/homeserver
+
+  # Taken directly from https://github.com/dezeroku/network_layout
+  networks:
+    pods: [10.42.0.0/16]
+    lan: [192.168.1.0/24]
+    guest: [192.168.2.0/24]
+    iot: [192.168.3.0/24]
+    cluster: [192.168.4.0/24]
+    iot_int: [192.168.5.0/24]
+    vpn_main: [192.168.69.0/24]
+    vpn_guest: [192.168.70.0/24]
+    vpn_family: [192.168.71.0/24]
