@@ -50,6 +50,9 @@ app-template:
             cert-manager.io/cluster-issuer: cert-manager-letsencrypt-dns-prod
         spec:
           gatewayClassName: envoy-gateway
+          allowedListeners:
+            namespaces:
+              from: Same
           listeners:
           - name: http
             port: 80
