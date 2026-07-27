@@ -1,0 +1,9 @@
+---
+# What the backup cluster does differently. Loaded by backup/helmfile.yaml.gotmpl
+# on top of cluster.yaml.gotmpl, so only the deltas belong here - the networks
+# are the same site either way.
+cluster:
+  storageClass: longhorn
+
+  vault:
+    kubernetesMount: k8s/homeserver-backup

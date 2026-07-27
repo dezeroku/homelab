@@ -2,6 +2,15 @@
 bases:
   - ../lib/base.yaml.gotmpl
 
+# This is a cluster of its own - a different Vault kubernetes mount, a different
+# storage class - so the lib's `cluster` values get one more file on top of the
+# ones base.yaml.gotmpl already loads.
+environments:
+  default:
+    values:
+      - ../cluster-backup.yaml.gotmpl
+---
+
 helmDefaults:
   kubeContext: homeserver-backup
 
