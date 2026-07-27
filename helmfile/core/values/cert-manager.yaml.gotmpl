@@ -1,11 +1,15 @@
 ---
-installCRDs: true
+crds:
+  enabled: true
+
 enableCertificateOwnerRef: true
 
 config:
   gatewayAPI:
     enabled: true
-
+    enableListenerSet: true
+  featureGates:
+    ListenerSets: true
 resources:
   requests:
     cpu: 10m
