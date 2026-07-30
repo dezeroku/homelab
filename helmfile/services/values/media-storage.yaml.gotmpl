@@ -1,6 +1,7 @@
 ---
 global:
   alwaysAppendIdentifierToResourceName: true
+  createDefaultServiceAccount: false
 
 persistence:
   main:
@@ -8,4 +9,4 @@ persistence:
     type: persistentVolumeClaim
     storageClass: longhorn-ssd
     accessMode: ReadWriteMany
-    size: 1300Gi
+    size: 1400Gi
