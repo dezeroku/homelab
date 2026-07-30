@@ -30,6 +30,10 @@ persistence:
 defaultSettings:
   defaultDataLocality: best-effort
   createDefaultDiskLabeledNodes: true
+  # Default is 25%, which is too much for the SSDs we run
+  # It seems that there's no way to have it separate for NVMe and SSD for now
+  # 25 is recommended for the system drives
+  storageMinimalAvailablePercentage: 10
   # Try to have roughly same number of replicas between nodes
   replicaAutoBalance: best-effort
   # Region doesn't matter, but we have to set something for Longhorn to be happy
