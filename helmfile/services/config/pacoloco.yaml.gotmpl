@@ -3,4 +3,8 @@
 releaseConfig:
   pacoloco:
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
+    templates: [gateway]
+    routes:
+      main:
+        networks: [lan, guest, cluster, vpn_main]

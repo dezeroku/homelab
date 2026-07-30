@@ -10,7 +10,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/anatol/pacoloco
-          tag: 1.7
+          tag: 1.8
           pullPolicy: IfNotPresent
         probes:
           liveness:
@@ -48,25 +48,6 @@ service:
     ports:
       http:
         port: 9129
-
-ingress:
-  main:
-    enabled: true
-    className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24"
-    tls:
-      - secretName: pacoloco-general-tls
-        hosts:
-          - pacoloco.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: pacoloco.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: main
 
 configMaps:
   config:
@@ -114,3 +95,18 @@ persistence:
     type: emptyDir
     globalMounts:
       - path: /reflector-output
+
+rawResources:
+  traffic-policy:
+    manifest:
+      apiVersion: gateway.envoyproxy.io/v1alpha1
+      kind: BackendTrafficPolicy
+      spec:
+        targetRefs:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+            name: {{ .Release.Name }}-main
+        timeout:
+          http:
+            # For those insanely big packages!
+            requestTimeout: 1h
