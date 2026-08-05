@@ -189,7 +189,24 @@ app-template:
                 selector:
                   matchLabels:
                     kubernetes.io/metadata.name: lldap
-            # TODO: also add a rule for minecraft
+          - name: ntp
+            port: 123
+            protocol: UDP
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: chrony
+          - name: minecraft
+            port: 25565
+            protocol: TCP
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minecraft
     ingress-fallback:
       manifest:
         apiVersion: gateway.networking.k8s.io/v1
