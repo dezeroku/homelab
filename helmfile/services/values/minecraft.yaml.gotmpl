@@ -1,5 +1,5 @@
 image:
-  tag: 2025.2.1-java21-jdk
+  tag: 2026.8.0-java25-jdk
 
 resources:
   requests:
@@ -13,7 +13,7 @@ minecraftServer:
   # Uncomment this when applying changes to configs
   # overrideServerProperties: true
   eula: true
-  version: "25w14craftmine"
+  version: "26.2"
   #type: SPIGOT
   # difficulty: normal
   # whitelist: dezeroku
@@ -23,7 +23,7 @@ minecraftServer:
   gameMode: survival
   motd: "Welcome to the League of Minecraft"
   memory: 12G
-  worldSaveName: aprilfools2025
+  worldSaveName: 26.2
   # jvmOpts: ""
   # jvmXXOpts: "-Xmx12G -Xms12G"
 
@@ -42,29 +42,9 @@ app-template:
   global:
     alwaysAppendIdentifierToResourceName: true
 
-  serviceAccount:
-    main: {}
-
-  rawResources:
-    vault-auth:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultAuth
-      spec:
-        spec:
-          method: kubernetes
-          mount: k8s/homeserver
-          kubernetes:
-            role: minecraft
-            serviceAccount: minecraft-main
-    rcon:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
-        spec:
-          type: kv-v2
-          mount: kvv2
-          path: services/minecraft/rcon
-          destination:
-            name: minecraft-rcon
-            create: true
-          vaultAuthRef: minecraft-vault-auth
+  route:
+    main:
+      rules:
+        - backendRefs:
+            - name: minecraft-minecraft
+              port: 25565

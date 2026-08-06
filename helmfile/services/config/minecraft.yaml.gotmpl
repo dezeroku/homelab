@@ -4,6 +4,14 @@ releaseConfig:
   minecraft:
     chart: itzg/minecraft
     version: 4.24.0
+    templates: [gateway, vault-secrets]
+    secrets: [rcon]
+    routes:
+      main:
+        kind: TCPRoute
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+    labels:
+      chartRoot: app-template
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 4.1.2
+        version: 5.0.1
