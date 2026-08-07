@@ -1,0 +1,170 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+defaultPodOptions:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+controllers:
+  main:
+    type: deployment
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/mealie-recipes/mealie
+          tag: v3.22.0
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          BASE_URL: https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+          ALLOW_SIGNUP: "false"
+          ALLOW_PASSWORD_LOGIN: false
+          OIDC_AUTH_ENABLED: true
+          OIDC_SIGNUP_ENABLED: true
+          OIDC_AUTO_REDIRECT: true
+          OIDC_PROVIDER_NAME: Vault
+          # OIDC_REMEMBER_ME: true
+          OIDC_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_id
+          OIDC_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_secret
+          OIDC_USER_GROUP: {{ .Release.Name }}
+          OIDC_ADMIN_GROUP: {{ .Release.Name }}-admin
+          OIDC_CONFIGURATION_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/.well-known/openid-configuration
+          SMTP_AUTH_STRATEGY: NONE
+          SMTP_FROM_EMAIL: no-reply@mealie.home.dezeroku.com
+          SMTP_FROM_NAME: Mealie@dezeroku
+          SMTP_HOST: mailrise-main.mailrise
+          SMTP_PORT: 8025
+          DB_ENGINE: postgres
+          POSTGRES_USER:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: user
+          POSTGRES_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: password
+          POSTGRES_DB:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: dbname
+          POSTGRES_SERVER:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: host
+          POSTGRES_PORT:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: port
+        probes:
+          liveness: &probe
+            enabled: true
+          readiness: *probe
+          startup: *probe
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 9000
+
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Track cooking recipes
+      gethomepage.dev/group: Services
+      gethomepage.dev/icon: sh-mealie
+      gethomepage.dev/name: Mealie
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  storage:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /app/data
+
+rawResources:
+  db:
+    manifest:
+      apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      spec:
+        instances: 1
+        imageName: ghcr.io/cloudnative-pg/postgresql:17
+        storage:
+          size: 1Gi
+        bootstrap:
+          initdb:
+            database: {{ .Release.Name }}
+        managed:
+          roles:
+            - name: {{ .Release.Name }}
+              superuser: true
+              login: true
+        backup:
+          barmanObjectStore:
+            destinationPath: s3://{{ .Release.Name }}/
+            endpointURL: https://api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+            s3Credentials:
+              accessKeyId:
+                name: {{ .Release.Name }}-cnpg-backup-s3-secret
+                key: ACCESS_KEY_ID
+              secretAccessKey:
+                name: {{ .Release.Name }}-cnpg-backup-s3-secret
+                key: ACCESS_SECRET_KEY
+            wal:
+              compression: gzip
+          retentionPolicy: "14d"
+  db-backup:
+    manifest:
+      apiVersion: postgresql.cnpg.io/v1
+      kind: ScheduledBackup
+      spec:
+        schedule: "0 0 1 * * 0"
+        backupOwnerReference: self
+        cluster:
+          name: {{ .Release.Name }}-db
+  cnpg-backup-s3-secret:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
+      spec:
+        type: kv-v2
+        mount: kvv2
+        path: core/minio/k8s-backups/backuper-credentials
+        destination:
+          name: {{ .Release.Name }}-cnpg-backup-s3-secret
+          create: true
+          transformation:
+            excludes:
+              - .*
+            templates:
+              ACCESS_KEY_ID:
+                text: |-
+                  {{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
+              ACCESS_SECRET_KEY:
+                text: |-
+                  {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
+        vaultAuthRef: {{ .Release.Name }}-vault-auth

@@ -1,5 +1,5 @@
 module "navidrome" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "navidrome"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

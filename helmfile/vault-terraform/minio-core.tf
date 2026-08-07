@@ -1,5 +1,5 @@
 module "minio-core" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "minio"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

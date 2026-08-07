@@ -1,5 +1,5 @@
 module "tgtg" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "tgtg"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

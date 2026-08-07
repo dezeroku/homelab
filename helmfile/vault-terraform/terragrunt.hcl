@@ -15,3 +15,14 @@ inputs = {
   ses_smtp_password                  = dependency.ses_user.outputs.smtp_password
   ses_smtp_host                      = dependency.ses_user.outputs.smtp_host
 }
+
+generate "lib-path" {
+  path      = "lib-path.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+locals {
+  # This writes a hardcoded, literal absolute path string into the TF file
+  lib_path = "${get_terragrunt_dir()}/../lib"
+}
+EOF
+}

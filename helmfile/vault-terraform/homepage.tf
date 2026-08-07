@@ -1,5 +1,5 @@
 module "homepage" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "homepage"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

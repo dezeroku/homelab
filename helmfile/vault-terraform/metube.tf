@@ -1,5 +1,5 @@
 module "metube" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "metube"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

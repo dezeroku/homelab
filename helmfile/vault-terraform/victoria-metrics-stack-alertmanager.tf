@@ -1,5 +1,5 @@
 module "victoria-metrics-stack-alertmanager" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "victoria-metrics-stack-alertmanager"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

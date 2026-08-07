@@ -1,6 +1,6 @@
 # Backup-cluster service: MinIO instance on the backup cluster that receives Longhorn backups.
 module "minio-longhorn" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "minio-longhorn"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver_backup.path
 

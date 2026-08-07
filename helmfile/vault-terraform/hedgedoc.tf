@@ -1,5 +1,5 @@
 module "hedgedoc" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "hedgedoc"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

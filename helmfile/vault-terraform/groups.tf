@@ -30,6 +30,8 @@ locals {
     "metube"                     = []
     "navidrome"                  = []
     "silverbullet"               = []
+    "mealie"                     = []
+    "mealie-admin"               = []
   }
 }
 

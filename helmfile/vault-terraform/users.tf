@@ -13,7 +13,7 @@ resource "vault_auth_backend" "userpass" {
 module "user" {
   for_each = var.users
 
-  source = "../lib/terraform/user"
+  source = "${local.lib_path}/terraform/user"
 
   userpass_accessor = vault_auth_backend.userpass.accessor
   username          = each.key

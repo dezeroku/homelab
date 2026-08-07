@@ -6,7 +6,7 @@ module "paperless_ses_incoming" {
 }
 
 module "paperless" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "paperless"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

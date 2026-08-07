@@ -2,3 +2,4 @@ terraform.tfstate*
 .terraform*
 !.terraform.lock.hcl
 terraform.tfvars
+.terragrunt-cache

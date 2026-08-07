@@ -1,5 +1,5 @@
 module "minio-k8s-backups" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "minio-k8s-backups"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

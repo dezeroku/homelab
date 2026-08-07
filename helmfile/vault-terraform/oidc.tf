@@ -1,13 +1,13 @@
 resource "vault_identity_oidc_scope" "profile" {
   name = "profile"
   # Seems that this field really doesn't like jsonencode
-  template = "{\"username\":{{identity.entity.name}},\"preferred_username\":{{identity.entity.name}}}"
+  template = "{\"name\":{{identity.entity.name}},\"username\":{{identity.entity.name}},\"preferred_username\":{{identity.entity.name}}}"
 }
 
 resource "vault_identity_oidc_scope" "email" {
   name = "email"
   # Seems that this field really doesn't like jsonencode
-  template = "{\"email\":{{identity.entity.metadata.email}}}"
+  template = "{\"email\":{{identity.entity.metadata.email}},\"email_verified\":true}"
 }
 
 resource "vault_policy" "oidc_auth" {

@@ -1,5 +1,5 @@
 module "home-assistant" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "home-assistant"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

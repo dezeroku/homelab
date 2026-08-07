@@ -1,5 +1,5 @@
 module "actual-budget" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "actual-budget"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 

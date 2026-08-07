@@ -1,6 +1,6 @@
 # cert-manager on the backup cluster. Role only; the policy/secret live in cert-manager.tf.
 module "cert-manager-backup" {
-  source             = "../lib/terraform/service"
+  source             = "${local.lib_path}/terraform/service"
   name               = "cert-manager"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver_backup.path
 
