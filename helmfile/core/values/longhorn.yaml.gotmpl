@@ -31,8 +31,8 @@ defaultSettings:
   defaultDataLocality: best-effort
   createDefaultDiskLabeledNodes: true
   # Default is 25%, which is too much for the SSDs we run
-  # It seems that there's no way to have it separate for NVMe and SSD for now
-  # 25 is recommended for the system drives
+  # Default disks (SSDs) will stay with the 30%, that's assigned via a separate setting
+  # Upstream recommends at least 25% for the system drives
   storageMinimalAvailablePercentage: 10
   # Try to have roughly same number of replicas between nodes
   replicaAutoBalance: best-effort
@@ -41,14 +41,20 @@ defaultSettings:
   backupTargetCredentialSecret: longhorn-credentials-s3
   concurrentAutomaticEngineUpgradePerNodeLimit: 1
 
+  # I suppose we want it? Introduced in 1.9.0
+  # There are not offline volumes in the cluster though
+  # offlineReplicaRebuilding: true
+
 app-template:
   global:
     alwaysAppendIdentifierToResourceName: true
+    createDefaultServiceAccount: false
   rawResources:
     k8s-backups:
-      apiVersion: longhorn.io/v1beta1
-      kind: RecurringJob
-      spec:
+      manifest:
+        # TODO: this api will have to be migrated
+        apiVersion: longhorn.io/v1beta2
+        kind: RecurringJob
         spec:
           cron: "0 1 * * *"
           task: "backup"

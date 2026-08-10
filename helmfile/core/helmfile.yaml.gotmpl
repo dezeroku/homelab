@@ -71,14 +71,14 @@ releases:
 
   - name: longhorn
     chart: longhorn/longhorn
-    version: 1.8.0
+    version: 1.9.2
     inherit:
       - template: default
     dependencies:
       - chart: ./charts/longhorn-enhancements
         version: 0.1.0
       - chart: bjw-s-labs/app-template
-        version: 4.1.2
+        version: 5.0.1
   - name: longhorn
     inherit:
       - template: argocd-app
