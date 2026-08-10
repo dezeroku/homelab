@@ -22,6 +22,7 @@
         line: "{{ item }}"
       loop:
         - "188.114.96.11 get.rke2.io"
+        - "140.82.121.4 github.com"
 
 - name: Obtain rke2_token from Bitwarden, if it's not explicitly provided
   hosts: k8s_homeserver
@@ -55,10 +56,13 @@
     rke2_ha_mode: true
     # TODO: complaining about ipv4_default_address variable, let's try to make it work
     rke2_ha_mode_keepalived: false
-    rke2_version: v1.32.0+rke2r1
+    # rke2_version: v1.33.13+rke2r2
+    # rke2_version: v1.34.10+rke2r1
+    # rke2_version: v1.35.7+rke2r1
+    rke2_version: v1.36.3+rke2r1
     rke2_disable:
-      # TODO: maybe it's worth sticking with it?
       - rke2-ingress-nginx
+    rke2_ingress_controller: none
     rke2_servers_group_name: k8s_controlplanes
     rke2_agents_group_name: k8s_workers
     rke2_server_options:

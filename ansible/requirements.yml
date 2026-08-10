@@ -8,4 +8,4 @@ roles:
   - name: xanmanning.k3s
     version: "v3.4.4"
   - name: lablabs.rke2
-    version: "1.40.3"
+    version: "1.53.1"
