@@ -1,0 +1,41 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    type: deployment
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: rhasspy/wyoming-whisper
+          tag: 3.5.0
+          pullPolicy: IfNotPresent
+        args:
+          - --model
+          - tiny-int8
+          - --language=en
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+          startup:
+            enabled: true
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 10300
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
