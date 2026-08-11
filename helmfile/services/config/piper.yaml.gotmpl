@@ -1,0 +1,13 @@
+---
+releaseConfig:
+  piper:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, oidc-secret]
+    routes:
+      ui:
+        hostnames:
+          - piper-ui.{{ requiredEnv "DOMAIN" }}
+        networks: [lan, vpn_main]
+        oidc: true
+        service: ui

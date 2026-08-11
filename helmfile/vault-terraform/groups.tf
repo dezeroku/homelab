@@ -32,6 +32,7 @@ locals {
     "silverbullet"               = []
     "mealie"                     = []
     "mealie-admin"               = []
+    "piper"                      = []
   }
 }
 

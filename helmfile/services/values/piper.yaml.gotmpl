@@ -1,0 +1,60 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    type: statefulset
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: rhasspy/wyoming-piper
+          tag: 2.3.1
+          pullPolicy: IfNotPresent
+        args:
+          - --voice
+          - en_US-lessac-medium
+# Not present in 2.3.1 yet it seems
+# TODO: uncomment with the next upgrade
+#          - --web-server
+#          - --web-server-host
+#          - 0.0.0.0
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+          startup:
+            enabled: true
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 10200
+  ui:
+    controller: main
+    ports:
+      http:
+        port: 5000
+
+route:
+  ui:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: UI for managing custom voices
+      gethomepage.dev/group: IoT
+      gethomepage.dev/icon: sh-piper-tts
+      gethomepage.dev/name: Piper TTS
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
