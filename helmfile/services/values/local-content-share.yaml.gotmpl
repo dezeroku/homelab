@@ -1,0 +1,55 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+# TODO: attach emptyDirs in required places and run as non-root
+#defaultPodOptions:
+#  securityContext:
+#    runAsUser: 19972
+#    runAsGroup: 19972
+#    fsGroup: 19972
+
+controllers:
+  main:
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: tanq16/local-content-share
+          # TODO: nothing better to pin against for now
+          tag: main
+          pullPolicy: IfNotPresent
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8080
+
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Easily share files and snippets (shared)
+      gethomepage.dev/group: Tools
+      gethomepage.dev/icon: sh-local-content-share
+      gethomepage.dev/name: Local Content Share
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    advancedMounts:
+      main:
+        main:
+          - path: /app/data
