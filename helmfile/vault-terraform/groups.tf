@@ -33,6 +33,8 @@ locals {
     "mealie"                     = []
     "mealie-admin"               = []
     "piper"                      = []
+    "open-webui"                 = []
+    "open-webui-admin"           = []
   }
 }
 

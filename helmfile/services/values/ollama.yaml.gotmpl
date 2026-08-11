@@ -1,0 +1,16 @@
+image:
+  # TODO: chart was locked to 0.32.8 that was not available
+  # at the time of the deployment
+  # Drop this hardcode as part of the next upgrade
+  tag: 0.32.9
+
+ollama:
+  models:
+    pull:
+      - llama2
+
+persistentVolume:
+  storageClass: longhorn-double-replica
+  size: 30Gi
+  accessModes:
+    - ReadWriteOnce

@@ -1,0 +1,10 @@
+---
+releaseConfig:
+  open-webui:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, vault-secrets, oidc-secret]
+    routes:
+      main:
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+    secrets: [secret-key]

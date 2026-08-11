@@ -1,133 +1,22 @@
-version: 0.0.0-dev
+version: v1.5.2
 dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
     version: 4.1.2
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
     version: 5.0.1
-  - name: immich
-    repository: https://immich-app.github.io/immich-charts
-    version: 0.9.3
   - name: minecraft
     repository: https://itzg.github.io/minecraft-server-charts/
     version: 4.24.0
-  - name: tenant
-    repository: https://operator.min.io/
-    version: 7.0.0
+  - name: ollama
+    repository: https://helm.otwld.com/
+    version: 1.73.0
   - name: tenant
     repository: https://operator.min.io/
     version: 7.0.0
   - name: zot
     repository: http://zotregistry.dev/helm-charts
     version: 0.1.98
-digest: sha256:c4c9c993c7eac8330a07fa42095d92675b91ed778842e638167f53c5cd425539
-generated: "2026-07-12T23:58:41.962650465+02:00"
+digest: sha256:c2d1b949861cbc0c61cd5a5cd8c6af25938e87af682f95bf9dba65443a877533
+generated: "2026-08-12T00:54:16.079848355+02:00"

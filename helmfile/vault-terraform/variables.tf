@@ -315,3 +315,7 @@ variable "lldap_key_seed" {
 variable "lldap_admin_password" {
   type = string
 }
+
+variable "open_webui_secret_key" {
+  type = string
+}

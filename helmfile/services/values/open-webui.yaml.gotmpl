@@ -1,0 +1,82 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    type: deployment
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: ghcr.io/open-webui/open-webui
+          tag: v0.11.0
+          pullPolicy: IfNotPresent
+        env:
+          # Don't download anything, seems to crash the pod for some reason
+          HF_HUB_OFFLINE: 1
+          OLLAMA_BASE_URL: http://ollama.ollama:11434
+          ENABLE_SIGNUP: false
+          ENABLE_OAUTH: true
+          ENABLE_OAUTH_SIGNUP: true
+          OAUTH_AUTO_REDIRECT: true
+          WEBUI_SECRET_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secret-key
+                key: key
+          ENABLE_OAUTH_ID_TOKEN_COOKIE: false
+          CORS_ALLOW_ORIGIN: https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+          OPENID_PROVIDER_URL: "https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main/.well-known/openid-configuration"
+          OAUTH_PROVIDER_NAME: Vault
+          OAUTH_SCOPES: openid email profile groups
+          OAUTH_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_id
+          OAUTH_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_secret
+          OPENID_REDIRECT_URL: "https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}/oauth/oidc/callback"
+          # TODO: roles are not the same as groups, though it works in our case
+          OAUTH_ROLES_CLAIM: groups
+          OAUTH_ALLOWED_ROLES: open-webui
+          OAUTH_ADMIN_ROLES: open-webui-admin
+          WEBUI_URL: https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+        probes:
+          readiness:
+            enabled: true
+          liveness:
+            enabled: true
+          startup:
+            enabled: true
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8080
+
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: AI Chat
+      gethomepage.dev/group: Services
+      gethomepage.dev/icon: sh-open-webui
+      gethomepage.dev/name: Open WebUI
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 30Gi
+    globalMounts:
+      - path: /app/backend/data
