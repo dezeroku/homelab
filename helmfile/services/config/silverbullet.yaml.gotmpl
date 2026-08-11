@@ -7,5 +7,15 @@ releaseConfig:
     templates: [gateway, oidc-secret]
     routes:
       main:
+        hostnames:
+          - silverbullet.{{ requiredEnv "DOMAIN" }}
         networks: [lan, guest, vpn_main]
         oidc: true
+        service: main
+      # Expose the .client/ part without auth, for the service worker part to work correctly
+      # Specific rules added in the values file
+      client:
+        hostnames:
+          - silverbullet.{{ requiredEnv "DOMAIN" }}
+        networks: [lan, guest, vpn_main]
+        service: main

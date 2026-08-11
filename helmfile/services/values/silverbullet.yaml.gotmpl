@@ -15,7 +15,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/silverbulletmd/silverbullet
-          tag: 2.9.0
+          tag: 2.10.0
           pullPolicy: IfNotPresent
         probes:
           liveness: &probe
@@ -45,6 +45,18 @@ route:
       gethomepage.dev/icon: sh-silverbullet
       gethomepage.dev/name: silverbullet
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=silverbullet"
+
+  client:
+    rules:
+      - matches:
+        - path:
+            type: PathPrefix
+            value: /.client
+        - path:
+            type: PathPrefix
+            value: /service_worker.js
+        backendRefs:
+          - identifier: main
 
 persistence:
   storage:
