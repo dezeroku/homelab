@@ -35,11 +35,21 @@ defaultSettings:
   # Upstream recommends at least 25% for the system drives
   storageMinimalAvailablePercentage: 10
   # Try to have roughly same number of replicas between nodes
-  replicaAutoBalance: best-effort
+  # replicaAutoBalance: best-effort
+  # After a while, let's switch to avoiding rebuilds
+  # happening too often. It's 4 nodes anyway, with most of the
+  # volumes being 3 replicas, so it's not like much can be balanced.
+  replicaAutoBalance: least-effort
   # Region doesn't matter, but we have to set something for Longhorn to be happy
   backupTarget: s3://longhorn@us-east-1/
   backupTargetCredentialSecret: longhorn-credentials-s3
   concurrentAutomaticEngineUpgradePerNodeLimit: 1
+  # Avoid starving the nodes out of IO, especially network
+  # Default is 5, we should be able to live with 2-3 in case of upgrades
+  concurrentReplicaRebuildPerNodeLimit: 1
+  # Wait half an hour before dropping the replica,
+  # default is 10 minutes, our drains usually take longer
+  replicaReplenishmentWaitInterval: 1800
 
   # I suppose we want it? Introduced in 1.9.0
   # There are not offline volumes in the cluster though
