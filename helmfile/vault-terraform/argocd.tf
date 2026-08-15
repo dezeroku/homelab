@@ -60,3 +60,15 @@ resource "vault_generic_secret" "argocd-credentials-homelab" {
     }
   )
 }
+
+resource "vault_generic_secret" "argocd-credentials-helmfile-lib" {
+  path = "kvv2/core/argocd/credentials/helmfile-lib"
+
+  data_json = jsonencode(
+    {
+      "type" : "git",
+      "url" : "git@github.com:dezeroku/helmfile-lib.git"
+      "sshPrivateKey" : var.argocd_credentials_helmfile_lib_private_key
+    }
+  )
+}

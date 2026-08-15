@@ -99,6 +99,20 @@ app-template:
               argocd.argoproj.io/secret-type: repository
             create: true
           vaultAuthRef: argocd-vault-auth
+    credentials-helmfile-lib:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
+        spec:
+          type: kv-v2
+          mount: kvv2
+          path: core/argocd/credentials/helmfile-lib
+          destination:
+            name: credentials-helmfile-lib
+            labels:
+              argocd.argoproj.io/secret-type: repository
+            create: true
+          vaultAuthRef: argocd-vault-auth
     oidc:
       manifest:
         apiVersion: secrets.hashicorp.com/v1beta1

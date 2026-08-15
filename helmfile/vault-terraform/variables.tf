@@ -38,6 +38,10 @@ variable "argocd_credentials_homelab_private_key" {
   type = string
 }
 
+variable "argocd_credentials_helmfile_lib_private_key" {
+  type = string
+}
+
 variable "minio_root_username" {
   type = string
 }

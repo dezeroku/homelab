@@ -16,6 +16,7 @@ users = {
   }
 }
 argocd_credentials_homelab_private_key = "Private Key"
+argocd_credentials_helmfile_lib_private_key = "Private Key"
 minio_root_username = "admin"
 minio_root_password = "password"
 # dezeroku is just our internal alias, the real username may be different
