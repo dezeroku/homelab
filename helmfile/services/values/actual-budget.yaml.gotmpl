@@ -68,3 +68,19 @@ persistence:
     size: 1Gi
     globalMounts:
       - path: /data
+
+rawResources:
+    # Increase the default timeouts to avoid breaking banksync setup
+  backend-traffic-policy:
+    manifest:
+      apiVersion: gateway.envoyproxy.io/v1alpha1
+      kind: BackendTrafficPolicy
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: actual-budget-main
+        timeout:
+          http:
+            requestTimeout: 180s
+            connectionIdleTimeout: 180s
