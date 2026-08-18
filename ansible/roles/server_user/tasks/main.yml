@@ -64,8 +64,9 @@
   become: true
   become_user: root
 
-- name: Set authorized key from host
+- name: Set authorized keys from host
   ansible.posix.authorized_key:
     user: "{{ user_name }}"
     state: present
-    key: "{{ lookup('ansible.builtin.file', vars.ssh_pub_key_file) }}"
+    key: "{{ lookup('ansible.builtin.file', item) }}"
+  loop: "{{ vars.ssh_pub_key_files }}"

@@ -132,7 +132,10 @@ all:
     ansible_user: server
     # username to use during the initial provisioning
     ansible_bootstrap_user: ansible_bootstrap
-    ssh_pub_key_file: ~/.ssh/id_smartcard_dezeroku.pub
+    # TODO: switch to use homelab/ssh/yubikey rbw entries
+    ssh_pub_key_files:
+      - ~/.ssh/id_smartcard_dezeroku.pub
+      - ~/.ssh/id_smartcard_termius_dezeroku.pub
     cleanup_bootstrap_user: true
     upgrade_packages: false
     timezone: Europe/Warsaw
