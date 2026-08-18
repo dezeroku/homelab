@@ -39,6 +39,16 @@ service:
       http:
         port: 8080
 
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Notes
+      gethomepage.dev/group: Utils
+      gethomepage.dev/icon: flatnotes.png
+      gethomepage.dev/name: flatnotes
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=flatnotes"
+
 persistence:
   storage:
     enabled: true
