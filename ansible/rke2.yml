@@ -73,6 +73,8 @@
     rke2_cni:
       - multus
       - canal
+    rke2_custom_manifests:
+      - rke2_custom_manifests/canal-config.yaml
     # Copy of the defaults, for the sake of completeness
     rke2_cluster_cidr:
       - 10.42.0.0/16

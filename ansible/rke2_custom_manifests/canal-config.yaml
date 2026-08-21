@@ -1,0 +1,12 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-canal
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    flannel:
+      iface: "enp2s0"
+    calico:
+      ipAutoDetectionMethod: "interface=enp2s0"
