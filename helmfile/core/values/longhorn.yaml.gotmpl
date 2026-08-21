@@ -28,6 +28,13 @@ persistence:
     selector: nvme
 
 defaultSettings:
+  # Use a dedicated network for data traffic
+  storageNetwork: longhorn/longhorn-storage-net
+
+  # Enabling this one is not trival and requires preparation, let's leave it using the default for now
+  # It requires more IPs in the subnet
+  # endpointNetworkForRWXVolume: longhorn/longhorn-storage-net
+
   defaultDataLocality: best-effort
   createDefaultDiskLabeledNodes: true
   # Default is 25%, which is too much for the SSDs we run
@@ -72,3 +79,21 @@ app-template:
           - k8s-backups
           retain: 2
           concurrency: 1
+    storage-net:
+      manifest:
+        apiVersion: k8s.cni.cncf.io/v1
+        kind: NetworkAttachmentDefinition
+        spec:
+          config: |
+            {
+              "cniVersion": "0.3.1",
+              "name": "longhorn-storage-net",
+              "type": "macvlan",
+              "master": "enp3s0",
+              "mode": "bridge",
+              "ipam": {
+                "type": "whereabouts",
+                "range": "192.168.14.16/28",
+                "exclude": []
+              }
+            }
