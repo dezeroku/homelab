@@ -8,13 +8,7 @@ helmDefaults:
 environments:
   default:
     values:
-      - releaseConfig:
-          minio-k8s-backups:
-            routes:
-              api:
-                networks: [lan, cluster, vpn_main, pods]
-              console:
-                networks: [lan, vpn_main]
+      - config/*.yaml.gotmpl
 ---
 
 repositories:
@@ -51,6 +45,45 @@ repositories:
   - name: metallb
     url: https://metallb.github.io/metallb
 releases:
+{{- /*
+  One app release per entry in releaseConfig, plus its argocd-app companion.
+  Everything about a release lives in config/<name>.yaml.gotmpl; see the
+  comment at the top of this file. `dig` rather than plain field access
+  because helmfile renders with strict map lookup, so a missing optional key
+  would otherwise be a hard error.
+*/}}
+{{- range $name, $cfg := .Values.releaseConfig }}
+  - name: {{ $name }}
+    chart: {{ $cfg.chart }}
+    version: {{ $cfg.version }}
+    {{- with dig "namespace" "" $cfg }}
+    namespace: {{ . }}
+    {{- end }}
+    {{- with dig "labels" dict $cfg }}
+    labels:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with dig "dependencies" list $cfg }}
+    dependencies:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with dig "values" list $cfg }}
+    values:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    inherit:
+      {{- range dig "templates" list $cfg }}
+      - template: {{ . }}
+      {{- end }}
+      - template: default
+  - name: {{ $name }}
+    {{- with dig "namespace" "" $cfg }}
+    values:
+      - targetNamespace: {{ . }}
+    {{- end }}
+    inherit:
+      - template: argocd-app
+{{- end }}
   - name: prometheus-operator-crds
     chart: prometheus-community/prometheus-operator-crds
     version: 19.0.0
@@ -282,23 +315,6 @@ releases:
   - name: intel-gpu-device-plugin
     values:
       - targetNamespace: intel
-    inherit:
-      - template: argocd-app
-
-  # TODO: migrate to something better
-  - name: minio-k8s-backups
-    chart: minio/tenant
-    version: 7.1.1
-    labels:
-      chartRoot: app-template
-    inherit:
-      - template: gateway
-      - template: vault
-      - template: default
-    dependencies:
-      - chart: bjw-s-labs/app-template
-        version: 5.0.1
-  - name: minio-k8s-backups
     inherit:
       - template: argocd-app
 

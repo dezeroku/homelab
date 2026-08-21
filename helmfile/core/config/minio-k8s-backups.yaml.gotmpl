@@ -1,0 +1,15 @@
+releaseConfig:
+  minio-k8s-backups:
+    chart: minio/tenant
+    version: 7.1.1
+    labels:
+      chartRoot: app-template
+    templates: [gateway, vault]
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
+    routes:
+      api:
+        networks: [lan, cluster, vpn_main, pods]
+      console:
+        networks: [lan, vpn_main]
