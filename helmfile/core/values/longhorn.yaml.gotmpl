@@ -58,6 +58,10 @@ defaultSettings:
   # Default is 5, we should be able to live with 2-3 in case of upgrades
   # There is a dedicated network for it now, let's use it
   # concurrentReplicaRebuildPerNodeLimit: 1
+  concurrentReplicaRebuildPerNodeLimit: 5
+
+  # How many replicas can the sync pull from, anything >2 does not really make sense with 3 replicas
+  rebuildConcurrentSyncLimit: 2
 
   # Wait half an hour before dropping the replica,
   # default is 10 minutes, our drains usually take longer
