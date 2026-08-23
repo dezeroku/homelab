@@ -152,6 +152,24 @@ configMaps:
             - name: "Homelab Plug Output State"
               state_topic: "homelab-plug/status/switch:0"
               value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.output {{"{{"}}"{{"}}"}}"{{"}}"}}"
+        sensor:
+          - platform: rest
+            name: dezeroku-desktop PSU Power
+            # TODO: can we get rid of this chip hardcode?
+            resource: >-
+              http://vmsingle-vm-victoria-metrics-k8s-stack.victoria-metrics-stack:8429/api/v1/query?query=node_hwmon_power_watt%7Bchip%3D%225_6%3A1_0_0003%3A0db0%3A56d4_0003%22%2Csensor%3D%22power1%22%2Cinstance%3D%22dezeroku-desktop.lan%3A9100%22%7D
+            method: GET
+            value_template: "{{"{{"}}"{{"{{"}}"{{"}}"}} value_json.data.result[0].value[1] | float | round(1) {{"{{"}}"{{"}}"}}"{{"}}"}}"
+            unit_of_measurement: "W"
+            device_class: power
+            state_class: measurement
+            scan_interval: 30
+          - platform: integration
+            source: sensor.dezeroku_desktop_psu_power
+            name: dezeroku-desktop PSU Energy
+            unit_prefix: k
+            unit_time: h
+            method: trapezoidal
         # logger:
         #   default: warning
         #   logs:
