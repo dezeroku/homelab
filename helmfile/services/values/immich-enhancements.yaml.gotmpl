@@ -9,6 +9,9 @@ persistence:
     storageClass: longhorn-ssd
     accessMode: ReadWriteOnce
     size: 300Gi
+    labels:
+      recurring-job-group.longhorn.io/daily-snapshot: enabled
+      recurring-job.longhorn.io/source: enabled
 
 route:
   main:
