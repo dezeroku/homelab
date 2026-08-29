@@ -59,6 +59,9 @@ persistence:
     storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 1Gi
+    labels:
+      recurring-job-group.longhorn.io/daily-snapshot: enabled
+      recurring-job.longhorn.io/source: enabled
     globalMounts:
       - path: /config
 
