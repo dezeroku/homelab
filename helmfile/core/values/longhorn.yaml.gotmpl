@@ -78,7 +78,6 @@ app-template:
   rawResources:
     k8s-backups:
       manifest:
-        # TODO: this api will have to be migrated
         apiVersion: longhorn.io/v1beta2
         kind: RecurringJob
         spec:
@@ -88,6 +87,18 @@ app-template:
           - k8s-backups
           retain: 2
           concurrency: 1
+    daily-snapshot:
+      manifest:
+        apiVersion: longhorn.io/v1beta2
+        kind: RecurringJob
+        spec:
+          cron: "0 1 * * *"
+          task: "snapshot"
+          groups:
+          - daily-snapshot
+          - k8s-backups
+          retain: 7
+          concurrency: 3
     storage-net:
       manifest:
         apiVersion: k8s.cni.cncf.io/v1
