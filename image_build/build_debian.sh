@@ -12,7 +12,7 @@ pubkey="$(cat "$pubkey_file")"
 luks_password="${LUKS_PASSWORD:-}"
 if [ -z "$luks_password" ]; then
     # Get password from password manager
-    luks_password="$(rbw get homeserver_luks)"
+    luks_password="$(rbw get homeserver/luks/root)"
 fi
 
 debian_version=12.7.0
