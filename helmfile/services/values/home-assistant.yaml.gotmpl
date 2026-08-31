@@ -7,7 +7,8 @@ controllers:
     type: statefulset
     replicas: 1
     pod:
-      hostNetwork: true
+      annotations:
+        k8s.v1.cni.cncf.io/networks: {{ .Release.Name }}-lan-net
     containers:
       main:
         securityContext:
@@ -211,3 +212,24 @@ rawResources:
           name: {{ .Release.Name }}-hass-prometheus-secret
           create: true
         vaultAuthRef: {{ .Release.Name }}-vault-auth
+  lan-net:
+    manifest:
+
+      apiVersion: "k8s.cni.cncf.io/v1"
+      kind: NetworkAttachmentDefinition
+      spec:
+        config: '{
+          "cniVersion": "0.3.1",
+          "type": "macvlan",
+          "master": "enp2s0.99",
+          "mode": "bridge",
+          "ipam": {
+            "type": "static",
+            "addresses": [
+              {
+                "address": "192.168.1.89/24",
+                "gateway": "192.168.1.1"
+              }
+            ]
+          }
+        }'
