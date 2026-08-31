@@ -1,0 +1,75 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+defaultPodOptions:
+  securityContext:
+#    runAsUser: 1000
+#    runAsGroup: 1000
+    fsGroup: 1000
+
+controllers:
+  main:
+    type: statefulset
+    replicas: 1
+    pod:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: {{ .Release.Name }}-lan-net
+    initContainers:
+      enable-ra:
+        image:
+          repository: busybox
+          tag: 1.31
+        securityContext:
+          privileged: true
+        command: ["sh", "-c", "sysctl -w net.ipv6.conf.net1.accept_ra=2 && sysctl -w net.ipv6.conf.net1.accept_ra_rt_info_max_plen=64"]
+    containers:
+      main:
+        image:
+          repository: ghcr.io/matter-js/matterjs-server
+          tag: 1.4.0
+          pullPolicy: IfNotPresent
+ #     alpine:
+ #       image:
+ #         repository: alpine
+ #         tag: latest
+ #       command:
+ #         - sleep
+ #         - "3600"
+service:
+  main:
+    controller: main
+    ports:
+      ws:
+        port: 5580
+
+persistence:
+  storage:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /data
+
+rawResources:
+  lan-net:
+    manifest:
+      apiVersion: "k8s.cni.cncf.io/v1"
+      kind: NetworkAttachmentDefinition
+      spec:
+        config: '{
+          "cniVersion": "0.3.1",
+          "type": "macvlan",
+          "master": "enp2s0.99",
+          "mode": "bridge",
+          "ipam": {
+            "type": "static",
+            "addresses": [
+              {
+                "address": "192.168.1.90/24",
+                "gateway": "192.168.1.1"
+              }
+            ]
+          }
+        }'
