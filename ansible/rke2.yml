@@ -1,4 +1,78 @@
 ---
+
+- name: Configure enp2s0 (VLAN 99, for macvlan, for Matter) and enp3s0 (bare, for macvlan, for longhorn)
+  hosts: k8s_homeserver
+  become: true
+  become_user: root
+  tags:
+    - rke2
+  tasks:
+    # --- enp2s0: unchanged base, VLAN 99 added on top ---
+    - name: Ensure vlan package is installed (8021q support for ifupdown)
+      ansible.builtin.apt:
+        name: vlan
+        state: present
+        update_cache: true
+
+    - name: Load 8021q kernel module now
+      community.general.modprobe:
+        name: 8021q
+        state: present
+
+    - name: Persist 8021q module load across reboots
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/8021q.conf
+        content: "8021q\n"
+        mode: '0644'
+
+    - name: Add VLAN 99 interface definition on enp2s0
+      ansible.builtin.copy:
+        dest: /etc/network/interfaces.d/enp2s0.99
+        content: |
+          auto enp2s0.99
+          iface enp2s0.99 inet manual
+              vlan-raw-device enp2s0
+          # No inet/inet6 address — macvlan children (HA, later OTBR) handle their own
+        mode: '0644'
+      register: vlan99_file
+
+    - name: Bring up VLAN 99 interface
+      ansible.builtin.command: ifup enp2s0.99
+      when: vlan99_file.changed
+      changed_when: true
+
+    # --- enp3s0: bring up on boot, no address, for the Longhorn macvlan ---
+    - name: Add enp3s0 interface definition (no address)
+      ansible.builtin.copy:
+        dest: /etc/network/interfaces.d/enp3s0
+        content: |
+          auto enp3s0
+          iface enp3s0 inet manual
+        mode: '0644'
+      register: enp3s0_file
+
+    - name: Bring up enp3s0
+      ansible.builtin.command: ifup enp3s0
+      when: enp3s0_file.changed
+      changed_when: true
+
+    # --- Stop the host's VLAN parent interfaces from accepting RAs ---
+    - name: Disable IPv6 RA acceptance on enp2s0.99 (host parent — pods handle their own)
+      ansible.posix.sysctl:
+        name: "net.ipv6.conf.enp2s0/99.accept_ra"
+        value: "0"
+        sysctl_file: /etc/sysctl.d/99-macvlan-no-ra.conf
+        state: present
+        reload: true
+
+    - name: Disable IPv6 RA acceptance on enp3s0 (host parent)
+      ansible.posix.sysctl:
+        name: "net.ipv6.conf.enp3s0.accept_ra"
+        value: "0"
+        sysctl_file: /etc/sysctl.d/99-macvlan-no-ra.conf
+        state: present
+        reload: true
+
 - name: Install rke2 services dependencies
   hosts: k8s_homeserver
   become: true
