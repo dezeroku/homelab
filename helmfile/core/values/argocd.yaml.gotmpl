@@ -54,7 +54,8 @@ repoServer:
   extraContainers:
     - name: helmfile-plugin
       # image: travisghansen/argo-cd-helmfile:v0.3.11
-      image: ghcr.io/b1-systems/argo-cd-helmfile:v0.3.15
+      # image: ghcr.io/b1-systems/argo-cd-helmfile:v0.3.15
+      image: ghcr.io/dezeroku/argo-cd-helmfile@sha256:d1edf46631d4d1b8e6de859cbc5b3da8db878c09147501ec0b6f358d5f7810a5
       command: [/var/run/argocd/argocd-cmp-server]
       securityContext:
         runAsNonRoot: true
