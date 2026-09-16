@@ -36,6 +36,7 @@ locals {
     "open-webui"                 = []
     "open-webui-admin"           = []
     "homebox"                    = []
+    "outline"                    = []
   }
 }
 
