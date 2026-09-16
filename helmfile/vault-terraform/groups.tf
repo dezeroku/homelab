@@ -35,6 +35,7 @@ locals {
     "piper"                      = []
     "open-webui"                 = []
     "open-webui-admin"           = []
+    "homebox"                    = []
   }
 }
 

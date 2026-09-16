@@ -1,0 +1,10 @@
+---
+releaseConfig:
+  homebox:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, vault-secrets, oidc-secret]
+    routes:
+      main:
+        networks: [lan, vpn_main]
+    secrets: [api-key]
