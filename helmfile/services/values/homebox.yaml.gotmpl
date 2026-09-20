@@ -75,6 +75,18 @@ controllers:
           liveness:
             enabled: true
 
+    initContainers:
+      wait-for-vault:
+        image:
+          repository: busybox
+          tag: 1.31
+        args:
+          # Does this Vault service name always point to the primary?
+          - /bin/sh
+          - -c
+          - echo "Wait for Vault to be unsealed"; while !  wget -q -O /dev/null "http://vault.vault:8200/v1/sys/health"; do sleep 1; echo "-"; done; echo "Ready";
+        resources: {}
+
 service:
   main:
     controller: main
