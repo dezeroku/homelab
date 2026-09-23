@@ -82,14 +82,6 @@ alertmanager:
             requests:
               storage: 5Gi
 
-defaultDatasources:
-  extra:
-    # TODO: expose both VM clusters under a common proxy
-    # and split based on the label name
-    - name: VictoriaMetricsHASS
-      url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/
-      type: prometheus
-
 grafana:
   # We disable the admin account creation via grafana.ini
   # This value is added here just to avoid unnecessary secret changes
@@ -229,16 +221,6 @@ vmagent:
         cpu: 250m
       limits:
         cpu: 1
-  additionalRemoteWrites:
-    # TODO: don't write hass data to the main cluster
-    # This seems to not be easily achievable without using global options, that would break
-    # the below integration
-
-    # Save the hass data to the IoT cluster (by dropping everything non-hass)
-    - url: http://vmsingle-vm-hass-vmsingle.victoria-metrics-stack.svc:8429/api/v1/write
-      inlineUrlRelabelConfig:
-        - if: '{__name__!~"hass_.*"}'
-          action: drop
 
   ingress:
     annotations:

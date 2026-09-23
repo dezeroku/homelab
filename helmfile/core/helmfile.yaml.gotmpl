@@ -167,7 +167,7 @@ releases:
   - name: vm-operator
     namespace: victoria-metrics-operator
     chart: victoria-metrics/victoria-metrics-operator
-    version: 0.67.2
+    version: 0.67.3
     inherit:
       - template: default
   - name: vm-operator
@@ -181,7 +181,7 @@ releases:
   - name: vm
     namespace: victoria-metrics-stack
     chart: victoria-metrics/victoria-metrics-k8s-stack
-    version: 0.33.5
+    version: 0.93.0
     values:
       - values/grafana-dashboards.yaml.gotmpl
     inherit:
@@ -207,21 +207,6 @@ releases:
   - name: vm-logs
     values:
       - targetNamespace: victoria-logs
-    inherit:
-      - template: argocd-app
-
-  # A separate stack with longer retention period
-  # for IoT related data
-  # We only care about vmsingle here
-  - name: vm-hass
-    namespace: victoria-metrics-stack
-    chart: bjw-s-labs/app-template
-    version: 4.1.2
-    inherit:
-      - template: default
-  - name: vm-hass
-    values:
-      - targetNamespace: victoria-metrics-stack
     inherit:
       - template: argocd-app
 
