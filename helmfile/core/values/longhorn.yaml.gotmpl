@@ -41,10 +41,12 @@ defaultSettings:
 
   defaultDataLocality: best-effort
   createDefaultDiskLabeledNodes: true
+  # We set storageReserved on every disk level, that prevents too many volumes from being scheduled
+  # This check in turn, prevent the replica to be scheduled BASED ON REAL DISK USAGE
   # Default is 25%, which is too much for the SSDs we run
-  # Default disks (SSDs) will stay with the 30%, that's assigned via a separate setting
-  # Upstream recommends at least 25% for the system drives
-  storageMinimalAvailablePercentage: 10
+  # Upstream recommends at least 25% for the system drives (we do 400Gs with storageReserved already)
+  # Thus lowering it, especially for the SSDs
+  storageMinimalAvailablePercentage: 5
 
   # Try to have roughly same number of replicas between nodes
   replicaAutoBalance: best-effort
