@@ -20,6 +20,10 @@ ingress:
 longhornUI:
   replicas: 1
 
+metrics:
+  serviceMonitor:
+    enabled: true
+
 persistence:
   defaultDataLocality: best-effort
   defaultDiskSelector:
