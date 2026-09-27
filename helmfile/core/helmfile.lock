@@ -3,15 +3,12 @@ dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
     version: 5.0.1
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
   - name: argo-cd
     repository: https://argoproj.github.io/argo-helm
     version: 10.2.1
   - name: cloudnative-pg
     repository: https://cloudnative-pg.github.io/charts
-    version: 0.23.0
+    version: 0.29.1
   - name: goldpinger
     repository: https://bloomberg.github.io/goldpinger
     version: 1.0.1
@@ -63,5 +60,5 @@ dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.67.3
-digest: sha256:3003c977eac4a09dbe34faadd1f9f21584a74a19df7e7b71b54eae3912e3ab33
-generated: "2026-09-23T21:06:22.838255246+02:00"
+digest: sha256:c3317e8c46ee8eb116f1818c605894fa21628fffc99e45fc41763bb0a1b80b69
+generated: "2026-09-27T21:47:44.458385168+02:00"
