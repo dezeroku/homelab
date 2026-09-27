@@ -4,8 +4,13 @@ releaseConfig:
   ente:
     chart: bjw-s-labs/app-template
     version: 5.0.1
-    templates: [gateway, vault-secrets]
+    templates: [gateway, vault-secrets, postgres]
     secrets: [jwt-secret, key]
+    postgres:
+      database: ente
+      superuser: true
+      serverName: ente-v1
+      recover: true
     routes:
       auth:
         hostname: 'auth.ente.{{ requiredEnv "DOMAIN" }}'
