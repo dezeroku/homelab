@@ -9,9 +9,9 @@ controllers:
     containers:
       main:
         image:
-          repository: ghcr.io/ente-io/web
-          # January 2025
-          tag: 460ee1671b08b119b894f0ddd71b4c906fb29647
+          repository: ghcr.io/ente/web
+          # September 2026
+          tag: 1a623f325ad9b6ba68e23c1298eb6cf4486f27c8
           pullPolicy: IfNotPresent
         env:
           ENTE_API_ORIGIN: https://api.{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
@@ -31,9 +31,9 @@ controllers:
     containers:
       main:
         image:
-          repository: ghcr.io/ente-io/server
-          # December 2025
-          tag: fa30e7c7bf695b1af49b895a72e4de86fb791e09
+          repository: ghcr.io/ente/server
+          # September 2026
+          tag: 163f45c26f130090abed03649530f53d2d976565
           pullPolicy: IfNotPresent
         probes:
           liveness:
@@ -123,7 +123,7 @@ rawResources:
       kind: Cluster
       spec:
         instances: 1
-        imageName: ghcr.io/cloudnative-pg/postgresql:17
+        imageName: ghcr.io/cloudnative-pg/postgresql:18.6
         storage:
           size: 1Gi
         bootstrap:
