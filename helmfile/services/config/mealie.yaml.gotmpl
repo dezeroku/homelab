@@ -4,7 +4,13 @@ releaseConfig:
   mealie:
     chart: bjw-s-labs/app-template
     version: 5.0.1
-    templates: [gateway, oidc-secret]
+    templates: [gateway, oidc-secret, postgres]
+    postgres:
+      serverName: mealie-v1
+      database: mealie
+      # Is it needed though?
+      superuser: true
+      recover: true
     routes:
       main:
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
