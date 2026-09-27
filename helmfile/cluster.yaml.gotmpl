@@ -4,7 +4,12 @@
 # lib/cluster-defaults.yaml.gotmpl, which documents the full set of keys and
 # holds the ones that are the same everywhere.
 cluster:
-  storageClass: longhorn-ssd
+  storageClass: longhorn
+
+  postgres:
+    backup:
+      endpointURL: https://api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+      credentialsPath: core/minio/k8s-backups/backuper-credentials
 
   vault:
     kubernetesMount: k8s/homeserver
