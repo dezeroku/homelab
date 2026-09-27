@@ -6,6 +6,10 @@ controllers:
   main:
     strategy: Recreate
     replicas: 1
+    pod:
+      securityContext:
+        # Not sure why it's not set by default tbh, if that's the main user id too
+        fsGroup: 1001
     containers:
       main:
         image:
@@ -20,7 +24,9 @@ controllers:
           # Using mailrise under the hood, not a real SMTP server
           SMTP_HOST: mailrise-main.mailrise
           SMTP_PORT: 8025
-          SMTP_FROM: "Outline@dezeroku <outline@home.dezeroku.com>"
+          SMTP_FROM_EMAIL: "Outline@dezeroku <outline@home.dezeroku.com>"
+          # It's internal anyway
+          SMTP_SECURE: false
 
           SECRET_KEY:
             valueFrom:
@@ -42,7 +48,7 @@ controllers:
           REDIS_URL: redis://{{ .Release.Name }}-dragonfly-db:6379/0
 
           FILE_STORAGE: local
-          FILE_STORAGE_UPLOAD_MAX_SIZE: 26214400
+          FILE_STORAGE_UPLOAD_MAX_SIZE: "26214400"
           FILE_STORAGE_IMPORT_MAX_SIZE: ""
           FILE_STORAGE_WORKSPACE_IMPORT_MAX_SIZE: ""
 
@@ -71,19 +77,6 @@ service:
       http:
         port: 3000
 
-persistence:
-  config-storage:
-    enabled: true
-    type: persistentVolumeClaim
-    storageClass: longhorn
-    accessMode: ReadWriteOnce
-    size: 1Gi
-    # labels:
-    #   recurring-job-group.longhorn.io/daily-snapshot: enabled
-    #   recurring-job.longhorn.io/source: enabled
-    globalMounts:
-      - path: /var/lib/outline/data
-
 route:
   main:
     annotations:
@@ -93,6 +86,19 @@ route:
       gethomepage.dev/icon: sh-outline
       gethomepage.dev/name: Outline
       gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  storage:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    # labels:
+    #   recurring-job-group.longhorn.io/daily-snapshot: enabled
+    #   recurring-job.longhorn.io/source: enabled
+    globalMounts:
+      - path: /var/lib/outline/data
 
 rawResources:
   dragonfly-db:
