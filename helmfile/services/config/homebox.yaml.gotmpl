@@ -3,7 +3,10 @@ releaseConfig:
   homebox:
     chart: bjw-s-labs/app-template
     version: 5.0.1
-    templates: [gateway, vault-secrets, oidc-secret]
+    templates: [gateway, vault-secrets, oidc-secret, postgres]
+    postgres:
+      serverName: homebox-v1
+      recover: true
     routes:
       main:
         networks: [lan, vpn_main]
