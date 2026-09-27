@@ -14,27 +14,7 @@ controllers:
           tag: 460ee1671b08b119b894f0ddd71b4c906fb29647
           pullPolicy: IfNotPresent
         env:
-          ENTE_API_ORIGIN: https://api.ente.home.dezeroku.com
-          POSTGRES_USER:
-            valueFrom:
-              secretKeyRef:
-                name: ente-db-app
-                key: user
-          POSTGRES_PASSWORD:
-            valueFrom:
-              secretKeyRef:
-                name: ente-db-app
-                key: password
-          POSTGRES_DB:
-            valueFrom:
-              secretKeyRef:
-                name: ente-db-app
-                key: dbname
-          POSTGRES_HOST:
-            valueFrom:
-              secretKeyRef:
-                name: ente-db-app
-                key: host
+          ENTE_API_ORIGIN: https://api.{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
         probes:
           liveness:
             enabled: true
@@ -69,44 +49,44 @@ controllers:
           ENTE_JWT_SECRET:
             valueFrom:
               secretKeyRef:
-                name: ente-jwt-secret
+                name: {{ .Release.Name }}-jwt-secret
                 key: secret
           ENTE_KEY_ENCRYPTION:
             valueFrom:
               secretKeyRef:
-                name: ente-key
+                name: {{ .Release.Name }}-key
                 key: encryption
           ENTE_KEY_HASH:
             valueFrom:
               secretKeyRef:
-                name: ente-key
+                name: {{ .Release.Name }}-key
                 key: hash
           ENTE_DB_USER:
             valueFrom:
               secretKeyRef:
-                name: ente-db-app
+                name: {{ .Release.Name }}-db-app
                 key: user
           ENTE_DB_PASSWORD:
             valueFrom:
               secretKeyRef:
-                name: ente-db-app
+                name: {{ .Release.Name }}-db-app
                 key: password
           ENTE_DB_NAME:
             valueFrom:
               secretKeyRef:
-                name: ente-db-app
+                name: {{ .Release.Name }}-db-app
                 key: dbname
           ENTE_DB_HOST:
             valueFrom:
               secretKeyRef:
-                name: ente-db-app
+                name: {{ .Release.Name }}-db-app
                 key: host
           ENTE_DB_SSLMODE: require
           ENTE_APPS_ACCOUNTS: http://ente-accounts:3001
           # Using mailrise under the hood, not a real SMTP server
           ENTE_SMTP_HOST: mailrise-main.mailrise
           ENTE_SMTP_PORT: 8025
-          ENTE_SMTP_EMAIL: admin@ente.home.dezeroku.com
+          ENTE_SMTP_EMAIL: {{ .Release.Name }}@{{ requiredEnv "DOMAIN" }}
           ENTE_SMTP_SENDER_NAME: Ente@dezeroku
 
 service:
@@ -134,14 +114,7 @@ route:
       gethomepage.dev/group: Services
       gethomepage.dev/icon: sh-ente-auth
       gethomepage.dev/name: Ente Auth
-      gethomepage.dev/pod-selector: "app.kubernetes.io/name=ente"
-    rules:
-      - backendRefs:
-        - identifier: auth
-  api:
-    rules:
-      - backendRefs:
-        - identifier: server
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
 
 rawResources:
   db:
@@ -152,26 +125,40 @@ rawResources:
         instances: 1
         imageName: ghcr.io/cloudnative-pg/postgresql:17
         storage:
-          size: 5Gi
+          size: 1Gi
         bootstrap:
-          initdb:
+          #initdb:
+          #  database: ente
+          #  owner: ente
+          recovery:
+            source: {{ .Release.Name }}-backup
             database: ente
+            owner: ente
         managed:
           roles:
             - name: ente
               superuser: true
               login: true
+        externalClusters:
+          - name: {{ .Release.Name }}-backup
+            barmanObjectStore:
+              <<: &objstore
+                serverName: {{ .Release.Name }}-v1
+
+                destinationPath: s3://{{ .Release.Name }}/
+                endpointURL: https://api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
+                s3Credentials:
+                  accessKeyId:
+                    name: {{ .Release.Name }}-cnpg-backup-s3-secret
+                    key: ACCESS_KEY_ID
+                  secretAccessKey:
+                    name: {{ .Release.Name }}-cnpg-backup-s3-secret
+                    key: ACCESS_SECRET_KEY
         backup:
           barmanObjectStore:
-            destinationPath: s3://ente/
-            endpointURL: https://api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
-            s3Credentials:
-              accessKeyId:
-                name: ente-cnpg-backup-s3-secret
-                key: ACCESS_KEY_ID
-              secretAccessKey:
-                name: ente-cnpg-backup-s3-secret
-                key: ACCESS_SECRET_KEY
+            <<: *objstore
+            serverName: {{ .Release.Name }}-v1
+
             wal:
               compression: gzip
           retentionPolicy: "14d"
@@ -180,10 +167,10 @@ rawResources:
       apiVersion: postgresql.cnpg.io/v1
       kind: ScheduledBackup
       spec:
-        schedule: "0 0 1 * * 0"
+        schedule: "0 0 1 * * *"
         backupOwnerReference: self
         cluster:
-          name: ente-db
+          name: {{ .Release.Name }}-db
   cnpg-backup-s3-secret:
     manifest:
       apiVersion: secrets.hashicorp.com/v1beta1
@@ -193,7 +180,7 @@ rawResources:
         mount: kvv2
         path: core/minio/k8s-backups/backuper-credentials
         destination:
-          name: ente-cnpg-backup-s3-secret
+          name: {{ .Release.Name }}-cnpg-backup-s3-secret
           create: true
           transformation:
             excludes:
@@ -205,28 +192,4 @@ rawResources:
               ACCESS_SECRET_KEY:
                 text: |-
                   {{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
-        vaultAuthRef: ente-vault-auth
-  jwt-secret:
-    manifest:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/ente/jwt-secret
-        destination:
-          name: ente-jwt-secret
-          create: true
-        vaultAuthRef: ente-vault-auth
-  key-secret:
-    manifest:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/ente/key
-        destination:
-          name: ente-key
-          create: true
-        vaultAuthRef: ente-vault-auth
+        vaultAuthRef: {{ .Release.Name }}-vault-auth

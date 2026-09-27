@@ -4,11 +4,14 @@ releaseConfig:
   ente:
     chart: bjw-s-labs/app-template
     version: 5.0.1
-    templates: [gateway, vault]
+    templates: [gateway, vault-secrets]
+    secrets: [jwt-secret, key]
     routes:
       auth:
         hostname: 'auth.ente.{{ requiredEnv "DOMAIN" }}'
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+        service: auth
       api:
         hostname: 'api.ente.{{ requiredEnv "DOMAIN" }}'
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+        service: server
