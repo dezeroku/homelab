@@ -1,0 +1,18 @@
+---
+releaseConfig:
+  shelly-manager:
+    chart: bjw-s-labs/app-template
+    version: 5.0.1
+    templates: [gateway, oidc-secret, vault-secrets]
+    routes:
+      main:
+        networks: [lan, vpn_main]
+        oidc: true
+        service: web
+      api:
+        hostname: api-shelly-manager.{{ requiredEnv "DOMAIN" }}
+        networks: [lan, vpn_main]
+        service: api
+    secrets:
+      - secret-key
+      - auth-token

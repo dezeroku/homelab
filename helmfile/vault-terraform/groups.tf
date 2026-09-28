@@ -37,6 +37,7 @@ locals {
     "open-webui-admin"           = []
     "homebox"                    = []
     "outline"                    = []
+    "shelly-manager"             = []
   }
 }
 

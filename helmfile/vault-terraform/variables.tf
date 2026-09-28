@@ -323,3 +323,7 @@ variable "lldap_admin_password" {
 variable "open_webui_secret_key" {
   type = string
 }
+
+variable "shelly_manager_auth_token" {
+  type = string
+}
