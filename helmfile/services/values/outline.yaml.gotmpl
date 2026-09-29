@@ -107,6 +107,7 @@ rawResources:
       kind: Dragonfly
       spec:
         args:
+          - "--dbfilename=dump"
           # Fix needed specifically for how Outline does it
           - --default_lua_flags=allow-undeclared-keys
         replicas: 1
@@ -118,7 +119,7 @@ rawResources:
             cpu: 250m
             memory: 512Mi
         snapshot:
-          cron: "*/5 * * * *"
+          cron: "0 * * * *"
           persistentVolumeClaimSpec:
             accessModes:
             - ReadWriteOnce
