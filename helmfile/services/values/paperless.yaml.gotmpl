@@ -76,22 +76,22 @@ controllers:
           PAPERLESS_DBHOST:
             valueFrom:
               secretKeyRef:
-                name: paperless-db-pguser-paperless
+                name: paperless-db-app
                 key: host
           PAPERLESS_DBNAME:
             valueFrom:
               secretKeyRef:
-                name: paperless-db-pguser-paperless
+                name: paperless-db-app
                 key: dbname
           PAPERLESS_DBUSER:
             valueFrom:
               secretKeyRef:
-                name: paperless-db-pguser-paperless
+                name: paperless-db-app
                 key: user
           PAPERLESS_DBPASS:
             valueFrom:
               secretKeyRef:
-                name: paperless-db-pguser-paperless
+                name: paperless-db-app
                 key: password
           PAPERLESS_SECRET_KEY:
             valueFrom:
@@ -352,6 +352,8 @@ rawResources:
       apiVersion: dragonflydb.io/v1alpha1
       kind: Dragonfly
       spec:
+        args:
+          - "--dbfilename=dump"
         replicas: 1
         resources:
           requests:
@@ -361,86 +363,11 @@ rawResources:
             cpu: 250m
             memory: 512Mi
         snapshot:
-          cron: "*/5 * * * *"
+          cron: "0 * * * *"
           persistentVolumeClaimSpec:
             accessModes:
             - ReadWriteOnce
             resources:
               requests:
-                storage: 2Gi
-            storageClassName: longhorn-ssd
-  db:
-    manifest:
-      apiVersion: postgres-operator.crunchydata.com/v1beta1
-      kind: PostgresCluster
-      spec:
-        postgresVersion: 16
-        users:
-          - name: paperless
-            databases:
-              - paperless
-            # TODO: These permissions can be probably much more fine-grained
-            # We want to keep them quite lax, as the program itself is responsible
-            # for creating the initial table layout.
-            # This takes the burden off of our shoulders.
-            options: "SUPERUSER"
-        instances:
-          - name: paperless-db
-            dataVolumeClaimSpec:
-              accessModes:
-                - "ReadWriteOnce"
-              resources:
-                requests:
-                  storage: 20Gi
-
-        backups:
-          pgbackrest:
-            configuration:
-              - secret:
-                  name: paperless-pgo-backup-s3-secret
-            global:
-              repo1-s3-uri-style: path
-              repo1-retention-full: "2"
-              repo1-retention-full-type: count
-            repos:
-              - name: repo1
-                schedules:
-                  full: "0 1 * * 0"
-                  differential: "0 1 * * 1-6"
-                s3:
-                  bucket: paperless
-                  endpoint: api.k8s-backups.minio.{{ requiredEnv "DOMAIN" }}
-                  region: default
-  pgo-backup-s3-secret:
-    manifest:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: core/minio/k8s-backups/backuper-credentials
-        destination:
-          name: paperless-pgo-backup-s3-secret
-          create: true
-          transformation:
-            excludes:
-              - .*
-            templates:
-              s3.conf:
-                text: |
-                  [global]
-                  repo1-s3-key={{ "{{`{{" }}.Secrets.username{{ "}}`}}" }}
-                  repo1-s3-key-secret={{ "{{`{{" }}.Secrets.password{{ "}}`}}" }}
-        vaultAuthRef: paperless-vault-auth
-#  smtp:
-#    apiVersion: secrets.hashicorp.com/v1beta1
-#    kind: VaultStaticSecret
-#    spec:
-#      spec:
-#        type: kv-v2
-#        mount: kvv2
-#        path: services/paperless/smtp
-#        destination:
-#          name: paperless-smtp
-#          create: true
-#        vaultAuthRef: paperless-vault-auth
+                storage: 1Gi
+            storageClassName: longhorn

@@ -4,7 +4,13 @@ releaseConfig:
   paperless:
     chart: bjw-s-labs/app-template
     version: 5.0.1
-    templates: [gateway, vault-secrets, oidc-secret]
+    templates: [gateway, vault-secrets, oidc-secret, postgres]
+    postgres:
+      # database: paperless
+      # superuser: true
+      serverName: paperless-v2
+      recover: true
+      recoverFrom: paperless-v2
     routes:
       main:
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
