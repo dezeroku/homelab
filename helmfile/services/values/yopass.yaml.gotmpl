@@ -49,6 +49,8 @@ rawResources:
       apiVersion: dragonflydb.io/v1alpha1
       kind: Dragonfly
       spec:
+        args:
+          - "--dbfilename=dump"
         replicas: 1
         resources:
           requests:
@@ -58,11 +60,11 @@ rawResources:
             cpu: 250m
             memory: 512Mi
         snapshot:
-          cron: "*/5 * * * *"
+          cron: "0 * * * *"
           persistentVolumeClaimSpec:
             accessModes:
             - ReadWriteOnce
             resources:
               requests:
-                storage: 2Gi
+                storage: 1Gi
             storageClassName: longhorn
