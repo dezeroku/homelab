@@ -7,7 +7,9 @@ releaseConfig:
     version: 1.12.1
     labels:
       chartRoot: app-template
-    templates: [gateway, oidc-secret]
+    templates: [gateway, oidc-secret, vault-secrets]
+    secrets:
+      - minio-credentials-s3
     routes:
       main:
         networks: [lan, vpn_main]

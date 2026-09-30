@@ -40,7 +40,7 @@ defaultSettings:
 
   # Region doesn't matter, but we have to set something for Longhorn to be happy
   backupTarget: s3://longhorn@us-east-1/
-  backupTargetCredentialSecret: longhorn-credentials-s3
+  backupTargetCredentialSecret: longhorn-minio-credentials-s3
 
   concurrentAutomaticEngineUpgradePerNodeLimit: 1
   # Default is 5, we should be able to live with 2-3 in case of upgrades
@@ -58,6 +58,8 @@ defaultSettings:
   # I suppose we want it? Introduced in 1.9.0
   # There are not offline volumes in the cluster though
   # offlineReplicaRebuilding: true
+
+  # removeSnapshotsDuringFilesystemTrim: true
 
 app-template:
   global:
@@ -99,6 +101,20 @@ app-template:
           - daily-snapshot
           retain: 7
           concurrency: 3
+    weekly-trim:
+      manifest:
+        apiVersion: longhorn.io/v1beta2
+        kind: RecurringJob
+        spec:
+          cron: "0 3 * * 0"
+          task: "filesystem-trim"
+          # Simply all groups
+          groups:
+          - default
+          - k8s-backups
+          - daily-snapshot
+          retain: 0
+          concurrency: 2
     storage-net:
       manifest:
         apiVersion: k8s.cni.cncf.io/v1

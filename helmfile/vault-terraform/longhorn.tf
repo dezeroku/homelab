@@ -3,11 +3,8 @@ module "longhorn" {
   name               = "longhorn"
   kubernetes_backend = vault_auth_backend.kubernetes_homeserver.path
 
-  service_account_names = ["longhorn-service-account"]
-  secrets_prefix        = "longhorn"
-
   secrets = {
-    "minio-backup-credentials-s3" = {
+    "minio-credentials-s3" = {
       AWS_ACCESS_KEY_ID     = var.minio_longhorn_longhorn_username
       AWS_SECRET_ACCESS_KEY = var.minio_longhorn_longhorn_password
       AWS_ENDPOINTS         = var.minio_longhorn_endpoint
