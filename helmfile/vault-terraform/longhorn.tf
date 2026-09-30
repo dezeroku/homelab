@@ -13,6 +13,11 @@ module "longhorn" {
       AWS_ENDPOINTS         = var.minio_longhorn_endpoint
     }
   }
+
+  oidc = {
+    redirect_uris = ["https://longhorn.${var.domain}/oauth2/callback"]
+    group_ids     = [vault_identity_group.this["longhorn"].id]
+  }
 }
 
 moved {

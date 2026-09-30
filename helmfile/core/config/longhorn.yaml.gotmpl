@@ -1,0 +1,19 @@
+releaseConfig:
+  longhorn:
+    chart: longhorn/longhorn
+    # version: 1.9.2
+    # version: 1.10.2
+    # version: 1.11.3
+    version: 1.12.1
+    labels:
+      chartRoot: app-template
+    templates: [gateway, oidc-secret]
+    routes:
+      main:
+        networks: [lan, vpn_main]
+        oidc: true
+    dependencies:
+      - chart: ./charts/longhorn-enhancements
+        version: 0.1.0
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1

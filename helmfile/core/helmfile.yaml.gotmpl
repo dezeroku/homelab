@@ -102,23 +102,6 @@ releases:
     inherit:
       - template: argocd-app
 
-  - name: longhorn
-    chart: longhorn/longhorn
-    # version: 1.9.2
-    # version: 1.10.2
-    # version: 1.11.3
-    version: 1.12.1
-    inherit:
-      - template: default
-    dependencies:
-      - chart: ./charts/longhorn-enhancements
-        version: 0.1.0
-      - chart: bjw-s-labs/app-template
-        version: 5.0.1
-  - name: longhorn
-    inherit:
-      - template: argocd-app
-
   - name: ingress-nginx
     chart: ingress-nginx/ingress-nginx
     version: 4.15.1

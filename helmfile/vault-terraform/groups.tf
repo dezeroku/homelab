@@ -38,6 +38,7 @@ locals {
     "homebox"                    = []
     "outline"                    = []
     "shelly-manager"             = []
+    "longhorn"                   = []
   }
 }
 
