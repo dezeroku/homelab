@@ -21,7 +21,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/home-assistant/home-assistant
-          tag: 2026.8.3
+          tag: 2026.9.4
           pullPolicy: IfNotPresent
         probes:
           readiness:
@@ -95,12 +95,12 @@ configMaps:
         default_config:
 
         # Load frontend themes from the themes folder
-        #frontend:
-        #  themes: !include_dir_merge_named themes
+        frontend:
+          themes: !include_dir_merge_named themes
 
-        #automation: !include automations.yaml
+        automation: !include automations.yaml
         #script: !include scripts.yaml
-        #scene: !include scenes.yaml
+        scene: !include scenes.yaml
 
         prometheus:
           namespace: hass
