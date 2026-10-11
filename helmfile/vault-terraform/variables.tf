@@ -323,3 +323,7 @@ variable "open_webui_secret_key" {
 variable "shelly_manager_auth_token" {
   type = string
 }
+
+variable "whisper_hass_token" {
+  type = string
+}

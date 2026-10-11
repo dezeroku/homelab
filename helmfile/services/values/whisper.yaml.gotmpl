@@ -10,12 +10,22 @@ controllers:
       main:
         image:
           repository: rhasspy/wyoming-whisper
-          tag: 3.5.0
+          tag: 3.8.1
           pullPolicy: IfNotPresent
         args:
           - --model
           - tiny-int8
           - --language=en
+          - --hass-api
+          - http://home-assistant-main.home-assistant:8123/api
+          - --hass-token
+          - "$(HASS_TOKEN)"
+        env:
+          HASS_TOKEN:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-hass
+                key: token
         probes:
           readiness:
             enabled: true
