@@ -10,16 +10,17 @@ controllers:
       main:
         image:
           repository: rhasspy/wyoming-piper
-          tag: 2.3.1
+          tag: 2.5.2
+          # tag: 2.5.2-omnivoice
           pullPolicy: IfNotPresent
         args:
+          - --web-server
+          - --web-server-host
+          - 0.0.0.0
           - --voice
-          - en_US-lessac-medium
-# Not present in 2.3.1 yet it seems
-# TODO: uncomment with the next upgrade
-#          - --web-server
-#          - --web-server-host
-#          - 0.0.0.0
+          - en_US-amy-medium
+          - --voice
+          - pl_PL-bass-high
         probes:
           readiness:
             enabled: true
