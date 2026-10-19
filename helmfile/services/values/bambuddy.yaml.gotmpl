@@ -1,0 +1,169 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    type: deployment
+    replicas: 1
+    pod:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: {{ .Release.Name }}-iot-net
+    containers:
+      main:
+        image:
+          repository: ghcr.io/maziggy/bambuddy
+          tag: 1.2.5.7
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          # TRUSTED_PROXY_IPS: "10.42.0.0/16,192.168.4.0/24"
+          APP_URL: https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+          BAMBUDDY_OIDC_SCOPES: "openid email profile groups"
+          BAMBUDDY_OIDC_NAME: Vault
+          BAMBUDDY_OIDC_ISSUER_URL: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
+          BAMBUDDY_OIDC_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_id
+          BAMBUDDY_OIDC_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_secret
+          BAMBUDDY_OIDC_AUTO_CREATE_USERS: true
+          BAMBUDDY_OIDC_AUTOLOGIN: true
+          BAMBUDDY_LOCAL_LOGIN: false
+          A_DBNAME:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: dbname
+          A_DBPORT:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: port
+          A_DBUSER:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: user
+          A_DBPASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: password
+          A_DBHOST:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-db-app
+                key: host
+          # Currently all of this is done to replace the postgresql:// prefix of the default uri
+          # with postgresql_asyncpg:// required by bambuddy
+          # TODO: just sed it with ESO when it is installed
+          DATABASE_URL: "postgresql+asyncpg://$(A_DBUSER):$(A_DBPASSWORD)@$(A_DBHOST):$(A_DBPORT)/$(A_DBNAME)"
+          BAMBU_STUDIO_API_URL: http://bambuddy-slicer:3000
+        probes:
+          liveness: &probe
+            enabled: true
+          readiness: *probe
+          startup: *probe
+  slicer:
+    type: deployment
+    replicas: 1
+    containers:
+      bambu:
+        image:
+          repository: ghcr.io/maziggy/bambu-studio-api
+          # TODO: lock to a tag
+          tag: latest
+          pullPolicy: IfNotPresent
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          MAX_MODEL_UPLOAD_MB: 512
+        probes:
+          liveness: &probe
+            enabled: true
+          readiness: *probe
+          startup: *probe
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 8000
+  slicer:
+    controller: slicer
+    ports:
+      http:
+        port: 3000
+
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: 3D printer cloud
+      gethomepage.dev/group: Utils
+      gethomepage.dev/icon: sh-bambuddy
+      gethomepage.dev/name: Bambuddy
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      main:
+        main:
+          - path: /app/data
+
+  logs:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      main:
+        main:
+          - path: /app/logs
+
+  bambu-slicer-data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      slicer:
+        bambu:
+          - path: /app/data
+
+rawResources:
+  iot-net:
+    manifest:
+      apiVersion: "k8s.cni.cncf.io/v1"
+      kind: NetworkAttachmentDefinition
+      spec:
+        config: '{
+          "cniVersion": "0.3.1",
+          "type": "macvlan",
+          "master": "enp2s0.30",
+          "mode": "bridge",
+          "ipam": {
+            "type": "static",
+            "addresses": [
+              {
+                "address": "192.168.3.92/24",
+                "gateway": "192.168.3.1"
+              }
+            ]
+          }
+        }'

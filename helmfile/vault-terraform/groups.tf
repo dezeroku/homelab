@@ -39,6 +39,7 @@ locals {
     "outline"                    = []
     "shelly-manager"             = []
     "longhorn"                   = []
+    "bambuddy"                   = []
   }
 }
 
