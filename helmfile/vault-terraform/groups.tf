@@ -40,6 +40,8 @@ locals {
     "shelly-manager"             = []
     "longhorn"                   = []
     "bambuddy"                   = []
+    "trek"                       = []
+    "trek-admin"                 = []
   }
 }
 

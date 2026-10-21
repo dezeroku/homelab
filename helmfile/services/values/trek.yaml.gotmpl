@@ -1,0 +1,104 @@
+---
+global:
+  alwaysAppendIdentifierToResourceName: true
+
+controllers:
+  main:
+    type: deployment
+    replicas: 1
+    containers:
+      main:
+        image:
+          repository: mauriceboe/trek
+          tag: 4.3.4
+          pullPolicy: IfNotPresent
+        env:
+          TZ: Europe/Warsaw
+          PORT: 3000
+          ALLOWED_ORIGINS: https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+          APP_URL: https://{{ .Release.Name }}.{{ requiredEnv "DOMAIN" }}
+
+          # For connecting to immich
+          ALLOW_INTERNAL_NETWORK: true
+
+          OIDC_SCOPE: "openid email profile groups"
+          OIDC_DISPLAY_NAME: Vault
+          OIDC_ISSUER: https://vault.{{ requiredEnv "DOMAIN" }}/v1/identity/oidc/provider/main
+          OIDC_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_id
+          OIDC_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-oidc-secret
+                key: client_secret
+          OIDC_ADMIN_CLAIM: groups
+          OIDC_ADMIN_VALUE: trek-admin
+          BAMBUDDY_OIDC_AUTO_CREATE_USERS: true
+          OIDC_ONLY: true
+          # Defaults to true with outbound requests
+          # TREK_PLACES_ENABLED: false
+
+          # Using mailrise under the hood, not a real SMTP server
+          SMTP_HOST: mailrise-main.mailrise
+          SMTP_PORT: 8025
+          SMTP_FROM: "Trek@dezeroku <trek@home.dezeroku.com>"
+
+          ENCRYPTION_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-encryption-key
+                key: value
+        probes:
+          liveness: &probe
+            enabled: true
+          readiness: *probe
+          startup: *probe
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 3000
+
+route:
+  main:
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Trip planner
+      gethomepage.dev/group: Services
+      gethomepage.dev/icon: sh-trek
+      gethomepage.dev/name: Trek
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name={{ .Release.Name }}"
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    labels:
+      recurring-job-group.longhorn.io/daily-snapshot: enabled
+      recurring-job.longhorn.io/source: enabled
+    advancedMounts:
+      main:
+        main:
+          - path: /app/data
+
+  uploads:
+    enabled: true
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    labels:
+      recurring-job-group.longhorn.io/daily-snapshot: enabled
+      recurring-job.longhorn.io/source: enabled
+    advancedMounts:
+      main:
+        main:
+          - path: /app/uploads
