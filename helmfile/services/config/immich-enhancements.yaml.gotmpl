@@ -12,5 +12,5 @@ releaseConfig:
     namespace: immich
     routes:
       main:
-        networks: [lan, guest, vpn_main, vpn_guest, vpn_family]
+        networks: [lan, guest, vpn_main, vpn_guest, vpn_family, pods]
         hostname: immich.{{ requiredEnv "DOMAIN" }}
