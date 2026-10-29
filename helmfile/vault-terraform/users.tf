@@ -4,8 +4,8 @@ resource "vault_auth_backend" "userpass" {
 
   # oidc-auth is defined in oidc.tf
   tune {
-    default_lease_ttl  = "1h"
-    max_lease_ttl      = "1h"
+    default_lease_ttl  = "12h"
+    max_lease_ttl      = "12h"
     listing_visibility = "unauth"
   }
 }
