@@ -327,3 +327,7 @@ variable "shelly_manager_auth_token" {
 variable "whisper_hass_token" {
   type = string
 }
+
+variable "trek_unsplash_access_key" {
+  type = string
+}

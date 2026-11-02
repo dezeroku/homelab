@@ -4,7 +4,7 @@ releaseConfig:
     chart: bjw-s-labs/app-template
     version: 5.0.1
     templates: [gateway, oidc-secret, vault-secrets]
-    secrets: [encryption-key]
+    secrets: [encryption-key, unsplash]
     routes:
       main:
         networks: [lan, guest, vpn_main, vpn_guest, vpn_family]

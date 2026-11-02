@@ -46,6 +46,12 @@ controllers:
           SMTP_PORT: 8025
           SMTP_FROM: "Trek@dezeroku <trek@home.dezeroku.com>"
 
+          UNSPLASH_ACCESS_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-unsplash
+                key: access-key
+
           ENCRYPTION_KEY:
             valueFrom:
               secretKeyRef:

@@ -14,6 +14,9 @@ module "trek" {
     encryption-key = {
       value = random_bytes.trek_encryption_key.hex
     }
+    unsplash = {
+      access-key = var.trek_unsplash_access_key
+    }
   }
 }
 
