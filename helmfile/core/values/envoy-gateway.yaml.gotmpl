@@ -52,7 +52,14 @@ app-template:
           gatewayClassName: envoy-gateway
           allowedListeners:
             namespaces:
-              from: Same
+              from: Selector
+              selector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: In
+                    values:
+                      - envoy-gateway
+                      - kopia
           listeners:
           - name: http
             port: 80
