@@ -39,6 +39,9 @@ dependencies:
   - name: prometheus-operator-crds
     repository: https://prometheus-community.github.io/helm-charts
     version: 19.0.0
+  - name: reloader
+    repository: https://stakater.github.io/stakater-charts
+    version: 2.2.20
   - name: tenant
     repository: https://operator.min.io/
     version: 7.1.1
@@ -57,5 +60,5 @@ dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.67.3
-digest: sha256:a02945b825adc82ec9f6324f5f5cf9ba99b8ad20aced74e7adfcaed3c0467ecc
-generated: "2026-11-18T17:33:33.350211028+01:00"
+digest: sha256:b209bcd0e9851036e4e565d4e17816c5ad8eb4054e48fdc2e6d34ff89dca6066
+generated: "2026-11-18T18:37:04.989258304+01:00"
