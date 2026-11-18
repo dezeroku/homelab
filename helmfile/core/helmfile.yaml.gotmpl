@@ -16,8 +16,6 @@ repositories:
     url: https://victoriametrics.github.io/helm-charts/
   - name: ingress-nginx
     url: https://kubernetes.github.io/ingress-nginx
-  - name: nixys
-    url: https://registry.nixys.ru/chartrepo/public
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
   - name: longhorn
@@ -170,9 +168,9 @@ releases:
     inherit:
       - template: default
     dependencies:
-      - chart: nixys/universal-chart
-        version: 2.4.0
-        alias: grafana_dashboards
+#        - chart: nixys/universal-chart
+#          version: 2.4.0
+#          alias: grafana_dashboards
       - chart: ./charts/victoria-metrics-stack-enhancements
         version: 0.1.0
   - name: vm
@@ -288,7 +286,7 @@ releases:
 
   - name: goldpinger
     chart: goldpinger/goldpinger
-    version: 1.0.1
+    version: 1.2.0
     inherit:
       - template: default
   - name: goldpinger

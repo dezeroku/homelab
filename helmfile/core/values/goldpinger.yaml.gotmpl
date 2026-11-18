@@ -5,27 +5,20 @@ extraEnv:
   - name: DISPLAY_NODENAME
     value: "true"
 
-ingress:
+httpRoute:
   enabled: true
-  className: nginx
   annotations:
-    cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
     gethomepage.dev/enabled: "true"
     gethomepage.dev/description: Inter-node connectivity
     gethomepage.dev/group: Monitoring
     gethomepage.dev/icon: si-planet
     gethomepage.dev/name: Goldpinger
     gethomepage.dev/app: goldpinger
-    nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-  hosts:
-    - host: goldpinger.{{ requiredEnv "DOMAIN" }}
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls:
-    - secretName: goldpinger-general-tls
-      hosts:
-        - goldpinger.{{ requiredEnv "DOMAIN" }}
+  parentRefs:
+    - name: envoy-gateway-main
+      namespace: envoy-gateway
+  hostnames:
+    - goldpinger.{{ requiredEnv "DOMAIN" }}
 
 resources:
   requests:
