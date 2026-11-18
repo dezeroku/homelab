@@ -1,11 +1,11 @@
-version: v1.5.2
+version: v1.8.0
 dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.1.2
+    version: 5.0.1
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
-    version: 5.0.1
+    version: 4.1.2
   - name: minecraft
     repository: https://itzg.github.io/minecraft-server-charts/
     version: 4.24.0
@@ -17,6 +17,6 @@ dependencies:
     version: 7.0.0
   - name: zot
     repository: http://zotregistry.dev/helm-charts
-    version: 0.1.98
-digest: sha256:c2d1b949861cbc0c61cd5a5cd8c6af25938e87af682f95bf9dba65443a877533
-generated: "2026-08-12T00:54:16.079848355+02:00"
+    version: 0.1.134
+digest: sha256:2eb86d8267e1bf182b58fc784363db2788838ac5342d2145c396e038eebfa029
+generated: "2026-11-18T15:03:59.019189467+01:00"

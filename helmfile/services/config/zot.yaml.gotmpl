@@ -3,4 +3,13 @@
 releaseConfig:
   zot:
     chart: zot/zot
-    version: 0.1.98
+    version: 0.1.134
+    templates: [gateway]
+    labels:
+      chartRoot: app-template
+    routes:
+      main:
+        networks: [lan, vpn_main, cluster]
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
