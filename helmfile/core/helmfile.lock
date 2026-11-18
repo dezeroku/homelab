@@ -12,9 +12,6 @@ dependencies:
   - name: goldpinger
     repository: https://bloomberg.github.io/goldpinger
     version: 1.2.0
-  - name: ingress-nginx
-    repository: https://kubernetes.github.io/ingress-nginx
-    version: 4.15.1
   - name: intel-device-plugins-gpu
     repository: https://intel.github.io/helm-charts
     version: 0.30.0
@@ -60,5 +57,5 @@ dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.67.3
-digest: sha256:0f41269d32413dd040ee2498ad02463b2a3a54a533e4dce6fb78b645e06da849
-generated: "2026-11-18T14:55:58.611882627+01:00"
+digest: sha256:a02945b825adc82ec9f6324f5f5cf9ba99b8ad20aced74e7adfcaed3c0467ecc
+generated: "2026-11-18T17:33:33.350211028+01:00"

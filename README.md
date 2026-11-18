@@ -13,10 +13,9 @@ Currently this boils down to:
 
 Key takeaways:
 
-- `ingress-nginx` on entry, with `cert-manager` + `Let's Encrypt` (DNS based challenges in Route53) backed
-  SSL, `oauth2-proxy` for non-OIDC-native services
+- `envoy-gateway` on entry, with `cert-manager` + `Let's Encrypt` (DNS based challenges in Route53) backed SSL
 - `vault` for centralized identity and secrets management
-- `longhorn` used for storage with daily backups of "important" volumes in a separate cluster
+- `longhorn` used for storage with daily backups of important volumes in a separate cluster
 
 # Networking
 
