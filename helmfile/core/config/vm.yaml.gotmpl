@@ -1,0 +1,34 @@
+releaseConfig:
+  vm:
+    chart: victoria-metrics/victoria-metrics-k8s-stack
+    version: 0.98.1
+    values:
+      - values/grafana-dashboards.yaml.gotmpl
+    labels:
+      chartRoot: app-template
+    templates: [gateway, oidc-secret, vault-secrets]
+    secrets:
+      - alertmanager-deadmanssnitch-url
+      - alertmanager-pagerduty-token
+    routes:
+      alertmanager:
+        networks: [lan, vpn_main]
+        oidc: true
+        hostname: alertmanager.{{ requiredEnv "DOMAIN" }}
+      prometheus:
+        networks: [lan, vpn_main]
+        oidc: true
+        hostname: prometheus.{{ requiredEnv "DOMAIN" }}
+      vmagent:
+        networks: [lan, vpn_main]
+        oidc: true
+        hostname: vmagent.{{ requiredEnv "DOMAIN" }}
+      grafana:
+        networks: [lan, vpn_main]
+        hostname: grafana.{{ requiredEnv "DOMAIN" }}
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
+#        - chart: nixys/universal-chart
+#          version: 2.4.0
+#          alias: grafana_dashboards

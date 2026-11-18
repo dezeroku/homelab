@@ -34,44 +34,16 @@ alertmanager:
     - name: default
     - name: pagerduty
       pagerduty_configs:
-      - routing_key_file: /etc/vm/secrets/alertmanager-pagerduty-token/token
+      - routing_key_file: /etc/vm/secrets/vm-alertmanager-pagerduty-token/token
         send_resolved: true
     - name: deadman
       webhook_configs:
-      - url_file: /etc/vm/secrets/alertmanager-deadmanssnitch-url/url
-  ingress:
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Alerts routing
-      gethomepage.dev/group: Monitoring
-      gethomepage.dev/icon: alertmanager.png
-      gethomepage.dev/name: AlertManager
-      gethomepage.dev/app: vmalertmanager
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      # TODO: redirects don't work correctly on the initial request if they have a path after the slash
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
-      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - alertmanager.{{ requiredEnv "DOMAIN" }}
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    tls:
-      - secretName: alertmanager-general-tls
-        hosts:
-          - alertmanager.{{ requiredEnv "DOMAIN" }}
+      - url_file: /etc/vm/secrets/vm-alertmanager-deadmanssnitch-url/url
   spec:
-    image:
-      # TODO: we manually bump to this version to have support for url_file webhook config
-      # get rid of this when a new enough version is vendored in the chart itself
-      tag: v0.27.0
     externalURL: https://alertmanager.{{ requiredEnv "DOMAIN" }}
     secrets:
-    - alertmanager-pagerduty-token
-    - alertmanager-deadmanssnitch-url
+    - vm-alertmanager-pagerduty-token
+    - vm-alertmanager-deadmanssnitch-url
     storage:
       volumeClaimTemplate:
         spec:
@@ -98,10 +70,8 @@ grafana:
         key: client_secret
   defaultDashboardsTimezone: Europe/Warsaw
   sidecar:
-    # datasources:
-    #   searchNamespace: victoria-metrics-stack,victoria-logs
     dashboards:
-      searchNamespace: victoria-metrics-stack,victoria-logs,cnpg
+      searchNamespace: vm,vm-logs,cnpg
   plugins:
     - grafana-piechart-panel
   # TODO: new VM release doesn't like having both sidecar and configmaps provided dashboards
@@ -146,55 +116,10 @@ grafana:
       # These are set directly through env variables
       # client_id: ""
       # client_secret: ""
-      role_attribute_path: contains(groups[*], 'monitoring-admins') && 'GrafanaAdmin' || contains(groups[*], 'monitoring-editors') && 'Editor' || 'Viewer'
+      role_attribute_path: contains(groups[*], 'vm') && 'GrafanaAdmin' || contains(groups[*], 'vm-grafana-editor') && 'Editor' || 'Viewer'
       allow_assign_grafana_admin: true
-  ingress:
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Dashboards
-      gethomepage.dev/group: Monitoring
-      gethomepage.dev/icon: grafana.png
-      gethomepage.dev/name: Grafana
-      gethomepage.dev/app: grafana
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - grafana.{{ requiredEnv "DOMAIN" }}
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    tls:
-      - secretName: grafana-general-tls
-        hosts:
-          - grafana.{{ requiredEnv "DOMAIN" }}
 
 vmsingle:
-  ingress:
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Metrics provider
-      gethomepage.dev/group: Monitoring
-      gethomepage.dev/icon: si-victoriametrics
-      gethomepage.dev/name: VictoriaMetrics
-      gethomepage.dev/app: vmsingle
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
-      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - prometheus.{{ requiredEnv "DOMAIN" }}
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    tls:
-      - secretName: prometheus-general-tls
-        hosts:
-          - prometheus.{{ requiredEnv "DOMAIN" }}
-
   spec:
     resources:
       requests:
@@ -222,33 +147,108 @@ vmagent:
       limits:
         cpu: 1
 
-  ingress:
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Metrics scraper
-      gethomepage.dev/group: Monitoring
-      gethomepage.dev/icon: si-victoriametrics
-      gethomepage.dev/name: VMAgent
-      gethomepage.dev/app: vmagent
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      # TODO: redirects don't work correctly on the initial request if they have a path after the slash
-      nginx.ingress.kubernetes.io/auth-url: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/auth?allowed_groups=monitoring-admins"
-      nginx.ingress.kubernetes.io/auth-signin: "https://sso.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://$host$escaped_request_uri"
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - vmagent.{{ requiredEnv "DOMAIN" }}
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    tls:
-      - secretName: vmagent-general-tls
-        hosts:
-          - vmagent.{{ requiredEnv "DOMAIN" }}
-
 vmalert:
   spec:
     extraArgs:
-      # TODO: this feels a little bit hacky, but seems this option can't be defined in a different way?
       external.url: https://prometheus.{{ requiredEnv "DOMAIN" }}
+
+app-template:
+  global:
+    alwaysAppendIdentifierToResourceName: true
+
+  route:
+    alertmanager:
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: Alerts routing
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/icon: sh-alertmanager
+        gethomepage.dev/name: AlertManager
+        gethomepage.dev/app: vmalertmanager
+      rules:
+        - backendRefs:
+          - name: vmalertmanager-vm-victoria-metrics-k8s-stack
+            port: 9093
+
+    prometheus:
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: Metrics provider
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/icon: sh-victoriametrics
+        gethomepage.dev/name: VictoriaMetrics
+        gethomepage.dev/app: vmsingle
+      rules:
+        - backendRefs:
+          - name: vmsingle-vm-victoria-metrics-k8s-stack
+            port: 8428
+
+    vmagent:
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: Metrics scraper
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/icon: sh-victoriametrics
+        gethomepage.dev/name: VMAgent
+        gethomepage.dev/app: vmagent
+      rules:
+        - backendRefs:
+          - name: vmagent-vm-victoria-metrics-k8s-stack
+            port: 8429
+
+    grafana:
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: Dashboards
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/icon: sh-grafana
+        gethomepage.dev/name: Grafana
+        gethomepage.dev/app: grafana
+      rules:
+        - backendRefs:
+          - name: vm-grafana
+            port: 80
+
+  rawResources:
+    static-scrape:
+      manifest:
+        apiVersion: operator.victoriametrics.com/v1beta1
+        kind: VMStaticScrape
+        spec:
+          jobName: node-exporter
+          targetEndpoints:
+            - targets:
+                - devserver.lan:9100
+                - 192.168.4.1:9100
+                - dezeroku-desktop.lan:9100
+    # Separate OIDC setup just for grafana
+    vault-auth-grafana:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultAuth
+        spec:
+          method: kubernetes
+          mount: k8s/homeserver
+          kubernetes:
+            role: {{ .Release.Name }}-grafana
+            serviceAccount: {{ .Release.Name }}-grafana
+    grafana-oidc-secret:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
+        spec:
+          type: kv-v1
+          mount: /identity
+          path: oidc/client/{{ .Release.Name }}-grafana
+          destination:
+            name: {{ .Release.Name }}-grafana-oidc-secret
+            create: true
+            transformation:
+              templates:
+                client-id:
+                  text: |-
+                    {{ "{{`{{" }}.Secrets.client_id{{ "}}`}}" }}
+                client-secret:
+                  text: |-
+                    {{ "{{`{{" }}.Secrets.client_secret{{ "}}`}}" }}
+          vaultAuthRef: {{ .Release.Name }}-vault-auth-grafana

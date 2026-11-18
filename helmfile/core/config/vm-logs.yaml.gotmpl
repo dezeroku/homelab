@@ -1,0 +1,14 @@
+releaseConfig:
+  vm-logs:
+    chart: victoria-metrics/victoria-logs-single
+    version: 0.13.13
+    labels:
+      chartRoot: app-template
+    templates: [gateway, oidc-secret]
+    routes:
+      main:
+        networks: [lan, vpn_main]
+        oidc: true
+    dependencies:
+      - chart: bjw-s-labs/app-template
+        version: 5.0.1
