@@ -7,10 +7,10 @@ global:
 # TODO: enable zstd-better-compression globally
 controllers:
   main:
+    annotations:
+      secret.reloader.stakater.com/reload: kopia-tls-cert
     type: statefulset
     replicas: 1
-    serviceAccount:
-      identifier: main
     containers:
       main:
         image:
@@ -46,10 +46,10 @@ controllers:
           KOPIA_PASSWORD:
             valueFrom:
               secretKeyRef:
-                name: kopia-repository-secret
+                name: kopia-repository
                 key: password
           # To make running admin commands inside the container easier
-          KOPIA_SERVER_ADDRESS: https://kopia.{{ requiredEnv "DOMAIN" }}:443
+          KOPIA_SERVER_ADDRESS: https://kopia.tls.{{ requiredEnv "DOMAIN" }}:443
           SERVER_CONTROL_AUTH_FLAGS: --server-control-username=$(KOPIA_SERVER_CONTROL_USER) --server-control-password=$(KOPIA_SERVER_CONTROL_PASSWORD)
         args:
           - server
@@ -184,59 +184,18 @@ service:
       http:
         port: 51515
 
-serviceAccount:
-  main: {}
-
-ingress:
-  grpc:
-    enabled: true
-    className: nginx
+route:
+  main:
     annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      #nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      # To allow running GRPC on the backend, it requires TLS cert to be present in the server
-      # https://github.com/kopia/kopia/issues/1982#issuecomment-2449454069
-      # In practice, this means double TLS termination, once on Ingress and once on the backend.
-      nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
-      # Potentially big uploads
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      # Add 192.168.4.0 to allow traffic from inside the pod to hit ingress
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.2.0/24,192.168.4.0/24,192.168.69.0/24"
-    tls:
-      - secretName: grpc-kopia-general-tls
-        hosts:
-          - kopia.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: kopia.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: main
-  ui:
-    enabled: true
-    className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Backup server
       gethomepage.dev/group: Server
-      gethomepage.dev/icon: kopia.png
+      gethomepage.dev/icon: sh-kopia
       gethomepage.dev/name: Kopia
       gethomepage.dev/pod-selector: "app.kubernetes.io/name=kopia"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-    tls:
-      - secretName: ui-kopia-general-tls
-        hosts:
-          - ui.kopia.{{ requiredEnv "DOMAIN" }}
-    hosts:
-      - host: ui.kopia.{{ requiredEnv "DOMAIN" }}
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            service:
-              identifier: main
+    parentRefs:
+      - name: kopia-tls-listenerset
+        kind: ListenerSet
 
 persistence:
   storage:
@@ -251,7 +210,7 @@ persistence:
   cert:
     enabled: true
     type: secret
-    name: grpc-kopia-general-tls
+    name: kopia-tls-cert
     globalMounts:
       - path: /kopia-cert
 
@@ -268,20 +227,34 @@ persistence:
       - path: /kopia-cache
 
 rawResources:
-  vault-auth:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultAuth
-    spec:
+  listener-set:
+    forceRename: kopia-tls-listenerset
+    manifest:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: ListenerSet
       spec:
-        method: kubernetes
-        mount: k8s/homeserver
-        kubernetes:
-          role: kopia
-          serviceAccount: kopia-main
+        parentRef:
+          name: envoy-gateway-main
+          namespace: envoy-gateway
+          kind: Gateway
+          group: gateway.networking.k8s.io
+        listeners:
+          - name: tls
+            port: 443
+            protocol: TLS
+            hostname: "kopia.tls.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Passthrough
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: kopia
   control-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -291,9 +264,9 @@ rawResources:
           create: true
         vaultAuthRef: kopia-vault-auth
   server-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -302,22 +275,10 @@ rawResources:
           name: kopia-server-secret
           create: true
         vaultAuthRef: kopia-vault-auth
-  repository-secret:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
-      spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/kopia/repository
-        destination:
-          name: kopia-repository-secret
-          create: true
-        vaultAuthRef: kopia-vault-auth
   target-users:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+    manifest:
+      apiVersion: secrets.hashicorp.com/v1beta1
+      kind: VaultStaticSecret
       spec:
         type: kv-v2
         mount: kvv2
@@ -329,15 +290,21 @@ rawResources:
         rolloutRestartTargets:
           - kind: StatefulSet
             name: kopia
-  pushover:
-    apiVersion: secrets.hashicorp.com/v1beta1
-    kind: VaultStaticSecret
-    spec:
+  kopia-tls-cert:
+    manifest:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: kopia-tls-cert
       spec:
-        type: kv-v2
-        mount: kvv2
-        path: services/kopia/pushover
-        destination:
-          name: kopia-pushover
-          create: true
-        vaultAuthRef: kopia-vault-auth
+        secretName: kopia-tls-cert
+
+        duration: 2160h # 90d
+        renewBefore: 360h # 15d
+
+        dnsNames:
+          - kopia.tls.{{ requiredEnv "DOMAIN" }}
+
+        issuerRef:
+          name: cert-manager-letsencrypt-dns-prod
+          kind: ClusterIssuer

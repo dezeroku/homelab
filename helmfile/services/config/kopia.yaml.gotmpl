@@ -3,4 +3,13 @@
 releaseConfig:
   kopia:
     chart: bjw-s-labs/app-template
-    version: 4.1.2
+    version: 5.0.1
+    templates: [gateway, vault-secrets]
+    secrets:
+      - pushover
+      - repository
+    routes:
+      main:
+        hostname: 'kopia.tls.{{ requiredEnv "DOMAIN" }}'
+        service: main
+        kind: TLSRoute
