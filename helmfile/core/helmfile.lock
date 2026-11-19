@@ -30,9 +30,6 @@ dependencies:
   - name: node-problem-detector
     repository: https://charts.deliveryhero.io/
     version: 2.3.12
-  - name: oauth2-proxy
-    repository: https://oauth2-proxy.github.io/manifests
-    version: 7.12.8
   - name: operator
     repository: https://operator.min.io/
     version: 7.0.0
@@ -60,5 +57,5 @@ dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.68.2
-digest: sha256:0cedd1f16009b2481b49c450e6ff5ee9b2fe7d6d798d1fe43a73b5c0664369ef
-generated: "2026-11-18T19:00:12.712941676+01:00"
+digest: sha256:5db8d2b7d46391010c274fba517638def6ca0c7a006bb4d6e866d812e3c3982d
+generated: "2026-11-19T02:13:58.761463655+01:00"

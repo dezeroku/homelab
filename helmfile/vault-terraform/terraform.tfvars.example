@@ -3,8 +3,6 @@ homeserver_backup_victoria_metrics_alertmanager_pagerduty_token = "example_token
 victoria_metrics_alertmanager_deadmanssnitch_url = "https://nosnch.in/some_id"
 # This is the same value as set in Vault ingress
 domain = "your-domain-exposed-via-ingress"
-# generate e.g. with `dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d -- '\n' | tr -- '+/' '-_' ; echo`
-oauth2_proxy_cookie_secret = "someSecret"
 users = {
   dezeroku = {
     email = "dezeroku@gmail.com"

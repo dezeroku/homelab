@@ -22,8 +22,6 @@ repositories:
     url: https://charts.deliveryhero.io/
   - name: minio
     url: https://operator.min.io/
-  - name: oauth2-proxy
-    url: https://oauth2-proxy.github.io/manifests
   - name: argo-helm
     url: https://argoproj.github.io/argo-helm
   - name: bjw-s-labs
@@ -160,18 +158,6 @@ releases:
     inherit:
       - template: default
   - name: minio-operator
-    inherit:
-      - template: argocd-app
-
-  - name: oauth2-proxy
-    chart: oauth2-proxy/oauth2-proxy
-    version: 7.12.8
-    inherit:
-      - template: default
-    dependencies:
-      - chart: bjw-s-labs/app-template
-        version: 4.1.2
-  - name: oauth2-proxy
     inherit:
       - template: argocd-app
 

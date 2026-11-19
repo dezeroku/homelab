@@ -22,10 +22,6 @@ variable "domain" {
   type = string
 }
 
-variable "oauth2_proxy_cookie_secret" {
-  type = string
-}
-
 variable "cert_manager_aws_access_key_id" {
   type = string
 }
