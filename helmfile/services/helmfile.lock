@@ -14,9 +14,9 @@ dependencies:
     version: 1.73.0
   - name: tenant
     repository: https://operator.min.io/
-    version: 7.0.0
+    version: 7.1.1
   - name: zot
     repository: http://zotregistry.dev/helm-charts
     version: 0.1.134
-digest: sha256:2eb86d8267e1bf182b58fc784363db2788838ac5342d2145c396e038eebfa029
-generated: "2026-11-18T15:03:59.019189467+01:00"
+digest: sha256:6c04078820aa48de09b64cfd7e8a346d53062e042284cd05a6293b5f836d19db
+generated: "2026-11-19T02:22:51.102207564+01:00"

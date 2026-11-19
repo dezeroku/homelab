@@ -1,9 +1,16 @@
 ---
-# minio-private: see ../helmfile.yaml.gotmpl for what these keys mean.
 releaseConfig:
   minio-private:
     chart: minio/tenant
-    version: 7.0.0
+    version: 7.1.1
+    labels:
+      chartRoot: app-template
+    templates: [gateway, vault]
     dependencies:
       - chart: bjw-s-labs/app-template
-        version: 4.1.2
+        version: 5.0.1
+    routes:
+      api:
+        networks: [lan, cluster, vpn_main, pods]
+      console:
+        networks: [lan, vpn_main]

@@ -124,6 +124,51 @@ app-template:
                 selector:
                   matchLabels:
                     kubernetes.io/metadata.name: minio-k8s-backups
+          - name: https-minio-private
+            port: 443
+            protocol: HTTPS
+            hostname: "private.minio.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: minio-private-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minio-private
+          - name: https-minio-private-api
+            port: 443
+            protocol: HTTPS
+            hostname: "api.private.minio.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: minio-private-api-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minio-private
+          - name: https-minio-private-api-wildcard
+            port: 443
+            protocol: HTTPS
+            hostname: "*.api.private.minio.{{ requiredEnv "DOMAIN" }}"
+            tls:
+              mode: Terminate
+              certificateRefs:
+              - kind: Secret
+                name: minio-private-api-wildcard-dezeroku-tls
+            allowedRoutes:
+              namespaces:
+                from: Selector
+                selector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: minio-private
           - name: https-homepage
             port: 443
             protocol: HTTPS

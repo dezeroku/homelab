@@ -25,44 +25,37 @@ tenant:
     - name: misc
   users:
     - name: minio-private-dezeroku-user-secret
-ingress:
-  api:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: minio-api-general-tls
-        hosts:
-          - api.private.minio.{{ requiredEnv "DOMAIN" }}
-    host: api.private.minio.{{ requiredEnv "DOMAIN" }}
-  console:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: "cert-manager-letsencrypt-dns-prod"
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: S3-compatible storage for personal files
-      gethomepage.dev/group: Storage
-      gethomepage.dev/icon: minio.png
-      gethomepage.dev/name: Minio (Private)
-      gethomepage.dev/pod-selector: "v1.min.io/tenant=private"
-      nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.1.0/24,192.168.69.0/24"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    tls:
-      - secretName: minio-console-general-tls
-        hosts:
-          - private.minio.{{ requiredEnv "DOMAIN" }}
-    host: private.minio.{{ requiredEnv "DOMAIN" }}
 
 app-template:
+  route:
+    api:
+      hostnames:
+        - api.private.minio.{{ requiredEnv "DOMAIN" }}
+        - "*.api.private.minio.{{ requiredEnv "DOMAIN" }}"
+      rules:
+        - backendRefs:
+          - name: minio
+            port: 80
+    console:
+      hostnames:
+        - private.minio.{{ requiredEnv "DOMAIN" }}
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/description: S3-compatible storage for personal files
+        gethomepage.dev/group: Storage
+        gethomepage.dev/icon: minio.png
+        gethomepage.dev/name: Minio (Private)
+        gethomepage.dev/pod-selector: "v1.min.io/tenant=private"
+      rules:
+        - backendRefs:
+          - name: private-console
+            port: 9090
+
   rawResources:
     vault-auth:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultAuth
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultAuth
         spec:
           method: kubernetes
           mount: k8s/homeserver
@@ -72,9 +65,9 @@ app-template:
             # so let's use default for now
             serviceAccount: default
     root-credentials:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v2
           mount: kvv2
@@ -92,9 +85,9 @@ app-template:
                     export MINIO_ROOT_PASSWORD={{ "{{`{{" }}.Secrets.rootPassword{{ "}}`}}" }}
           vaultAuthRef: minio-private-vault-auth
     dezeroku-user-secret:
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      spec:
+      manifest:
+        apiVersion: secrets.hashicorp.com/v1beta1
+        kind: VaultStaticSecret
         spec:
           type: kv-v2
           mount: kvv2
