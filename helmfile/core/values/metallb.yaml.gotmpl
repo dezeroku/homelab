@@ -22,21 +22,3 @@ app-template:
         spec:
           ipAddressPools:
             - envoy-gateway
-
-    ingress-nginx:
-      forceRename: ingress-nginx
-      manifest:
-        apiVersion: metallb.io/v1beta1
-        kind: IPAddressPool
-        spec:
-          addresses:
-            - 192.168.4.66/32
-
-    ingress-nginx-adv:
-      forceRename: ingress-nginx-adv
-      manifest:
-        apiVersion: metallb.io/v1beta1
-        kind: L2Advertisement
-        spec:
-          ipAddressPools:
-            - ingress-nginx
